@@ -24,7 +24,7 @@ def validate_args(input):
     #
     # TODO check number of args, min/max values of port, length of string (default to admin)
     # TODO raise CmdException with the right status for each
-    port = 12346
+    port = 1024
     password = "admin"
     return [port, password]
 
