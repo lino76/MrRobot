@@ -1,5 +1,6 @@
-*.idea
 
 *.pyproj
 *.sln
 .vs
+*.idea
+*.pyc
