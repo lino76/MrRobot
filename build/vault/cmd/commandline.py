@@ -2,19 +2,21 @@ import argparse
 import sys
 
 from vault.network import server
+from vault.error import CmdError
+from vault.error import VaultError
 
 
-class CmdError(Exception):
-    def __init__(self, statusCode):
-        self.statusCode
+def handle_app_error(error):
+    exit(error.statusCode)
 
 
-def handle_error(status):
-    sys.exit(status)
+def handle_system_error(error):
+    print("Unhandled error:", error)
+    exit(1)
 
 
-def exit():
-    sys.exit(0)
+def exit(code=0):
+    sys.exit(int(code))
 
 
 def validate_args(input):
@@ -24,7 +26,7 @@ def validate_args(input):
     #
     # TODO check number of args, min/max values of port, length of string (default to admin)
     # TODO raise CmdException with the right status for each
-    port = 12346
+    port = 1024
     password = "admin"
     return [port, password]
 
@@ -47,9 +49,11 @@ def main():
     try:
         input = handle_args()
         [port, password] = validate_args(input)
-    except CmdError:  # TODO probably need more checking
+    except VaultError as e:  #application errors
         # exit path
-        handle_error(CmdError)
+        handle_app_error(e)
+    except Exception:   #everything else
+        handle_system_error(Exception)
 
     try:
         server.start(port, password)

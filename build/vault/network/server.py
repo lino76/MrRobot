@@ -1,5 +1,7 @@
 import socket
 import threading
+import json
+
 from vault.data.datastore import DataStore
 from vault.parser.parser import Parser
 
@@ -7,20 +9,37 @@ datastore
 
 def handle_client(client_socket):
     # TODO: Add actual responses
-    request = client_socket.recv(1024)
-    print("[*] Received: %s" % request)
-
-    # Probably this needs to be a singleton that gets reset every time
     datastore = DataStore()
+    data = b''
+    while not b'***' in data:
+        tmp  = client_socket.recv(1024)
+        if not tmp:
+            break
+        data += tmp
+        print("[*] Received in socket", data)
 
-    try:
-        parser = Parser("Pass string in here")
-        # pass return the return value
-        client_socket.send("good job slick")
-    except Exception as e:
-        #Catch security exceptions
-        client_send("{ Security Violation }")
+        #TODO: It could issue the TIMEOUT status if input  with *** is not received within 30 seconds
+    if data and b'***' in data:
+        udata = data.decode("utf-8")
+        commands = udata.split('***', 1)[0]
+        print("[*] Received: %s" % commands)
     
+    try:
+        for command in commands:
+            try:
+                parser = Parser(command)
+                # pass return the return value
+                client_socket.send("good job slick")
+            except Exception as e:
+                #Catch security exceptions
+                client_send("{ Security Violation }")
+    else:
+        #TODO: raise Error
+        pass
+
+
+
+
     client_socket.close()
 
 
@@ -32,9 +51,9 @@ def start(port, password):
         server.bind((host, port))
         server.listen(1)
     except OSError:
-        print("whoops server startup error")
         print(OSError)
-        #TODO handle this
+        #TODO: handle this
+        #TODO: if port taken - the server should exit with code 63
         socket.close()
 
     print("Listening on:", host, port)
@@ -42,5 +61,16 @@ def start(port, password):
     while True:
         (client_socket, address) = server.accept()
         print("[*] Accepted connection from: %s:%d" % (address[0], address[1]))
-        client_handler = threading.Thread(target=handle_client, args=(client_socket,))
-        client_handler.start()
+        #TODO: It could issue the TIMEOUT status if input is not received within 30 seconds
+        conn.settimeout(30)
+        try:
+            handle_client(client_socket)
+
+            # client_handler = threading.Thread(target=handle_client, args=(client_socket,))
+            # client_handler.start()
+
+        except :
+            #TODO: Programm FAILED: the only status code sent back to the client is FAILED
+            client_socket.send(json.loads({"status":"FAILED"}))
+        finally:
+            client_socket.close()

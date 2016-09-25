@@ -1,6 +1,7 @@
 *.idea
-
 *.pyproj
 *.sln
 .vs
 __pycache__
+*.pyc
+
