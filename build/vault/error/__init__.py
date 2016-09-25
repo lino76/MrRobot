@@ -1,1 +1,1 @@
-from .exceptions import VaultError, NetworkError, CmdError
+from .exceptions import VaultError, NetworkError, CmdError, SecurityError

@@ -1,43 +1,46 @@
 import socket
 import threading
 import json
+from vault.error import CmdError, NetworkError, SecurityError
 
 def handle_client(client_socket):
-    # TODO: Add actual responses
+    """
+    Thread handler that manager 1 connection and close it
+    """
     client_socket.setblocking(True)
     client_socket.settimeout(30)
     data = b''
-    while not b'***' in data:
-        tmp  = client_socket.recv(1024)
-        if not tmp:
-            break
-        data += tmp
-        print("[*] Received in socket", data)
+    try:
+        while not b'***' in data:
+            tmp  = client_socket.recv(1024)
+            if not tmp:
+                break
+            data += tmp
+            print("[*] Received in socket", data)
 
-            #TODO: It could issue the TIMEOUT status if input  with *** is not received within 30 seconds
-    if data and b'***' in data:
-        udata = data.decode()
-        command = udata.split('***', 1)[0]
-        print("[*] Received: \n%s" % command)
+        if data and b'***' in data:
+            udata = data.decode()
+            command = udata.split('***', 1)[0]
+            print("[*] Received: \n%s" % command)
 
-        # Parse and process command
-        try:
-            #parser = Parser(command)
-            # pass return the return value
-            client_socket.send(b"good job slick")
-            print("[*] Sended")
-        except Exception as e:
-            #TODO Catch security exceptions
-            # send response
-            print('EXCEPTION')
-            client_socket.send("{exception}".encode())
-    else:
-        #TODO: Send time-out
-        pass
 
-    client_socket.shutdown(socket.SHUT_WR)
-    if not client_socket.recv(10):
-        client_socket.close()
+            try:
+                #TODO: insert parser code here
+                #Should return valid result or rise SecError
+                #parser = Parser(command)
+
+                #TODO: send value to client
+                client_socket.send(b"good job slick")
+            except SecurityError as e:
+                print('EXCEPTION', e)
+                client_socket.send("{exception}".encode())
+    except socket.timeout  as e:
+        print('socket timeout', e)
+        client_socket.send(json.loads({"status":"Timeout"}))
+    finally:
+        client_socket.shutdown(socket.SHUT_WR)
+        if not client_socket.recv(10):
+            client_socket.close()
 
 
 
@@ -59,11 +62,11 @@ def start(port, password):
     while True:
         (client_socket, address) = server.accept()
         print("[*] Accepted connection from: %s:%d" % (address[0], address[1]))
-        #client_socket.settimeout(30)
         try:
-            handle_client(client_socket)
-            # client_handler = threading.Thread(target=handle_client, args=(client_socket,))
-            # client_handler.start()
+            #handle_client(client_socket)
+            client_handler = threading.Thread(target=handle_client, args=(client_socket,))
+            client_handler.start()
         except Exception as e :
             print("FAILED", e)
+            raise
     socket.close()
