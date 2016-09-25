@@ -19,14 +19,17 @@ def clientSend(json_data):
         data = program['program']
         print('[*] Client sending program\n', data)
 
-        conn.send(data)
+        conn.send(data.encode('utf-8'))
 
         data = b""
+        
+        print('wait to receive')
         tmp = conn.recv(1024)
-        while tmp:
-            data += tmp
-            tmp = conn.recv(1024)
-        print('[*] Client received response', data)
+        print('received: ', tmp)
+        #while tmp:
+        #    data += tmp
+        #    tmp = conn.recv(1024)
+        print('[*] Client received response', tmp.decode())
 
     conn.close()
 
@@ -57,6 +60,10 @@ if __name__ == '__main__':
             with open(testfile, "r") as jsonFile:
                 data = jsonFile.read()
 
-            clientSend(json.loads(data))
+            try:
+                clientSend(json.loads(data))
+            except Exception as e:
+                print('network error')
+                print(e)
         else:
             print('File does not exist: ', testfile)
