@@ -2,10 +2,6 @@ import socket
 import threading
 import json
 
-from vault.data.datastore import DataStore
-from vault.parser.parser import Parser
-
-
 def handle_client(client_socket):
     # TODO: Add actual responses    
     
@@ -30,9 +26,9 @@ def handle_client(client_socket):
                 # pass return the return value
                 client_socket.send("good job slick".encode())
             except Exception as e:
-                #Catch security exceptions
+                #TODO Catch security exceptions
                 # send response
-                client_send("{ Security Violation }".encode())
+                client_socket.send("{exception}".encode())
             
 
             # if command has exit or no more commands exit          
