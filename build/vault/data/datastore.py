@@ -10,7 +10,7 @@ class DataStore():
         data = {}
 
         # Reset principals
-        principals = { 'admin': Principal(), 'anyone' : Principal() }
+        principals = { 'admin': Principal('admin', 'admin'), 'anyone' : Principal('anyone', None) }
 
             
     def authenticate_principal(self, user_id, pwd):

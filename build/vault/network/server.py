@@ -9,32 +9,39 @@ from vault.parser.parser import Parser
 def handle_client(client_socket):
     # TODO: Add actual responses
     datastore = DataStore()
-    data = b''
-    while not b'***' in data:
-        tmp  = client_socket.recv(1024)
-        if not tmp:
-            break
-        data += tmp
-        print("[*] Received in socket", data)
-
-        #TODO: It could issue the TIMEOUT status if input  with *** is not received within 30 seconds
-    if data and b'***' in data:
-        udata = data.decode("utf-8")
-        commands = udata.split('***', 1)[0]
-        print("[*] Received: %s" % commands)
     
-        
-        for command in commands:
+    while True:
+        data = b''
+        while not b'***' in data:
+            tmp  = client_socket.recv(1024)
+            if not tmp:
+                break
+            data += tmp
+            print("[*] Received in socket", data)
+
+            #TODO: It could issue the TIMEOUT status if input  with *** is not received within 30 seconds
+        if data and b'***' in data:
+            udata = data.decode()
+            command = udata.split('***', 1)[0]
+            print("[*] Received: \n%s" % command)
+    
+            # Parse and process command        
             try:
                 #parser = Parser(command)
                 # pass return the return value
-                client_socket.send("good job slick")
+                client_socket.send("good job slick".encode())
             except Exception as e:
                 #Catch security exceptions
-                client_send("{ Security Violation }")
-    else:
-        #TODO: raise Error
-        pass
+                # send response
+                client_send("{ Security Violation }".encode())
+            
+
+            # if command has exit or no more commands exit          
+
+        else:
+            #TODO: raise Error
+            #pass
+            break
 
 
 
@@ -71,5 +78,5 @@ def start(port, password):
         except :
             #TODO: Programm FAILED: the only status code sent back to the client is FAILED
             client_socket.send(json.loads({"status":"FAILED"}))
-        finally:
-            client_socket.close()
+        
+    client_socket.close()
