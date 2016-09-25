@@ -1,12 +1,26 @@
 import socket
 import threading
+from vault.data.datastore import DataStore
+from vault.parser.parser import Parser
 
+datastore
 
 def handle_client(client_socket):
     # TODO: Add actual responses
     request = client_socket.recv(1024)
     print("[*] Received: %s" % request)
-    client_socket.send("ACK!")
+
+    # Probably this needs to be a singleton that gets reset every time
+    datastore = DataStore()
+
+    try:
+        parser = Parser("Pass string in here")
+        # pass return the return value
+        client_socket.send("good job slick")
+    except Exception as e:
+        #Catch security exceptions
+        client_send("{ Security Violation }")
+    
     client_socket.close()
 
 
