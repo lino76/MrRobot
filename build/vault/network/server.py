@@ -3,8 +3,8 @@ import threading
 import json
 
 def handle_client(client_socket):
-    # TODO: Add actual responses    
-    
+    # TODO: Add actual responses
+
     while True:
         data = b''
         while not b'***' in data:
@@ -19,8 +19,8 @@ def handle_client(client_socket):
             udata = data.decode()
             command = udata.split('***', 1)[0]
             print("[*] Received: \n%s" % command)
-    
-            # Parse and process command        
+
+            # Parse and process command
             try:
                 #parser = Parser(command)
                 # pass return the return value
@@ -29,19 +29,15 @@ def handle_client(client_socket):
                 #TODO Catch security exceptions
                 # send response
                 client_socket.send("{exception}".encode())
-            
-
-            # if command has exit or no more commands exit          
-
         else:
-            #TODO: raise Error
-            #pass
+            #TODO: Send time-out
             break
+        client_socket.close()
 
 
 
 
-    client_socket.close()
+
 
 
 def start(port, password):
@@ -52,9 +48,7 @@ def start(port, password):
         server.bind(('', port))
         server.listen(1)
     except OSError:
-        print(OSError)
-        #TODO: handle this
-        #TODO: if port taken - the server should exit with code 63
+        raise CmdError(63, 'port is taken')
         socket.close()
 
     print("Listening on:", host, port)
@@ -62,8 +56,7 @@ def start(port, password):
     while True:
         (client_socket, address) = server.accept()
         print("[*] Accepted connection from: %s:%d" % (address[0], address[1]))
-        #TODO: It could issue the TIMEOUT status if input is not received within 30 seconds
-        #conn.settimeout(30)
+        client_socket.settimeout(30)
         try:
             handle_client(client_socket)
 
@@ -71,7 +64,8 @@ def start(port, password):
             # client_handler.start()
 
         except :
+            #TODO: handle time out
             #TODO: Programm FAILED: the only status code sent back to the client is FAILED
             client_socket.send(json.loads({"status":"FAILED"}))
-        
+
     client_socket.close()
