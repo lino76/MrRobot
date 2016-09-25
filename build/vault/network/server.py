@@ -4,7 +4,7 @@ import json
 
 def handle_client(client_socket):
     # TODO: Add actual responses
-
+    client_socket.setblocking(True)
     client_socket.settimeout(30)
     data = b''
     while not b'***' in data:
@@ -24,16 +24,20 @@ def handle_client(client_socket):
         try:
             #parser = Parser(command)
             # pass return the return value
-            client_socket.send("good job slick".encode())
+            client_socket.send(b"good job slick")
             print("[*] Sended")
         except Exception as e:
             #TODO Catch security exceptions
             # send response
+            print('EXCEPTION')
             client_socket.send("{exception}".encode())
     else:
         #TODO: Send time-out
         pass
 
+    client_socket.shutdown(socket.SHUT_WR)
+    if not client_socket.recv(10):
+        client_socket.close()
 
 
 
@@ -58,12 +62,8 @@ def start(port, password):
         #client_socket.settimeout(30)
         try:
             handle_client(client_socket)
-
             # client_handler = threading.Thread(target=handle_client, args=(client_socket,))
             # client_handler.start()
-
         except Exception as e :
             print("FAILED", e)
-            client_socket.send(json.loads({"status":"FAILED"}))
-        client_socket.close()
     socket.close()
