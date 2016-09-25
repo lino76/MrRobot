@@ -5,3 +5,4 @@ sys.path.append('PATH_TOKEN')
 
 from vault import cmd
 cmd.main()
+
