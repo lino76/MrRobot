@@ -1,5 +1,6 @@
 import argparse
 import sys
+import re
 
 from vault.network import server
 from vault.error import CmdError
@@ -19,15 +20,36 @@ def exit(code=0):
     sys.exit(int(code))
 
 
-def validate_args(input):
-    print('args: ', input)
-    # port = input[0]
-    # password = input[1]
-    #
-    # TODO check number of args, min/max values of port, length of string (default to admin)
-    # TODO raise CmdException with the right status for each
-    port = 1024
-    password = "admin"
+def validate_args(input_args):
+    # Validate the port
+    try:
+        port = str(input_args[0])
+    except:
+        raise CmdError(255, 'port not found')
+
+    try:
+        # test for leading 0
+        if port[0] is not '0':
+            port = int(port)
+        else:
+            raise CmdError(255, 'port not decimal1')
+    except CmdError as e:
+        raise e
+    except:
+        raise CmdError(255, 'port is not decimal2')
+
+    if port < 1024 or port > 65535:
+        raise CmdError(255, 'port not in range 1024-65535')
+
+    # Validate the password
+    try:
+        password = str(input_args[1])
+    except IndexError:
+        password = 'admin'
+
+    if not re.fullmatch('[A-Za-z0-9_ ,;\.?!-]*', password) and len(password) < 65536:
+        raise CmdError(255, 'invalid password')
+
     return [port, password]
 
 
@@ -45,16 +67,16 @@ def handle_args():
 
 # main app entry
 def main():
-    print("Welcome to the vault.")  # should probably remove this...
+    # Fetch and validate command line args
     try:
-        input = handle_args()
-        [port, password] = validate_args(input)
+        arg_input = handle_args()
+        [port, password] = validate_args(arg_input)
     except VaultError as e:  #application errors
-        # exit path
         handle_app_error(e)
-    except Exception:   #everything else
+    except Exception:  #everything else
         handle_system_error(Exception)
 
+    # Start Server
     try:
         server.start(port, password)
     except Exception: # TODO replace with application exception
