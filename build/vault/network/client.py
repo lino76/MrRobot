@@ -1,8 +1,10 @@
 import socket
+host = ''
+port = 1024
 
-def clientSend(port, data):
+def clientSend(data):
     conn = socket.socket()
-    conn.connect((socket.gethostname(), port))
+    conn.connect((host, port))
     print('[*] Client sending data', data)
     conn.send(data)
 
@@ -16,4 +18,4 @@ def clientSend(port, data):
 
 
 if __name__ == '__main__':
-    clientSend(1024,b'Helo***')
+    clientSend(b'Helo***')

@@ -5,7 +5,6 @@ import json
 from vault.data.datastore import DataStore
 from vault.parser.parser import Parser
 
-datastore
 
 def handle_client(client_socket):
     # TODO: Add actual responses
@@ -24,10 +23,10 @@ def handle_client(client_socket):
         commands = udata.split('***', 1)[0]
         print("[*] Received: %s" % commands)
     
-    try:
+        
         for command in commands:
             try:
-                parser = Parser(command)
+                #parser = Parser(command)
                 # pass return the return value
                 client_socket.send("good job slick")
             except Exception as e:
@@ -48,7 +47,7 @@ def start(port, password):
     host = socket.gethostname()
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        server.bind((host, port))
+        server.bind(('', port))
         server.listen(1)
     except OSError:
         print(OSError)
@@ -62,7 +61,7 @@ def start(port, password):
         (client_socket, address) = server.accept()
         print("[*] Accepted connection from: %s:%d" % (address[0], address[1]))
         #TODO: It could issue the TIMEOUT status if input is not received within 30 seconds
-        conn.settimeout(30)
+        #conn.settimeout(30)
         try:
             handle_client(client_socket)
 
