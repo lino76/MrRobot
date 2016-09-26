@@ -31,8 +31,6 @@ class Server:
                 # handle_client(client_socket)
                 client_handler = threading.Thread(target=self.handle_client, args=(client_socket,))
                 client_handler.start()
-            except socket.error:
-                print('Socket connection failed, nothing to do')
             except Exception as e:
                 print("FAILED", e)
                 raise
@@ -44,33 +42,38 @@ class Server:
         """
         client_socket.setblocking(True)
         client_socket.settimeout(30)
-        data = b''
         try:
-            while b'***' not in data:
-                tmp = client_socket.recv(1024)
-                if not tmp:
-                    break
-                data += tmp
-                print("[*] Received in socket", data)
+            data = b''
+            try:
+                while b'***' not in data:
+                    tmp = client_socket.recv(1024)
+                    if not tmp:
+                        break
+                    data += tmp
+                    print("[*] Received in socket", data)
 
-            if data and b'***' in data:
-                udata = data.decode()
-                src = udata.split('***', 1)[0]
-                print(src)
-                program = Program(src)
-                print("[*] Received: \n%s" % program.get_src())
+                if data and b'***' in data:
+                    udata = data.decode()
+                    src = udata.split('***', 1)[0]
+                    print(src)
+                    program = Program(src)
+                    print("[*] Received: \n%s" % program.get_src())
 
-                try:
-                    result = self.vault.run(program)
-                    # TODO socket.send requires the app to keep track of data and resend if necessary
-                    client_socket.send(result.encode('utf-8'))
-                except SecurityError as e:
-                    print('EXCEPTION', e)
-                    client_socket.send("{exception}".encode())
-        except socket.timeout as e:
-            print('socket timeout', e)
-            client_socket.send(json.loads({"status": "Timeout"}))
-        finally:
-            client_socket.shutdown(socket.SHUT_WR)
-            if not client_socket.recv(10):
-                client_socket.close()
+                    try:
+                        result = self.vault.run(program)
+                        # TODO socket.send requires the app to keep track of data and resend if necessary
+                        client_socket.send(result.encode('utf-8'))
+                    except SecurityError as e:
+                        print('EXCEPTION', e)
+                        client_socket.send("{exception}".encode())
+            except socket.timeout as e:
+                print('socket timeout', e)
+                client_socket.send(json.loads({"status": "Timeout"}))
+            finally:
+                client_socket.shutdown(socket.SHUT_WR)
+                if not client_socket.recv(10):
+                    client_socket.close()
+        except socket.error:
+            print('Socket connection failed, nothing to do')
+        except Exception as e:
+            print("THREAD FAILED", e)
