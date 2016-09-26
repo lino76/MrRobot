@@ -16,20 +16,66 @@ def clientSend(data):
 
     conn.connect((socket.gethostname(), port))
 
-    # print('[*] Client sending data', data)
 
     # Json file has mutiple parts, for now focus on the programs
     print('[*] Client sending program\n', data)
 
     conn.send(data.encode('utf-8'))
 
-    result = conn.recv(1024)
-    #while tmp:
-    #    data += tmp
-    #    tmp = conn.recv(1024)
-    print('[*] Client received response:', result.decode())
 
+    result = ''
+    try:
+        while True:
+            tmp = conn.recv(1024)
+            if tmp == b'':
+                break
+            result += tmp.decode()
+    except Exception as e:
+        print(e)
+    print('[*] Client received response:', result) 
     conn.close()
+
+    return result
+
+def compareResponses(ncommand, server_response, expected_response):
+    err_base = "Command " + str(ncommand) + "| Responses don't match: "
+    if len(server_response) != len(expected_response):
+        print(err_base + "different line numbers")
+        return False
+    for i in range(0, len(server_response)):
+        if expected_response[i]['status'] != server_response[i]['status']:
+            print(err_base + "statuses")
+            print("Line " + str(i) + ". Got: "+ server_response[i]['status'] + 
+                " expected " + expected_response[i]['status'])
+            return False
+        if expected_response[i].status == "RETURNING":
+            if expected_response[i].output != server_response[i].output:
+                print(err_base + "output doesn't match")
+                print("Got " + str(server_response[i]['output']) + " expected " + 
+                    str(expected_response[i]['output']))
+                return False
+    print("Responses match")
+    return True
+
+
+def sendFromFile(testfile):
+
+    if os.path.isfile(testfile):
+            #if Path.is_file(testfile):
+        with open(testfile, "r") as jsonFile:
+            data = jsonFile.read()
+
+            try:
+                i = 0
+                for program in json.loads(data)['programs']:
+                    response = clientSend(program['program'])
+                    response_json = [(lambda x: json.loads(x))(l) for l in response.split("\n")]
+                    compareResponses(i, response_json, program['output'])
+                    i += 1    
+            except Exception as e:
+                print(e)
+    else:
+        print('File does not exist: ', testfile)
 
 
 if __name__ == '__main__':
@@ -38,11 +84,13 @@ if __name__ == '__main__':
     cmd_parser.add_argument('-p', type=int, dest="port", default=1024)
     cmd_parser.add_argument('-d', type=str, dest="data_path", default=data_path, required=False)
     cmd_parser.add_argument('-m', type=str, dest="manualprogram", required=False)
+    #cmd_parser.add_argument('-a', dest='run_all', action='store_true')
     args = cmd_parser.parse_args()
-
+    
     port = args.port
     data_path = args.data_path
     manualprogram = args.manualprogram
+    #run_all = args.run_all
 
     print('Using port %d with data path of: %s' % (port, data_path))
 
@@ -53,24 +101,13 @@ if __name__ == '__main__':
         print('test file mode..')
         while True:
             select = input('Enter File Name or type exit:')
-            print(select)
             if select == 'exit':
                 exit()
 
-            testfile = os.path.join(os.path.dirname(__file__), data_path, select)
-
-            if os.path.isfile(testfile):
-            #if Path.is_file(testfile):
-                with open(testfile, "r") as jsonFile:
-                    data = jsonFile.read()
-
-                try:
-                    for program in json.loads(data)['programs']:
-                        clientSend(program['program'])
-                except Exception as e:
-                    print('network error')
-                    print(e)
-            else:
-                print('File does not exist: ', testfile)
+            test_file = os.path.join(os.path.dirname(__file__), data_path, select)
+            if not test_file.endswith(".json"):
+                test_file += ".json"
+            sendFromFile(test_file)
+            
 
 

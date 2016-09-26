@@ -81,6 +81,5 @@ def main():
         print(Exception)
         exit()  # TODO handle server exit
 
-
 if __name__ == '__main__':
     main()
