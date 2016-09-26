@@ -31,6 +31,8 @@ class Server:
                 # handle_client(client_socket)
                 client_handler = threading.Thread(target=self.handle_client, args=(client_socket,))
                 client_handler.start()
+            except socket.error:
+                print('Socket connection failed, nothing to do')
             except Exception as e:
                 print("FAILED", e)
                 raise
