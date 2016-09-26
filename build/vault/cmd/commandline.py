@@ -77,8 +77,8 @@ def main():
     # Start Server
     try:
         Server(password).start(port)
-    except Exception: # TODO replace with application exception
-        print(Exception)
+    except Exception as e: # TODO replace with application exception
+        print(e)
         exit()  # TODO handle server exit
 
 if __name__ == '__main__':
