@@ -46,10 +46,8 @@ def validate_args(input_args):
         password = str(input_args[1])
     except IndexError:
         password = 'admin'
-
-    if not re.fullmatch('[A-Za-z0-9_ ,;\.?!-]*', password) and len(password) < 65536:
+    if not re.fullmatch('[A-Za-z0-9_ ,;\.?!-]*', password) or len(password) > 65535:
         raise CmdError(255, 'invalid password')
-
     return [port, password]
 
 

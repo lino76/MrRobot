@@ -1,5 +1,7 @@
 import unittest
 import pytest
+import random
+import string
 
 from vault.cmd import commandline
 from vault.error import VaultError
@@ -56,4 +58,8 @@ class CommmandlineTest(unittest.TestCase):
         with pytest.raises(VaultError):
             commandline.validate_args(input)
 
-    #TODO test a password greater than 65535
+    def test_validate_port_longpass(self):
+        password = ''.join(random.choice(string.ascii_letters + string.digits) for x in range(65535+1))
+        input = [1024, password]
+        with pytest.raises(VaultError):
+            commandline.validate_args(input)
