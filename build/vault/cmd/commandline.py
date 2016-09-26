@@ -2,7 +2,7 @@ import argparse
 import sys
 import re
 
-from vault.network import server
+from vault.network import Server
 from vault.error import CmdError
 from vault.error import VaultError
 
@@ -78,7 +78,7 @@ def main():
 
     # Start Server
     try:
-        server.start(port, password)
+        Server(password).start(port)
     except Exception: # TODO replace with application exception
         print(Exception)
         exit()  # TODO handle server exit
