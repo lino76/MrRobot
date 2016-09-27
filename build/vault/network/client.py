@@ -18,18 +18,11 @@ def clientSend(json_data):
     for program in json_data['programs']:
         data = program['program']
         print('[*] Client sending program\n', data)
+        conn.send(data.encode('utf-8'))            
 
-        conn.send(data.encode('utf-8'))
-
-        data = b""
-        
-        print('wait to receive')
+        # needs to be more robust.   
         tmp = conn.recv(1024)
-        print('received: ', tmp)
-        #while tmp:
-        #    data += tmp
-        #    tmp = conn.recv(1024)
-        print('[*] Client received response', tmp.decode())
+        print('[*] Server response: ', tmp.decode())
 
     conn.close()
 

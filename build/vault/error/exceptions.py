@@ -14,3 +14,7 @@ class CmdError(VaultError):
 
 class NetworkError(VaultError):
     pass
+
+class SecurityError(VaultError):
+    pass
+

@@ -1,4 +1,4 @@
-
+from vault.error.exceptions import SecurityError
 
 class Principal():
     rights = []
@@ -9,7 +9,9 @@ class Principal():
         self.rights = rights
     
 
-    def authenticate(pwd):
-        return password == pwd
+    def authenticate(self, pwd):
+        if self.password == pwd:
+            return True
+        raise SecurityError(255, "Invalid Password")
     
     

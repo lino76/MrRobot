@@ -1,14 +1,14 @@
 import socket
 import threading
 import json
-
+from vault.error.exceptions import *
 from vault.data.datastore import DataStore
 from vault.parser.parser import Parser
 
 
-def handle_client(client_socket):
+def handle_client(client_socket, datastore):
     # TODO: Add actual responses
-    datastore = DataStore()
+    # We need the command line provided password here
     
     while True:
         data = b''
@@ -22,18 +22,19 @@ def handle_client(client_socket):
             #TODO: It could issue the TIMEOUT status if input  with *** is not received within 30 seconds
         if data and b'***' in data:
             udata = data.decode()
-            command = udata.split('***', 1)[0]
-            print("[*] Received: \n%s" % command)
+            program = udata.split('***', 1)[0]
+            print("[*] Received: \n%s" % program)
     
             # Parse and process command        
             try:
-                #parser = Parser(command)
+                parser = Parser(program, datastore)
                 # pass return the return value
                 client_socket.send("good job slick".encode())
-            except Exception as e:
+            
+            except SecurityError as e:
                 #Catch security exceptions
                 # send response
-                client_send("{ Security Violation }".encode())
+                client_socket.send("{ Security Violation }".encode())
             
 
             # if command has exit or no more commands exit          
@@ -51,6 +52,7 @@ def handle_client(client_socket):
 
 def start(port, password):
     print("server starting on port:", port)
+    datastore = DataStore(password)
     host = socket.gethostname()
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
@@ -70,7 +72,7 @@ def start(port, password):
         #TODO: It could issue the TIMEOUT status if input is not received within 30 seconds
         #conn.settimeout(30)
         try:
-            handle_client(client_socket)
+            handle_client(client_socket, datastore)
 
             # client_handler = threading.Thread(target=handle_client, args=(client_socket,))
             # client_handler.start()
