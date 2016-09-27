@@ -11,6 +11,11 @@ class Server:
     def __init__(self, password):
         self.vault = Vault(password)
 
+    def stop(self):
+        # TODO placeholder for now
+        # print("stop")
+        pass
+
     def start(self, port):
         print("server starting on port:", port)
         host = socket.gethostname()

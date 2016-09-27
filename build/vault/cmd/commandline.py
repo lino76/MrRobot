@@ -1,4 +1,5 @@
 import argparse
+import signal
 import sys
 import re
 
@@ -6,17 +7,32 @@ from vault.network import Server
 from vault.error import CmdError
 from vault.error import VaultError
 
+server = None
+
+
+def sigterm_handler(_signo, _stack_frame):
+    exit(0)
+
+def sigint_handler(_signo, _stack_frame):
+    exit(0)
+
+# Listen for exit
+signal.signal(signal.SIGTERM, sigterm_handler)
+signal.signal(signal.SIGINT, sigint_handler)
+
 
 def handle_app_error(error):
     exit(error.statusCode)
 
 
-def handle_system_error(error):
-    print("Unhandled error:", error)
+def handle_system_error():
+    print("Unhandled system error")
     exit(1)
 
 
 def exit(code=0):
+    if server:
+        server.stop()
     sys.exit(int(code))
 
 
@@ -71,15 +87,18 @@ def main():
         [port, password] = validate_args(arg_input)
     except VaultError as e:  #application errors
         handle_app_error(e)
-    except Exception:  #everything else
-        handle_system_error(Exception)
+    except:
+        handle_system_error()
 
     # Start Server
+    global server
+    server = Server(password)
     try:
-        Server(password).start(port)
-    except Exception: # TODO replace with application exception
-        print(Exception)
-        exit()  # TODO handle server exit
+        server.start(port)
+    except VaultError as ve:
+        handle_app_error(ve)
+    except:
+        pass
 
 if __name__ == '__main__':
     main()
