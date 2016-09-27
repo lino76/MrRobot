@@ -2,14 +2,14 @@
 Event based simple TCP server - proof of concept
 """
 from twisted.internet.protocol import Factory, Protocol
-from twisted.internet import reactor
+from twisted.internet import reactor, defer
 from twisted.internet.error import CannotListenError
 
 import simplejson as json
 
 from vault.error import CmdError, NetworkError, SecurityError
 from vault.core import Vault, Program
-
+import signal
 
 class TServer(Protocol):
     def __init__(self, vault):
@@ -21,6 +21,8 @@ class TServer(Protocol):
     def error_handler(self, exception):
         #print(exception)
         print('Connection lost somehow, nothing to do')
+        reactor.stop()
+
 
     def dataReceived(self, data):
         if data and b'***' in data:
@@ -50,11 +52,14 @@ class Server:
     def __init__(self, password):
         self.vault = Vault(password)
 
-    def stop(self):
-        # TODO still getting an exception when I kill
+    def stop(self, _signo):
         if reactor.running:
-            print("stopping reactor")
-            reactor.stop()
+            if _signo == signal.SIGTERM:
+                reactor.callFromThread(reactor.sigTerm)
+            elif _signo == signal.SIGINT:
+                reactor.callFromThread(reactor.sigInt)
+            else:
+                reactor.callFromThread(reactor.stop)
 
     def start(self, port):
         try:
@@ -64,6 +69,6 @@ class Server:
             raise NetworkError(63, 'port is taken')
 
         try:
-            reactor.run()
+            reactor.run(installSignalHandlers=False)
         except:
             raise NetworkError(0, 'reactor error')

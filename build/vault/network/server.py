@@ -11,10 +11,10 @@ class Server:
     def __init__(self, password):
         self.vault = Vault(password)
 
-    def stop(self):
+    def stop(self, _signo):
         # TODO placeholder for now
         # print("stop")
-        pass
+        exit(0)
 
     def start(self, port):
         print("server starting on port:", port)

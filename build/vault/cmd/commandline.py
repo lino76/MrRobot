@@ -11,10 +11,10 @@ server = None
 
 
 def sigterm_handler(_signo, _stack_frame):
-    exit(0)
+    exit(0, _signo)
 
 def sigint_handler(_signo, _stack_frame):
-    exit(0)
+    exit(0, _signo)
 
 # Listen for exit
 signal.signal(signal.SIGTERM, sigterm_handler)
@@ -30,10 +30,10 @@ def handle_system_error():
     exit(1)
 
 
-def exit(code=0):
+def exit(code=0, _signo = signal.SIGTERM):
     if server:
-        server.stop()
-    sys.exit(int(code))
+        server.stop(_signo)
+    #sys.exit(int(code))
 
 
 def validate_args(input_args):
