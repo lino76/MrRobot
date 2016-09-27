@@ -29,11 +29,10 @@ class Parser:
 
 	def validate_identifier(self, string):
 		return string not in self.reserved_words and \
-		   re.fullmatch('[A-Za-z][A-Za-z0-9_ ]*', string) and len(string) < 256
+		   re.fullmatch('[A-Za-z][A-Za-z0-9_]*', string) and len(string) < 256
 
 	def validate_comment(self, string):
-		return re.fullmatch(
-			'[\/][\/][A-Za-z][A-Za-z0-9_ ]*$', string)
+		return re.fullmatch('[\/][\/][A-Za-z][A-Za-z0-9_ ]*', string)
 
 	def remove_comments(self, string):
 
@@ -44,7 +43,8 @@ class Parser:
 				return ""	
 		if "//" in string:
 			uncommented = string.split("//")[0]
-			comment = string[len(uncommented) - 1: ]
+			comment = string[len(uncommented): ]
+			print("COMMENT IS: '"+ comment + "'")
 			if not self.validate_comment(comment):
 				raise VaultError(1, "Comment not valid: " + string)
 			else:
@@ -57,7 +57,7 @@ class Parser:
 
 		#test for string literal
 		if '"' in string:
-			if not (s.startswith('"') and s.endswith('"')):
+			if not (string.startswith('"') and string.endswith('"')):
 				raise VaultError(1, "Value not valid, quotes misplaced ?" + string)
 			if not self.validate_string_constant(string):
 				raise VaultError(1, "String literal not matching re: " + string)
@@ -135,7 +135,6 @@ class Parser:
 
 		if line[0] == "return":
 			expressions = {'return_value': self.parse_expression(line[1:])}
-			print(expressions)
 			return Command('return', expressions)
 
 		if line[0] == "create" and line[1] == "principal":

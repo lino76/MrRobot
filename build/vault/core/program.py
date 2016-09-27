@@ -6,12 +6,9 @@ class Expression:
         self.content = content
 
     def __str__(self):
-        print("self")
-        print("HEY, content: " + self.content)
         return self.expr_type + ": " + str(self.content)
 
     def __repr__(self):
-        print("repr")
         return str(self)
 
 
