@@ -16,9 +16,9 @@ class Expression:
         if self.type == 'value':
             return self.content #maybe this is not that simple, since values can either be literals or have and identifier
         if self.type == 'list':
-            return content[int(field)]
+            return self.content[int(field)]
         if self.type == 'record':
-            return content[str(field)]
+            return self.content[str(field)]
 
 
     def set(self, value, field=None):
