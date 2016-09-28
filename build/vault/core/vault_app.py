@@ -1,19 +1,18 @@
 '''Central point by which programs get executed'''
 
-from vault.core import Parser, Interpreter
-
+import vault
 
 class Vault:
 
     def __init__(self, password):
         self.password = password
         # TODO instantiate database
-        #self.datastore = DataStore()
+        self.datastore = vault.core.Datastore()
 
     def run(self, program):
         print('running program')
-        program = Parser().parse(program)
-        result = Interpreter().execute(program)
+        program = vault.core.Parser().parse(program)
+        result = vault.core.Interpreter(self.datastore ).execute(program)
         # TODO interpret results and determine status
         result = '{"status":"FAILURE"}'
         return result
