@@ -23,7 +23,8 @@ class Server:
         try:
             server.bind(('', port))
             server.listen(1)
-        except OSError:
+        except OSError as e:
+            print(e)
             raise CmdError(63, 'port is taken')
             socket.close()
 

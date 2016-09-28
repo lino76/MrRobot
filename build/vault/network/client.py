@@ -103,7 +103,7 @@ if __name__ == '__main__':
             select = input('Enter File Name or type exit:')
             if select == 'exit':
                 exit()
-
+            print(select)
             test_file = os.path.join(os.path.dirname(__file__), data_path, select)
             if not test_file.endswith(".json"):
                 test_file += ".json"
