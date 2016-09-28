@@ -68,20 +68,24 @@ class Datastore:
     @authorize(Role.write)
     def set(self, key, value):
         #  TODO validate params or is the parser enough?
-        self.context.queue.append(['SET', key, value])
+        self.context.queue.append(['SET', key, value, None])
 
     @authorize(Role.read)
     def get(self, key):
-        if key in self.datatable or key in self.context.keys():
-            self.context.queue.append(['GET', key, None])
+        if self.exists_or_pending(key):
+            self.context.queue.append(['GET', key, None, None])
         else:
             raise Exception(101, "key does not exist")
 
+    # TODO if the user has both this may append twice
     @authorize(Role.append)
     @authorize(Role.write)
     def append(self, key, value):
-        # TODO ...
-        return key
+        if self.exists_or_pending(key):
+            val_type = self.find_type(self.datatable[key])
+            self.context.queue.append(['APPEND', key, value, val_type])
+        else:
+            raise Exception(101, "key does not exist")
 
     '''Authorization API'''
     def change_password(self, principal):
@@ -108,10 +112,11 @@ class Datastore:
         self.authentication[principal.name] = principal
         return self.context
 
+    ''' This is where we actually persist the data'''
     def commit(self):
         # TODO verify order of loop
         result = []
-        for op, key, value in self.context.queue:
+        for op, key, value, type in self.context.queue:
             if op is "SET":
                 self.datatable[key] = value
                 result.append({"SET"})
@@ -119,13 +124,39 @@ class Datastore:
                 val = self.datatable[key]
                 result.append({"GET", val})
             elif op is "APPEND":
-                #  TODO handle types of append
-                pass
-
+                oldval = self.datatable[key]
+                if type is str or type is list:
+                    newval = oldval + value
+                    self.datatable[key] = newval
+                else:
+                    newval = dict(oldval.items() + value.items())
+                    self.datatable[key] = newval
+                result.append({"APPEND", newval})
+            else:
+                raise Exception(100, "Unsupported operation")
         return result
 
     def cancel(self):
         self.context = None
+
+    def exists_or_pending(self, key):
+        if key in self.datatable or key in self.context.keys():
+            return True
+        return False
+
+    def concat_vals(self, a, b):
+        #  TODO move concat here if needed
+        pass
+
+    @staticmethod
+    def find_type(val):
+        # TODO I dunno if this checking is right or we get these types.
+        if isinstance(val, str):
+            return str
+        elif isinstance(val, list):
+            return list
+        else:
+            return dict
 
 
 if __name__ == '__main__':

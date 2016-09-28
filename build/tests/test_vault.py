@@ -39,7 +39,7 @@ class VaultTest(unittest.TestCase):
         prog = '''as principal admin password "admin" do
                       create principal alice "alices_password"
                       set x = "my string"
-                      st y = {f1 = x, f2 = "field2"}
+                      set y = {f1 = x, f2 = "field2"}
                       set delegation x admin read -> alice
                       return y.f1
                   ***'''
