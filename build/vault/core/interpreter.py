@@ -32,7 +32,7 @@ class Interpreter:
             for cmd in program.commands:
                 try:
                     status = self.command_handlers[cmd.name](cmd)
-                except Exception:
+                except Exception as e:
                     self.reset()
                     raise # we're done here
                 if status is not None:

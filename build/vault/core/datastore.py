@@ -1,6 +1,24 @@
+from enum import Enum
 
 from vault.util import Context, Principal, Role, Vividict
 import vault.error
+
+
+class Transaction:
+    def __init__(self, op=None, key=None, value=None, principal=None, roles=None):
+        self.op = op
+        self.key = key
+        self.value = value
+        self.principal = principal
+        self.roles = roles
+
+
+class TxnTypes(Enum):
+    set = "SET"
+    change_password = "CHANGE_PASSWORD"
+    create_principal = "CREATE_PRINCIPAL"
+    grant = "GRANT"
+
 
 class Datastore:
 
@@ -21,86 +39,68 @@ class Datastore:
             return check_context
         return wrapper
 
-    '''authorization decoration (because it's kinda cool)'''
-    def authorize(role):
-        def wrapper(func):
-            def authorize_role_wrapper(*args, **kwargs):
-                # TODO clean this all up
-                if len(args) == 3:
-                    self, key, value = args
-                else:
-                    self, key = args
-
-                if self.is_authorized(self.context.principal, role, key):
-                    return func(*args, **kwargs)
-                else:
-                    raise vault.error.SecurityError(100, "DENIED")
-            return authorize_role_wrapper
-        return wrapper
-
-    '''authorization decoration impl'''
-    def is_authorized(self, principal, role, key):
-        if principal.name == 'admin':
-            return True
-        elif principal.name == 'anyone':  # TODO is this true?
-            return False
-        else:
-            if role == Role.write:
-                if key not in self.authorization:
-                    # if key does not exist then apply all perms to this key/user and return true
-                    #  TODO make mutations to the authorizations also transactional
-                    self.authorization[key][principal.name] = [Role.read, Role.write, Role.append, Role.delegate]
-                    return True
-                # else check the existing key for the proper role
-                elif role in self.authorization[key][principal.name]:
-                    # they have it
-                    return True
-                else:
-                    # they don't
-                    return False
-            elif role == Role.read:
-                if key not in self.authorization:
-                    return False
-                elif role in self.authorization[key][principal.name]:
-                    return True
-            else:
-                pass
-
-
     '''Authorization API'''
-    @authorize(Role.write)
+    @require_context()
     def set(self, key, value):
-        #  TODO validate params or is the parser enough?
-        self.context.queue.append(['SET', key, value, None])
-
-    @authorize(Role.read)
-    def get(self, key):
+        principal = self.context.principal
         if self.exists(key):
+            # check rights
+            grants = self.authorization[key][principal.name]
+            if Role.write not in grants:
+                raise vault.error.SecurityError(100, "DENIED")
+        else:
+            # check rights
+            grants = self.authorization[key][principal.name]
+            if Role.write not in grants and not self.is_admin():
+                raise vault.error.SecurityError(100, "DENIED")
+            else:
+                # init roles list
+                self.authorization[key][principal.name] = []
+                # add data and new roles
+                self.add_transaction(Transaction(op=TxnTypes.set, key=key, value=value))
+                self.add_transaction(Transaction(op=TxnTypes.grant, key=key, principal=principal,
+                                                 roles=[Role.read, Role.write, Role.append, Role.delegate]))
+                # add roles to admin
+                if not self.is_admin():
+                    self.add_transaction(Transaction(op=TxnTypes.grant, key=key, principal=Principal("admin"),
+                                                     roles=[Role.read, Role.write, Role.append, Role.delegate]))
+
+    @require_context()
+    def get(self, key):
+        principal = self.context.principal
+        if self.exists(key):
+            # check rights
+            grants = self.authorization[key][principal.name]
+            if Role.read not in grants and not self.is_admin():
+                raise vault.error.SecurityError(100, "DENIED")
+            # return data
             return self.datatable[key]
         else:
-            raise Exception(101, "key does not exist")
+            raise vault.error.VaultError(101, "key does not exist")
 
     '''Authorization API'''
     @require_context()
     def change_password(self, principal):
         if self.is_admin() or principal.name == self.context.principal.name:
-            self.context.queue.append(['CHANGE_PASSWORD', principal.name, principal, None])
+            self.add_transaction(Transaction(op=TxnTypes.change_password, key=principal.name, value=principal))
 
     @require_context()
     def create_principal(self, principal):
         if self.is_admin():
             if principal.name not in self.authentication:
-                self.context.queue.append(['CREATE_PRINCIPLE', principal.name, principal, None])
+                self.add_transaction(Transaction(op=TxnTypes.create_principal, key=principal.name, value=principal))
             else:
                 raise Exception(101, "principal already exists")
 
+    @require_context()
     def set_delegation(self, source_principal, target_principal, role):
         pass
 
+    @require_context()
     def delete_delegation(self, source_principal, target_principal, role):
         pass
 
-
+    @require_context()
     def default_delegator(self, principal):
         pass
 
@@ -115,20 +115,21 @@ class Datastore:
 
     ''' This is where we actually persist the data'''
     def commit(self):
-        result = []
-        for op, key, value, type in self.context.queue:
-            if op is "SET":
-                self.datatable[key] = value
-                result.append({"SET"})
-            elif op is "CHANGE_PASSWORD":
-                self.authentication[key] = value
-                result.append({"CHANGE_PASSWORD"})
-            elif op is "CREATE_PRINCIPLE":
-                self.authentication[key] = value
-                result.append({"CREATE_PRINCIPLE"})
+        for txn in self.context.queue:
+            if txn.op is TxnTypes.set:
+                self.datatable[txn.key] = txn.value
+            elif txn.op is TxnTypes.change_password:
+                self.authentication[txn.key] = txn.value
+            elif txn.op is TxnTypes.create_principal:
+                self.authentication[txn.key] = txn.value
+            elif txn.op is TxnTypes.grant:
+                # TODO there's probably a better way to merge into a unique list
+                existing = self.authorization[txn.key][txn.principal.name]
+                merged = list(set(existing + txn.roles))
+                self.authorization[txn.key][txn.principal.name] = merged
             else:
                 raise Exception(100, "Unsupported operation")
-        return result
+        return "success"
 
     def cancel(self):
         self.context = None
@@ -137,6 +138,9 @@ class Datastore:
         if key in self.datatable:
             return True
         return False
+
+    def add_transaction(self, txn):
+        self.context.queue.append(txn)
 
     def is_admin(self):
         return self.context.principal.name == "admin"
