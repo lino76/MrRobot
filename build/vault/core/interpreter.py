@@ -121,7 +121,7 @@ class Interpreter:
         return log
 
     def handle_set_delegation(self, cmd):
-        log = {"status": "SET_DELEGATION"}
+        log = {"status": "SET DELEGATION"}
         return log
 
     def handle_delete_delegation(self, cmd):
