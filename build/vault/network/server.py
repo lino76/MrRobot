@@ -61,7 +61,6 @@ class Server:
 
                 if data and b'***' in data:
                     udata = data.decode()
-                    print(udata)
                     program = Program(udata)
                     print("[*] Received: \n%s" % program.get_src())
 

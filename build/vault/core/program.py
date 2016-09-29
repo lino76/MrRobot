@@ -42,6 +42,12 @@ class FieldType:
         self.type = type
         self.value = value
 
+    def __str__(self):
+        return str(self.type) + " " + str(self.value)
+
+    def __repr__(self):
+        return str(self)
+
 
 from enum import Enum
 
