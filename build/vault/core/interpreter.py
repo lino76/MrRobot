@@ -94,6 +94,15 @@ class Interpreter:
             pass #TODO fail
         value = self.datastore.get(key)
         #now what
+        if value_to_append is Type.record:
+            for k in value_to_append.value.keys():
+                pass #maybe?
+        else:
+            value.value.append(value_to_append.value) #???
+
+        self.datastore.set(key, value)
+
+        #maybe??
         return log
 
     def handle_local(self, cmd):
