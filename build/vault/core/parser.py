@@ -20,11 +20,11 @@ class Parser:
         if self.is_quoted(s):
             raise VaultError(1, "This string should have been quoted: " + s)
         return s[1:-1]
-
+        
     def validate_terminator(self, lines):
-        terminator_pos = lines.find("***")
+        terminator_pos = lines.index("***")
         if terminator_pos == -1: #not found
-        	raise Exception(101, "invalid program, missing terminator")
+            raise Exception(101, "invalid program, missing terminator")
         return lines[:terminator_pos]
             
 
@@ -300,20 +300,25 @@ class Parser:
 
     def parse_prog(self, line):
         # I'm thinking about doing this slowly and carefully, but we could just cram all the inequalities together
-
+        
         line = line.strip().split(" ")  # remove spaces at beginning and end, then split
         while '' in line:
             line.remove('')  # remove empty entries in list due to multiple spaces together
+
         if line[0] != "as" and line[1] != "principal":
-            raise VaultError(1, "Error parsing prog")
+            raise VaultError(1, "Error parsing prog, first line missing as or principal")
         if not self.validate_identifier(line[2]):
-            raise VaultError(1, "Identifier not valid")
+            raise VaultError(1, "Identifier not valid, principal identifier")
+
         if line[3] != "password":
-            raise VaultError(1, "Error parsing prog")
-        if not self.validate_string_constant(line[4]):
+            raise VaultError(1, "Error parsing prog, missing password")
+        if not self.validate_string_constant(line[4]): #oh shit
             raise VaultError(1, "String not valid: " + line[4])
+
+
         if line[5] != "do":
-            raise VaultError(1, "Error parsing prog")
+            raise VaultError(1, "Error parsing prog, missing do")
+
         return (line[2], self.dequote(line[4]))
 
     def parse(self, program):
@@ -330,21 +335,22 @@ class Parser:
 
                 as principal admin password admin do\\nreturn success\\n***\\n
         '''
-        print(lines_tmp)
+
+        program.src = program.src.replace("\\n", "\n")
         lines_tmp = program.src.split("\n")
         lines = []
         for line in lines_tmp:
             line = self.remove_comments(line)
             if line != "":
                 lines.append(line)
-
         # validate the terminator and remove it (or fail)
         lines = self.validate_terminator(lines)
-
         principal, password = self.parse_prog(lines.pop(0))
+
         program.principal = principal
         program.password = password
         program.commands = []
+        print(2)
 
         for line in lines:
             program.commands.append(self.parse_command(line))

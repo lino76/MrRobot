@@ -15,8 +15,10 @@ class Vault:
         try:
             program = vault.core.Parser().parse(program)
         except Exception as e:
+            print("Parsing exception: " + str(e))
             # TODO add security and vaulterror
             return self.format_result(["status", "FAILED"])
+        #print(program)
         status_log = vault.core.Interpreter(self.datastore).execute(program)
         # TODO interpret results and determine status
         result_output = self.format_result(status_log)
