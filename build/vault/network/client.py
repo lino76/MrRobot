@@ -96,6 +96,7 @@ if __name__ == '__main__':
 
     if manualprogram is not None:
         print("sending manual program...")
+        print("program: ", manualprogram)
         clientSend(manualprogram)
     else:
         print('test file mode..')

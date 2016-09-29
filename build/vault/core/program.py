@@ -35,6 +35,22 @@ class Expression:
 
 #TOOD REST OF STUFF
 
+''' DRAFT object to hold field metadata '''
+class FieldType:
+
+    def __init__(self, value, type):
+        self.type = type
+        self.value = value
+
+
+from enum import Enum
+
+
+class Type(Enum):
+    literal = 'literal'
+    field = 'field'
+    record = 'record'
+    list = 'list'
 
 
 '''Represents each of the commands executed by a program'''

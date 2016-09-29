@@ -21,6 +21,14 @@ class Parser:
             raise VaultError(1, "This string should have been quoted: " + s)
         return s[1:-1]
 
+    def validate_terminator(self, lines):
+        if lines[-1] == '***':
+            del lines[-1]
+            return lines
+        else:
+            raise Exception(101, "invalid program")
+
+
     # maybe move this outside or make a static func
     def validate_string_constant(self, string):
         string = self.dequote(string)
@@ -64,7 +72,7 @@ class Parser:
                 raise VaultError(1, "Value not valid, quotes misplaced ?" + string)
             if not self.validate_string_constant(string):
                 raise VaultError(1, "String literal not matching re: " + string)
-            return string  # TODO CHANGE SO THIS RETURNS AN SPECIAL TYPE
+            return FieldType(string, Type.literal)  # TODO CHANGE SO THIS RETURNS AN SPECIAL TYPE
         # test for record.field
         if "." in string:
             splitted = string.split(".")
@@ -72,12 +80,12 @@ class Parser:
                 raise VaultError(1, "Record contains wrong number of dots (.): " + string)
             if not self.validate_identifier(splitted[0]) or not self.validate_identifier(splitted[1]):
                 raise VaultError(1, "One of the record fields are not valid: " + string)
-            return string  # TODO CHANGE SO THIS RETURNS AN SPECIAL TYPE
+            return FieldType(string, Type.record)  # TODO CHANGE SO THIS RETURNS AN SPECIAL TYPE
 
         # now only value posible
         if not self.validate_identifier(string):
             raise VaultError(1, "Single identifier not valid: " + string)
-        return string  # TODO CHANGE SO THIS RETURNS AN SPECIAL TYPE
+        return FieldType(string, Type.field)  # TODO CHANGE SO THIS RETURNS AN SPECIAL TYPE
 
     def parse_expression(self, splitted):
         # an expression is either a value, an empty list or a fieldval
@@ -309,12 +317,29 @@ class Parser:
         return (line[2], self.dequote(line[4]))
 
     def parse(self, program):
+        '''
+            NOTE: when running this program via the client->server:
+
+                as principal admin password "admin" do\nreturn "success"\n***\n
+
+            at some point up to here the source goes from:
+
+                as principal admin password admin do\nreturn success\n***\n
+
+            to this:
+
+                as principal admin password admin do\\nreturn success\\n***\\n
+        '''
+        # TODO strip off '***' (used to be done in server.py)
         lines_tmp = program.src.split("\n")
         lines = []
         for line in lines_tmp:
             line = self.remove_comments(line)
             if line != "":
                 lines.append(line)
+
+        # validate the terminator and remove it (or fail)
+        lines = self.validate_terminator(lines)
 
         principal, password = self.parse_prog(lines.pop(0))
         program.principal = principal

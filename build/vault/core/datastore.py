@@ -48,21 +48,13 @@ class Datastore:
                 else:
                     # they don't
                     return False
-            elif role == Role.append:
-                # if key does not exist append fails (they need write)
-                if key not in self.authorization:
-                    return False
-                elif role in self.authorization[key][principal.name]:
-                    #  they have perm
-                    return True
-                else:
-                    # they don't
-                    return False
             elif role == Role.read:
                 if key not in self.authorization:
                     return False
                 elif role in self.authorization[key][principal.name]:
                     return True
+            else:
+                pass
 
     '''Authorization API'''
     @authorize(Role.write)
@@ -72,18 +64,8 @@ class Datastore:
 
     @authorize(Role.read)
     def get(self, key):
-        if self.exists_or_pending(key):
-            self.context.queue.append(['GET', key, None, None])
-        else:
-            raise Exception(101, "key does not exist")
-
-    # TODO if the user has both this may append twice
-    @authorize(Role.append)
-    @authorize(Role.write)
-    def append(self, key, value):
-        if self.exists_or_pending(key):
-            val_type = self.find_type(self.datatable[key])
-            self.context.queue.append(['APPEND', key, value, val_type])
+        if self.exists(key):
+            return self.datatable[key]
         else:
             raise Exception(101, "key does not exist")
 
@@ -120,18 +102,6 @@ class Datastore:
             if op is "SET":
                 self.datatable[key] = value
                 result.append({"SET"})
-            elif op is "GET":
-                val = self.datatable[key]
-                result.append({"GET", val})
-            elif op is "APPEND":
-                oldval = self.datatable[key]
-                if type is str or type is list:
-                    newval = oldval + value
-                    self.datatable[key] = newval
-                else:
-                    newval = dict(oldval.items() + value.items())
-                    self.datatable[key] = newval
-                result.append({"APPEND", newval})
             else:
                 raise Exception(100, "Unsupported operation")
         return result
@@ -139,8 +109,8 @@ class Datastore:
     def cancel(self):
         self.context = None
 
-    def exists_or_pending(self, key):
-        if key in self.datatable or key in self.context.keys():
+    def exists(self, key):
+        if key in self.datatable:
             return True
         return False
 

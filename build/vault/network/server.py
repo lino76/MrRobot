@@ -47,7 +47,8 @@ class Server:
         Thread handler that manager 1 connection and close it
         """
         client_socket.setblocking(True)
-        client_socket.settimeout(30)
+        # client_socket.settimeout(30)
+        client_socket.settimeout(None)  # TODO THIS IS FOR DEBUGGING
         try:
             data = b''
             try:
@@ -60,16 +61,15 @@ class Server:
 
                 if data and b'***' in data:
                     udata = data.decode()
-                    src = udata.split('***', 1)[0]
-                    print(src)
-                    program = Program(src)
+                    print(udata)
+                    program = Program(udata)
                     print("[*] Received: \n%s" % program.get_src())
 
                     try:
                         result = self.vault.run(program)
                         # TODO socket.send requires the app to keep track of data and resend if necessary
                         client_socket.send(result.encode('utf-8'))
-                    except SecurityError as e:
+                    except NetworkError as e:
                         print('EXCEPTION', e)
                         client_socket.send("{exception}".encode())
             except socket.timeout as e:
