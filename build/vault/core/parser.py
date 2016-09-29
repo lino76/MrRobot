@@ -22,11 +22,11 @@ class Parser:
         return s[1:-1]
 
     def validate_terminator(self, lines):
-        if lines[-1] == '***':
-            del lines[-1]
-            return lines
-        else:
-            raise Exception(101, "invalid program")
+        terminator_pos = lines.find("***")
+        if terminator_pos == -1: #not found
+        	raise Exception(101, "invalid program, missing terminator")
+        return lines[:terminator_pos]
+            
 
 
     # maybe move this outside or make a static func
@@ -72,7 +72,7 @@ class Parser:
                 raise VaultError(1, "Value not valid, quotes misplaced ?" + string)
             if not self.validate_string_constant(string):
                 raise VaultError(1, "String literal not matching re: " + string)
-            return FieldType(string, Type.literal)  # TODO CHANGE SO THIS RETURNS AN SPECIAL TYPE
+            return FieldType(self.dequote(string), Type.literal)  # TODO CHANGE SO THIS RETURNS AN SPECIAL TYPE
         # test for record.field
         if "." in string:
             splitted = string.split(".")
@@ -330,7 +330,7 @@ class Parser:
 
                 as principal admin password admin do\\nreturn success\\n***\\n
         '''
-        # TODO strip off '***' (used to be done in server.py)
+        print(lines_tmp)
         lines_tmp = program.src.split("\n")
         lines = []
         for line in lines_tmp:
