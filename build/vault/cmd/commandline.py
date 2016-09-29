@@ -22,12 +22,12 @@ signal.signal(signal.SIGINT, sigint_handler)
 
 
 def handle_app_error(error):
-    exit(error.statusCode)
+    sys.exit(error.statusCode)
 
 
 def handle_system_error():
     print("Unhandled system error")
-    exit(1)
+    sys.exit(1)
 
 
 def exit(code=0, _signo = signal.SIGTERM):
@@ -38,6 +38,7 @@ def exit(code=0, _signo = signal.SIGTERM):
 
 def validate_args(input_args):
     # Validate the port
+    
     try:
         port = str(input_args[0])
     except:
@@ -64,7 +65,7 @@ def validate_args(input_args):
         password = 'admin'
     if not re.fullmatch('[A-Za-z0-9_ ,;\.?!-]*', password) or len(password) > 65535:
         raise CmdError(255, 'invalid password')
-    return [port, password]
+    return (port, password)
 
 
 def handle_args():
@@ -84,12 +85,11 @@ def main():
     # Fetch and validate command line args
     try:
         arg_input = handle_args()
-        [port, password] = validate_args(arg_input)
+        port, password = validate_args(arg_input)
     except VaultError as e:  #application errors
         handle_app_error(e)
     except:
         handle_system_error()
-
     # Start Server
     global server
     server = Server(password)

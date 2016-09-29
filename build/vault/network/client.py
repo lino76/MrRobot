@@ -89,7 +89,9 @@ if __name__ == '__main__':
 
     port = args.port
     data_path = args.data_path
-    manualprogram = args.manualprogram.replace("\\n", "\n")
+    manualprogram = args.manualprogram
+    if manualprogram:
+        manualprogram = manualprogram.replace("\\n", "\n")
     #run_all = args.run_all
 
     print('Using port %d with data path of: %s' % (port, data_path))
