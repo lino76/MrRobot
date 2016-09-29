@@ -211,9 +211,7 @@ class Parser:
         line = " ".join(splitted)
         if not "->" in line:
             raise VaultError(1, "set delegation missing ->: " + line)
-        print(line)
         line = line.replace("->", "", 1)
-        print(line)
         splitted = line.split(" ")
         while '' in splitted:
             splitted.remove('')  # remove empty entries in list due to consecutive spaces
@@ -349,7 +347,6 @@ class Parser:
         program.principal = principal
         program.password = password
         program.commands = []
-        print(2)
 
         for line in lines:
             program.commands.append(self.parse_command(line))
