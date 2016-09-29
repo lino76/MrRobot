@@ -80,7 +80,7 @@ def sendFromFile(testfile):
 
 if __name__ == '__main__':
     # Parse the command lines.  Expect a port followed by a data folder path
-    cmd_parser = argparse.ArgumentParser()
+    cmd_parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     cmd_parser.add_argument('-p', type=int, dest="port", default=1024)
     cmd_parser.add_argument('-d', type=str, dest="data_path", default=data_path, required=False)
     cmd_parser.add_argument('-m', type=str, dest="manualprogram", required=False)
@@ -89,7 +89,7 @@ if __name__ == '__main__':
 
     port = args.port
     data_path = args.data_path
-    manualprogram = args.manualprogram
+    manualprogram = args.manualprogram.replace("\\n", "\n")
     #run_all = args.run_all
 
     print('Using port %d with data path of: %s' % (port, data_path))
