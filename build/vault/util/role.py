@@ -6,4 +6,6 @@ class Role(Enum):
     read = 'read'
     append = 'append'
     delegate = 'delegate'
+    admin = 'admin'
+    current = 'current'
 

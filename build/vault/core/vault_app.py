@@ -33,13 +33,10 @@ if __name__ == '__main__':
     vault = Vault("admin")
     prog = Program('''as principal admin password "admin" do
         set x = "Success"
+        change password admin "password"
         return x
         ***
         ''')
-    # prog = Program('''as principal admin password "admin" do
-    #     exit
-    #     ***
-    #     ''')
     result = vault.run(prog)
     print(result)
 

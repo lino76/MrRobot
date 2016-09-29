@@ -79,8 +79,10 @@ class Interpreter:
 
     def handle_change_password(self, cmd):
         log = {"status": "CHANGE_PASSWORD"}
+        expressions = cmd.expressions
+        principal = vault.util.Principal(expressions['principal'], expressions['password'])
+        self.datastore.change_password(principal)
         return log
-
 
     def handle_append_to(self, cmd):
         log = {"status": "APPEND"}

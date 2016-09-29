@@ -10,6 +10,17 @@ class Datastore:
         self.datatable = Vividict()
         self.context = None
 
+    def require_context():
+        def wrapper(func):
+            def check_context(*args, **kwargs):
+                self = args[0]
+                if self.context is not None:
+                    return func(*args, **kwargs)
+                else:
+                    raise Exception("DENIED")
+            return check_context
+        return wrapper
+
     '''authorization decoration (because it's kinda cool)'''
     def authorize(role):
         def wrapper(func):
@@ -56,6 +67,7 @@ class Datastore:
             else:
                 pass
 
+
     '''Authorization API'''
     @authorize(Role.write)
     def set(self, key, value):
@@ -70,8 +82,11 @@ class Datastore:
             raise Exception(101, "key does not exist")
 
     '''Authorization API'''
+    @require_context()
     def change_password(self, principal):
-        pass
+        if self.is_admin() or principal.name == self.context.principal.name:
+            self.context.queue.append(['CHANGE_PASSWORD', principal.name, principal, None])
+
 
     def create_principal(self, principal):
         pass
@@ -81,6 +96,7 @@ class Datastore:
 
     def delete_delegation(self, source_principal, target_principal, role):
         pass
+
 
     def default_delegator(self, principal):
         pass
@@ -96,12 +112,14 @@ class Datastore:
 
     ''' This is where we actually persist the data'''
     def commit(self):
-        # TODO verify order of loop
         result = []
         for op, key, value, type in self.context.queue:
             if op is "SET":
                 self.datatable[key] = value
                 result.append({"SET"})
+            elif op is "CHANGE_PASSWORD":
+                self.authentication[key] = value
+                result.append({"CHANGE_PASSWORD"})
             else:
                 raise Exception(100, "Unsupported operation")
         return result
@@ -114,19 +132,8 @@ class Datastore:
             return True
         return False
 
-    def concat_vals(self, a, b):
-        #  TODO move concat here if needed
-        pass
-
-    @staticmethod
-    def find_type(val):
-        # TODO I dunno if this checking is right or we get these types.
-        if isinstance(val, str):
-            return str
-        elif isinstance(val, list):
-            return list
-        else:
-            return dict
+    def is_admin(self):
+        return self.context.principal.name == "admin"
 
 
 if __name__ == '__main__':
