@@ -30,7 +30,6 @@ class Interpreter:
         context = self.datastore.create_context(vault.util.Principal(program.principal, program.password))
         if context is not None:
             for cmd in program.commands:
-                print(cmd.name)
                 status = self.command_handlers[cmd.name](cmd)
                 if status is not None:
                     self.log.append(status)
@@ -62,8 +61,6 @@ class Interpreter:
         # fetch it from where ever it is
         
         if expression.expr_type is not Type.literal:
-            print("I am not a value")
-            print(expression.content)
             output = self.find_value(expression.content.value)
         elif expression.expr_type == Type.literal:
             output = expression.content
@@ -121,7 +118,6 @@ class Interpreter:
 
     def find_value(self, key):
 
-        print(key)
         if key in self.local:
             return self.local[key]
         if self.datastore.exists(key):
