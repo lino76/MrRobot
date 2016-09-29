@@ -26,13 +26,13 @@ def clientSend(data):
     result = ''
     try:
         while True:
-            tmp = conn.recv(1024)
+            tmp = conn.recv(8)
             if tmp == b'':
                 break
             result += tmp.decode()
     except Exception as e:
         print(e)
-    print('[*] Client received response:', result) 
+    print('[*] Client received response:', result)
     conn.close()
 
     return result
@@ -45,13 +45,13 @@ def compareResponses(ncommand, server_response, expected_response):
     for i in range(0, len(server_response)):
         if expected_response[i]['status'] != server_response[i]['status']:
             print(err_base + "statuses")
-            print("Line " + str(i) + ". Got: "+ server_response[i]['status'] + 
+            print("Line " + str(i) + ". Got: "+ server_response[i]['status'] +
                 " expected " + expected_response[i]['status'])
             return False
         if expected_response[i].status == "RETURNING":
             if expected_response[i].output != server_response[i].output:
                 print(err_base + "output doesn't match")
-                print("Got " + str(server_response[i]['output']) + " expected " + 
+                print("Got " + str(server_response[i]['output']) + " expected " +
                     str(expected_response[i]['output']))
                 return False
     print("Responses match")
@@ -71,7 +71,7 @@ def sendFromFile(testfile):
                     response = clientSend(program['program'])
                     response_json = [(lambda x: json.loads(x))(l) for l in response.split("\n")]
                     compareResponses(i, response_json, program['output'])
-                    i += 1    
+                    i += 1
             except Exception as e:
                 print(e)
     else:
@@ -86,7 +86,7 @@ if __name__ == '__main__':
     cmd_parser.add_argument('-m', type=str, dest="manualprogram", required=False)
     #cmd_parser.add_argument('-a', dest='run_all', action='store_true')
     args = cmd_parser.parse_args()
-    
+
     port = args.port
     data_path = args.data_path
     manualprogram = args.manualprogram
@@ -109,6 +109,6 @@ if __name__ == '__main__':
             if not test_file.endswith(".json"):
                 test_file += ".json"
             sendFromFile(test_file)
-            
+
 
 
