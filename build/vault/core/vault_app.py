@@ -34,6 +34,10 @@ if __name__ == '__main__':
         return x
         ***
         ''')
+    # prog = Program('''as principal admin password "admin" do
+    #     exit
+    #     ***
+    #     ''')
     result = vault.run(prog)
     print(result)
 

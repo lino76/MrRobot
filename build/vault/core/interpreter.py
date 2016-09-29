@@ -13,18 +13,17 @@ class Interpreter:
         self.local = {}
         self.context = None
         self.command_handlers = {
-            'get': self.handle_get,
             'set': self.handle_set,
             'return': self.handle_return,
-            'exit': None,
-            'create_principal': None,
-            'change_password': None,
-            'append_to': None,
-            'local': None,
-            'foreach': None,
-            'set_delegation': None,
-            'delete_delegation': None,
-            'default_delegator': None
+            'exit': self.handle_exit,
+            'create_principal': self.handle_create_principal,
+            'change_password': self.handle_change_password,
+            'append_to': self.handle_append_to,
+            'local': self.handle_local,
+            'foreach': self.handle_foreach,
+            'set_delegation': self.handle_set_delegation,
+            'delete_delegation': self.handle_delete_delegation,
+            'default_delegator': self.handle_default_delegator
         }
 
     def execute(self, program):
@@ -36,8 +35,6 @@ class Interpreter:
                     self.log.append(status)
 
         datastore_result = self.datastore.commit()
-        # TODO create result log
-        # TODO clear global
         program.result = self.log
         self.reset()
         return program
@@ -56,10 +53,6 @@ class Interpreter:
         self.datastore.set(key, value)  # this will de facto check for permission (fail fast)
         return log
 
-    def handle_get(self, cmd):
-        cmd, key = cmd
-        self.datastore.set(key)
-
     def handle_return(self, cmd):
         log = {"status": "RETURNING"}
         output = None
@@ -74,6 +67,43 @@ class Interpreter:
         # Return
         if output is not None:
             log["output"] = output.content.value
+        return log
+
+    def handle_exit(self, cmd):
+        # TODO to exit we finish the current program and tell the server to shutdown not sure how yet
+        pass
+
+    def handle_create_principal(self, cmd):
+        log = {"status": "CREATE_PRINCIPAL"}
+        return log
+
+    def handle_change_password(self, cmd):
+        log = {"status": "CHANGE_PASSWORD"}
+        return log
+
+
+    def handle_append_to(self, cmd):
+        log = {"status": "APPEND"}
+        return log
+
+    def handle_local(self, cmd):
+        log = {"status": "LOCAL"}
+        return log
+
+    def handle_foreach(self, cmd):
+        log = {"status": "FOREACH"}
+        return log
+
+    def handle_set_delegation(self, cmd):
+        log = {"status": "SET_DELEGATION"}
+        return log
+
+    def handle_delete_delegation(self, cmd):
+        log = {"status": "DELETE_DELEGATION"}
+        return log
+
+    def handle_default_delegator(self, cmd):
+        log = {"status": "DEFAULT_DELEGATOR"}
         return log
 
     def find_value(self, key):

@@ -19,3 +19,7 @@ class NetworkError(VaultError):
 class SecurityError(VaultError):
     pass
 
+
+class ExitError(VaultError):
+    pass
+
