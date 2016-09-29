@@ -87,8 +87,9 @@ class Interpreter:
     def handle_append_to(self, cmd):
         log = {"status": "APPEND"}
         key = cmd.expressions['key']
+        print(key)
         value_to_append = cmd.expressions['value']
-        if target.expr_type is not Type.list:
+        if key.expr_type is not Type.list:
             pass #TODO fail
         value = self.datastore.get(key)
         print(key)
