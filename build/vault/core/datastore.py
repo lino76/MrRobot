@@ -1,6 +1,6 @@
 
 from vault.util import Context, Principal, Role, Vividict
-
+import vault.error
 
 class Datastore:
 
@@ -34,8 +34,7 @@ class Datastore:
                 if self.is_authorized(self.context.principal, role, key):
                     return func(*args, **kwargs)
                 else:
-                    raise Exception("DENIED")
-                    # raise SecurityError(100, "DENIED")
+                    raise vault.error.SecurityError(100, "DENIED")
             return authorize_role_wrapper
         return wrapper
 
@@ -87,9 +86,13 @@ class Datastore:
         if self.is_admin() or principal.name == self.context.principal.name:
             self.context.queue.append(['CHANGE_PASSWORD', principal.name, principal, None])
 
-
+    @require_context()
     def create_principal(self, principal):
-        pass
+        if self.is_admin():
+            if principal.name not in self.authentication:
+                self.context.queue.append(['CREATE_PRINCIPLE', principal.name, principal, None])
+            else:
+                raise Exception(101, "principal already exists")
 
     def set_delegation(self, source_principal, target_principal, role):
         pass
@@ -120,6 +123,9 @@ class Datastore:
             elif op is "CHANGE_PASSWORD":
                 self.authentication[key] = value
                 result.append({"CHANGE_PASSWORD"})
+            elif op is "CREATE_PRINCIPLE":
+                self.authentication[key] = value
+                result.append({"CREATE_PRINCIPLE"})
             else:
                 raise Exception(100, "Unsupported operation")
         return result

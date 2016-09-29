@@ -30,7 +30,11 @@ class Interpreter:
         context = self.datastore.create_context(vault.util.Principal(program.principal, program.password))
         if context is not None:
             for cmd in program.commands:
-                status = self.command_handlers[cmd.name](cmd)
+                try:
+                    status = self.command_handlers[cmd.name](cmd)
+                except Exception:
+                    self.reset()
+                    raise # we're done here
                 if status is not None:
                     self.log.append(status)
         datastore_result = self.datastore.commit()
@@ -39,6 +43,7 @@ class Interpreter:
         return program
 
     def reset(self):
+        self.datastore.cancel()
         self.log = []
         self.local = {}
 
@@ -48,8 +53,8 @@ class Interpreter:
         output = None
         key = cmd.expressions["key"]
         value = cmd.expressions["value"]
-        self.local[key] = value  # keep it around for future use
         self.datastore.set(key, value)  # this will de facto check for permission (fail fast)
+        self.local[key] = value  # keep it around for future use
         return log
 
     def handle_return(self, cmd):
@@ -76,6 +81,8 @@ class Interpreter:
 
     def handle_create_principal(self, cmd):
         log = {"status": "CREATE_PRINCIPAL"}
+        principal = vault.util.Principal(cmd.expressions['principal'], cmd.expressions['password'])
+        self.datastore.create_principal(principal)
         return log
 
     def handle_change_password(self, cmd):
