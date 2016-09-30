@@ -82,20 +82,17 @@ if __name__ == '__main__':
 # Test 2
 
     prog1 = Program('''"as principal admin password "admin" do
-        local x = "2"
-        return x
+        set records = []
+        append to records with { name = "mike", date = "1-1-90" }
+        append to records with { name = "dave", date = "1-1-85" }
+        local names = records
+        return names
         ***
         ''')
 
-        # set records = []
-        # append to records with { name = "mike", date = "1-1-90" }
-        # append to records with { name = "dave", date = "1-1-85" }
-        # local names = records
-        # foreach rec in names replacewith rec.name
-        # local rec = ""
-        # return names
-        # ***
-        # ''')
+    #
+    #     foreach rec in names replacewith rec.name
+    #     local rec = ""
     #
     result = vault.run(prog1)
     print("output:")

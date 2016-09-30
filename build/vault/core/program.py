@@ -4,6 +4,8 @@ class Expression:
     def __init__(self, expr_type, content):
         self.expr_type = expr_type #'value', 'list' (or '[]'), 'record'
         self.content = content
+        # to nest (e.g. concat) expressions and retain their metadata we'll push them into here
+        self.children = []
 
     def __str__(self):
         return self.expr_type + ": " + str(self.content)
@@ -30,7 +32,17 @@ class Expression:
             self.content[int(field)] == value
 
     def append(self, other):
-        pass 
+        pass
+
+    # The idea here is than given an expression and it's concat'd children
+    # It could iterate and mash them all together producing the final value
+    def concat_children(self):
+        result = self.content
+        for child in self.children:
+            result.append(child.content)
+        return result
+
+
 
 
 #TOOD REST OF STUFF

@@ -1,4 +1,5 @@
 from enum import Enum
+from copy import deepcopy
 
 from vault.util import Context, Principal, Role, Vividict
 import vault.error
@@ -19,6 +20,7 @@ class TxnTypes(Enum):
     create_principal = "CREATE_PRINCIPAL"
     grant = "GRANT"
     delegate_add = "ADD_DELEGATE"
+    append = "APPEND"
 
 
 class Datastore:
@@ -69,7 +71,16 @@ class Datastore:
 
     @require_context()
     def append(self, key, value):
-        pass
+        # check for the right permissions (write and append)
+        principal = self.context.principal
+        if self.exists(key):
+            grants = self.authorization[key][principal.name]
+            if Role.write not in grants and Role.append not in grants and not self.is_admin():
+                raise vault.error.SecurityError(100, "DENIED")
+            else:
+                self.add_transaction(Transaction(op=TxnTypes.append, key=key, value=value))
+        else:
+            raise vault.error.VaultError(100, "cant append to missing value")
 
     @require_context()
     def get(self, key):
@@ -83,6 +94,22 @@ class Datastore:
             return self.datatable[key]
         else:
             raise vault.error.VaultError(101, "key does not exist")
+
+    @require_context()
+    def get_noperm(self, key):
+        # This is a convenience method for APPEND_TO that lets a value be read if the user has WRITE and APPEND perms
+        # but not READ
+        principal = self.context.principal
+        grants = self.authorization[key][principal.name]
+        if Role.write not in grants and Role.append not in grants and not self.is_admin():
+            raise vault.error.SecurityError(100, "DENIED")
+        else:
+            if key in self.datatable:
+                return self.datastore['key']
+            else:
+                #it must be in the queue
+                pass
+
 
     '''Authorization API'''
     @require_context()
@@ -137,17 +164,22 @@ class Datastore:
     ''' This is where we actually persist the data'''
     def commit(self):
         for txn in self.context.queue:
+
             if txn.op is TxnTypes.set:
                 self.datatable[txn.key] = txn.value
+
             elif txn.op is TxnTypes.change_password:
                 self.authentication[txn.key] = txn.value
+
             elif txn.op is TxnTypes.create_principal:
                 self.authentication[txn.key] = txn.value
+
             elif txn.op is TxnTypes.grant:
                 # TODO there's probably a better way to merge into a unique list
                 existing = self.authorization[txn.key][txn.principal.name]
                 merged = list(set(existing + txn.roles))
                 self.authorization[txn.key][txn.principal.name] = merged
+
             elif txn.op is TxnTypes.delegate_add:
                 existing_roles = self.authorization[txn.key][txn.principal.name]
                 if not isinstance(existing_roles, list):
@@ -155,6 +187,14 @@ class Datastore:
                 if txn.roles not in existing_roles:
                     existing_roles.append(txn.roles)
                     self.authorization[txn.key][txn.principal.name] = existing_roles
+
+            elif txn.op is TxnTypes.append:
+                # this was a nice idea but I'm not sure it's going to fly.
+                existing_value = self.datatable[txn.key]
+                appended_value = existing_value.concat_children()
+                existing_value.content = deepcopy(appended_value)
+                existing_value.children = []
+
             else:
                 raise Exception(100, "Unsupported operation")
         return "success"

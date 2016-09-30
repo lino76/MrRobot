@@ -1,4 +1,5 @@
 '''The runtime for the program'''
+from copy import deepcopy
 
 import vault.util
 import vault.error
@@ -63,18 +64,18 @@ class Interpreter:
         log = {"status": "RETURNING"}
         output = None
         expression = cmd.expressions["return_value"]
-        # figure out what the type is e.g. literal, variable, etc
-        # figure out if it's in local or global
-        # fetch it from where ever it is
-        
         if expression.expr_type is not Type.literal:
             output = self.find_value(expression.content.value)
+            if output.expr_type == Type.list.value and len(output.children) > 0:
+                output = output.concat_children()
         elif expression.expr_type == Type.literal:
             output = expression.content
-        # Return
-        
         if output is not None:
-            log["output"] = output.content.value
+            # TODO there are probably other types
+            if isinstance(output, Expression):
+                log["output"] = output.content.value
+            else:
+                log["output"] = output
         return log
 
     def handle_exit(self, cmd):
@@ -100,13 +101,19 @@ class Interpreter:
         value_to_append = cmd.expressions['value']
         # see if the value exists and if we can access it
         if self.is_local(key):
-            pass
-
-        key_value = self.find_value(key)
-        if Type(key_value.expr_type) is not Type.list:
-            raise vault.error.VaultError
-        # append
-        self.datastore.append(key, key)
+            # if local we have to do it all here
+            # the big difference is that local fields seem to have no permissions TODO (verify this)
+            key_value = self.local[key]
+            if Type(key_value.expr_type) is Type.list:
+                key_value.children.append(value_to_append)
+        elif self.is_global(key):
+            # here we have to push it down to the datastore because this user might not have READ permission
+            self.datastore.append(key, value_to_append)
+            # The idea here is I might be able to build the append value without getting it from the database
+            # this might work because a value has to be created in a program before it can be appended to
+            # so it's reference should be in the cache
+            if self.is_cached(key):
+                self.cache[key].children.append(value_to_append)
         return log
 
     def handle_local(self, cmd):
@@ -116,7 +123,10 @@ class Interpreter:
         # check for existing key
         if self.is_local(key) or self.is_global(key):
             raise vault.error.VaultError(100, "cannot create local variable of existing variable")
-        self.local[key] = expressions['value']
+        # get value of expression
+        value_key = expressions['value']
+        value = self.find_value(value_key.content.value)
+        self.local[key] = deepcopy(value)
         return log
 
     def handle_foreach(self, cmd):
@@ -144,27 +154,27 @@ class Interpreter:
     def is_local(self, key):
         if key in self.local:
             return True
-        else:
-            return False
+        return False
 
     # This requires no permission to check unlike find_value
     def is_global(self, key):
         return self.datastore.exists(key)
 
+    def is_cached(self, key):
+        if key in self.cache:
+            return True
+        return False
+
     def find_value(self, key):
-        if key in self.local:
-            return self.local[key]
         if key in self.cache:
             return self.cache[key]
+        if key in self.local:
+            return self.local[key]
         if self.datastore.exists(key):
             return self.datastore.get(key)
         else:
             raise Exception(101, "no key found in database")
 
 
-
 if __name__ == '__main__':
-    from vault.util import Principal
-    from vault.core import Datastore, Program
-    interpreter = Interpreter(Datastore())
-    program = interpreter.execute(Program(interpreter.fakeTokens))
+    pass
