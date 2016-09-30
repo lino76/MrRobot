@@ -49,9 +49,10 @@ class Datastore:
         principal = self.context.principal
         if self.exists(key):
             # check rights
-            grants = self.authorization[key][principal.name]
-            if Role.write not in grants:
+            if not self.has_role(key, Role.write, principal):
                 raise vault.error.SecurityError(100, "DENIED")
+            else:
+                self.add_transaction(Transaction(op=TxnTypes.set, key=key, value=value))
         else:
             # check rights
             grants = self.authorization[key][principal.name]
