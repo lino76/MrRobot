@@ -61,32 +61,51 @@ if __name__ == '__main__':
     #     ***
     #     ''')
 
-    prog1 = Program('''as principal admin password "admin" do
-        create principal bob "B0BPWxxd"
-        set x = "my string"
-        set delegation x admin read -> bob
+# Test 1
+#     prog1 = Program('''as principal admin password "admin" do
+#         create principal bob "B0BPWxxd"
+#         set x = "my string"
+#         set delegation x admin read -> bob
+#         return x
+#         ***
+#         ''')
+#     prog2 = Program('''as principal bob password "B0BPWxxd" do
+#         return x
+#         ***
+#         ''')
+#     prog3 = Program('''as principal bob password "B0BPWxxd" do
+#         set x = "another string"
+#         return x
+#         ***
+#         ''')
+
+# Test 2
+
+    prog1 = Program('''"as principal admin password "admin" do
+        local x = "2"
         return x
         ***
         ''')
-    prog2 = Program('''as principal bob password "B0BPWxxd" do
-        return x
-        ***
-        ''')
-    prog3 = Program('''as principal bob password "B0BPWxxd" do
-        set x = "another string"
-        return x
-        ***
-        ''')
+
+        # set records = []
+        # append to records with { name = "mike", date = "1-1-90" }
+        # append to records with { name = "dave", date = "1-1-85" }
+        # local names = records
+        # foreach rec in names replacewith rec.name
+        # local rec = ""
+        # return names
+        # ***
+        # ''')
     #
     result = vault.run(prog1)
     print("output:")
     print(result)
-    result = vault.run(prog2)
-    print("output:")
-    print(result)
-    result = vault.run(prog3)
-    print("output:")
-    print(result)
+    # result = vault.run(prog2)
+    # print("output:")
+    # print(result)
+    # result = vault.run(prog3)
+    # print("output:")
+    # print(result)
 
 
 

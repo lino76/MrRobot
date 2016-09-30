@@ -68,6 +68,10 @@ class Datastore:
                                                      roles=[Role.read, Role.write, Role.append, Role.delegate]))
 
     @require_context()
+    def append(self, key, value):
+        pass
+
+    @require_context()
     def get(self, key):
         principal = self.context.principal
         if self.exists(key):
@@ -172,6 +176,11 @@ class Datastore:
     def exists(self, key):
         if key in self.datatable:
             return True
+        else:
+            for txn in self.context.queue:
+                # TODO add append
+                if txn.op is TxnTypes.set and txn.key == key:
+                    return True
         return False
 
     def is_current(self, principal):

@@ -11,6 +11,7 @@ class Interpreter:
         self.datastore = datastore
         self.log = []
         self.local = {}
+        self.cache = {}
         self.context = None
         self.command_handlers = {
             'set': self.handle_set,
@@ -46,6 +47,7 @@ class Interpreter:
         self.datastore.cancel()
         self.log = []
         self.local = {}
+        self.cache = {}
 
     ''' Long list of handlers  '''
     def handle_set(self, cmd):
@@ -54,7 +56,7 @@ class Interpreter:
         key = cmd.expressions["key"]
         value = cmd.expressions["value"]
         self.datastore.set(key, value)  # this will de facto check for permission (fail fast)
-        self.local[key] = value  # keep it around for future use
+        self.cache[key] = value  # this reduces the complexity of the database transaction checks
         return log
 
     def handle_return(self, cmd):
@@ -95,25 +97,26 @@ class Interpreter:
     def handle_append_to(self, cmd):
         log = {"status": "APPEND"}
         key = cmd.expressions['key']
-        print(key)
         value_to_append = cmd.expressions['value']
-        if key.expr_type is not Type.list:
-            pass #TODO fail
-        value = self.datastore.get(key)
-        #now what
-        if value_to_append is Type.record:
-            for k in value_to_append.value.keys():
-                pass #maybe?
-        else:
-            value.value.append(value_to_append.value) #???
+        # see if the value exists and if we can access it
+        if self.is_local(key):
+            pass
 
-        self.datastore.set(key, value)
-
-        #maybe??
+        key_value = self.find_value(key)
+        if Type(key_value.expr_type) is not Type.list:
+            raise vault.error.VaultError
+        # append
+        self.datastore.append(key, key)
         return log
 
     def handle_local(self, cmd):
         log = {"status": "LOCAL"}
+        expressions = cmd.expressions
+        key = expressions['key']
+        # check for existing key
+        if self.is_local(key) or self.is_global(key):
+            raise vault.error.VaultError(100, "cannot create local variable of existing variable")
+        self.local[key] = expressions['value']
         return log
 
     def handle_foreach(self, cmd):
@@ -138,10 +141,21 @@ class Interpreter:
         log = {"status": "DEFAULT_DELEGATOR"}
         return log
 
-    def find_value(self, key):
+    def is_local(self, key):
+        if key in self.local:
+            return True
+        else:
+            return False
 
+    # This requires no permission to check unlike find_value
+    def is_global(self, key):
+        return self.datastore.exists(key)
+
+    def find_value(self, key):
         if key in self.local:
             return self.local[key]
+        if key in self.cache:
+            return self.cache[key]
         if self.datastore.exists(key):
             return self.datastore.get(key)
         else:
