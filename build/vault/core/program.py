@@ -98,6 +98,7 @@ class Program:
         self.status = None
         self.result = None
         self.src = src
+        self.exit = False
 
     def get_status(self):
         return self.status

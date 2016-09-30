@@ -65,8 +65,7 @@ class Server:
                     print("[*] Received: \n%s" % program.get_src())
 
                     try:
-                        result = self.vault.run(program)
-                        # TODO socket.send requires the app to keep track of data and resend if necessary
+                        result, shutdown = self.vault.run(program)
                         client_socket.send(result.encode('utf-8'))
                     except NetworkError as e:
                         print('EXCEPTION', e)

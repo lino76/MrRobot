@@ -35,7 +35,7 @@ class Vault:
         # TODO interpret results and determine status
         print('program complete')
         result_output = self.format_result(program_result.result)
-        return result_output
+        return result_output, program_result.exit
 
     def format_result(self, result_log):
         output = ""
@@ -88,6 +88,7 @@ if __name__ == '__main__':
         append to records with { name = "dave", date = "1-1-85" }
         local names = records
         return names
+        exit
         ***
         ''')
 
@@ -95,7 +96,7 @@ if __name__ == '__main__':
         # foreach rec in names replacewith rec.name
         # local rec = ""
     #
-    result = vault.run(prog1)
+    result, exiting = vault.run(prog1)
     print("output:")
     print(result)
     # result = vault.run(prog2)

@@ -14,6 +14,7 @@ class Interpreter:
         self.local = {}
         self.cache = {}
         self.context = None
+        self.program = None
         self.command_handlers = {
             'set': self.handle_set,
             'return': self.handle_return,
@@ -31,6 +32,7 @@ class Interpreter:
     def execute(self, program):
         context = self.datastore.create_context(vault.util.Principal(program.principal, program.password))
         if context is not None:
+            self.program = program
             for cmd in program.commands:
                 try:
                     status = self.command_handlers[cmd.name](cmd)
@@ -46,6 +48,7 @@ class Interpreter:
 
     def reset(self):
         self.datastore.cancel()
+        self.program = None
         self.log = []
         self.local = {}
         self.cache = {}
@@ -79,8 +82,12 @@ class Interpreter:
         return log
 
     def handle_exit(self, cmd):
-        # TODO to exit we finish the current program and tell the server to shutdown not sure how yet
-        pass
+        log = {"status": "EXITING"}
+        if self.datastore.is_admin():
+            self.program.exit = True
+        else:
+            raise vault.error.SecurityError(100, "unauthorized to shutdown the server")
+        return log
 
     def handle_create_principal(self, cmd):
         log = {"status": "CREATE_PRINCIPAL"}

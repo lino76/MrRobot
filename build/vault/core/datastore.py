@@ -244,6 +244,7 @@ class Datastore:
     def add_transaction(self, txn):
         self.context.queue.append(txn)
 
+    @require_context()
     def is_admin(self):
         return self.context.principal.name == "admin"
 
