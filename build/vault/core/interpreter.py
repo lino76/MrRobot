@@ -67,12 +67,13 @@ class Interpreter:
         log = {"status": "RETURNING"}
         output = None
         expression = cmd.expressions["return_value"]
-        if expression.expr_type is not Type.literal:
+        if expression.content.type is not Type.literal:
+            print('ret1')
             output = self.find_value(expression.content.value)
             if output.expr_type == Type.list.value and len(output.children) > 0:
                 output = output.concat_children_values()
-        elif expression.expr_type == Type.literal:
-            output = expression.content
+        elif expression.content.type== Type.literal:
+            output = expression.content.value
         if output is not None:
             # TODO there are probably other types
             if isinstance(output, Expression):
@@ -190,6 +191,7 @@ class Interpreter:
         if self.datastore.exists(key):
             return self.datastore.get(key)
         else:
+            print(key)
             raise Exception(101, "no key found in database")
 
 

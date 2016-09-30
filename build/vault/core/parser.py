@@ -33,7 +33,7 @@ class Parser:
     def validate_string_constant(self, string):
         string = self.dequote(string)
         return re.fullmatch('[A-Za-z0-9_ ,;\.?!-]*', string) and \
-               len(string) < 65535
+               len(string) < 65536
 
     def validate_identifier(self, string):
         return string not in self.reserved_words and \
