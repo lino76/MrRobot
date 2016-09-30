@@ -37,23 +37,25 @@ def clientSend(data):
 
     return result
 
-def compareResponses(ncommand, server_response, expected_response):
-    err_base = "Command " + str(ncommand) + "| Responses don't match: "
+def compareResponses( server_response, expected_response):
+    err_base = "Command "  + "| Responses don't match: "
     if len(server_response) != len(expected_response):
         print(err_base + "different line numbers")
         return False
-    for i in range(0, len(server_response)):
-        if expected_response[i]['status'] != server_response[i]['status']:
-            print(err_base + "statuses")
-            print("Line " + str(i) + ". Got: "+ server_response[i]['status'] +
-                " expected " + expected_response[i]['status'])
-            return False
-        if expected_response[i].status == "RETURNING":
-            if expected_response[i].output != server_response[i].output:
-                print(err_base + "output doesn't match")
-                print("Got " + str(server_response[i]['output']) + " expected " +
-                    str(expected_response[i]['output']))
-                return False
+    if server_response != expected_response:
+        return False
+    # for i in range(0, len(server_response)):
+    #     if expected_response[i]['status'] != server_response[i]['status']:
+    #         print(err_base + "statuses")
+    #         print("Line " + str(i) + ". Got: "+ server_response[i]['status'] +
+    #             " expected " + expected_response[i]['status'])
+    #         return False
+    #     if expected_response[i].status == "RETURNING":
+    #         if expected_response[i].output != server_response[i].output:
+    #             print(err_base + "output doesn't match")
+    #             print("Got " + str(server_response[i]['output']) + " expected " +
+    #                 str(expected_response[i]['output']))
+    #             return False
     print("Responses match")
     return True
 
@@ -66,14 +68,19 @@ def sendFromFile(testfile):
             data = jsonFile.read()
 
             try:
-                i = 0
-                for program in json.loads(data)['programs']:
+                programms = json.loads(data)['programs']
+                for program in programms:
                     response = clientSend(program['program'])
-                    response_json = [(lambda x: json.loads(x))(l) for l in response.split("\n")]
-                    compareResponses(i, response_json, program['output'])
-                    i += 1
+                    response = response.split('\n')[:-1]
+                    print (response)
+                    response_json = [json.loads(res) for res in response]
+                    if not compareResponses(response_json, program['output']):
+                        print('NOT MATCH')
+                        return
             except Exception as e:
+                print('expect')
                 print(e)
+                raise
     else:
         print('File does not exist: ', testfile)
 
