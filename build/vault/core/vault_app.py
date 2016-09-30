@@ -21,16 +21,16 @@ class Vault:
         except Exception as e:
             print("Parsing exception: " + str(e))
             # TODO add security and vaulterror
-            return self.format_result([{"status": "FAILED"}])
+            return self.format_result([{"status": "FAILED"}]), False
 
         print('executing program..')
         try:
             program_result = vault.core.Interpreter(self.datastore).execute(program)
         except vault.error.SecurityError as se:
-            return self.format_result([{"status": "DENIED"}])
+            return self.format_result([{"status": "DENIED"}]), False
         except Exception as e:
             print("error running program:", str(e))
-            return self.format_result([{"status": "FAILED"}])
+            return self.format_result([{"status": "FAILED"}]), False
 
         # TODO interpret results and determine status
         print('program complete')
@@ -63,34 +63,35 @@ if __name__ == '__main__':
     #     ''')
 
 # Test 1
-#     prog1 = Program('''as principal admin password "admin" do
-#         create principal bob "B0BPWxxd"
-#         local x = "my string"
-#         set delegation x admin read -> bob
-#         return x
-#         ***
-#         ''')
-#     prog2 = Program('''as principal bob password "B0BPWxxd" do
-#         return x
-#         ***
-#         ''')
-#     prog3 = Program('''as principal bob password "B0BPWxxd" do
-#         set x = "another string"
-#         return x
-#         ***
-#         ''')
+    prog1 = Program('''as principal admin password "admin" do
+        create principal bob "B0BPWxxd"
+        set x = "my string"
+        set delegation x admin read -> bob
+        return x
+        ***
+        ''')
+    prog2 = Program('''as principal bob password "B0BPWxxd" do
+        return x
+        ***
+        ''')
+    prog3 = Program('''as principal bob password "B0BPWxxd" do
+        set x = "another string"
+        return x
+        ***
+        ''')
 
 # Test 2
 
-    prog1 = Program('''"as principal admin password "admin" do
-        set records = []
-        append to records with { name = "mike", date = "1-1-90" }
-        append to records with { name = "dave", date = "1-1-85" }
-        local names = records
-        return names
-        exit
-        ***
-        ''')
+    # prog1 = Program('''"as principal admin password "admin" do
+    #     set records = []
+    #     append to records with { name = "mike", date = "1-1-90" }
+    #     append to records with { name = "dave", date = "1-1-85" }
+    #     local names = records
+    #     foreach rec in names replacewith rec.name
+    #     local rec = ""
+    #     return names
+    #     ***
+    #     ''')
 
 
         # foreach rec in names replacewith rec.name
@@ -99,12 +100,12 @@ if __name__ == '__main__':
     result, exiting = vault.run(prog1)
     print("output:")
     print(result)
-    # result = vault.run(prog2)
-    # print("output:")
-    # print(result)
-    # result = vault.run(prog3)
-    # print("output:")
-    # print(result)
+    result, exiting = vault.run(prog2)
+    print("output:")
+    print(result)
+    result, exiting = vault.run(prog3)
+    print("output:")
+    print(result)
 
 
 

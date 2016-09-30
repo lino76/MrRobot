@@ -34,6 +34,20 @@ class Expression:
 
     # The idea here is than given an expression and it's concat'd children
     # It could iterate and mash them all together producing the final value
+    def concat_children_values(self):
+        result = self.content
+        for child in self.children:
+            child_val = None
+            if Type(child.expr_type) == Type.record:
+                val = {}
+                for key in child.content.keys():
+                    val[key] = child.content[key].value
+                child_val = val
+            else:
+                child_val = child.content
+            result.append(child_val)
+        return result
+
     def concat_children(self):
         result = self.content
         for child in self.children:

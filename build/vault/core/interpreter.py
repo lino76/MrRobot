@@ -70,7 +70,7 @@ class Interpreter:
         if expression.expr_type is not Type.literal:
             output = self.find_value(expression.content.value)
             if output.expr_type == Type.list.value and len(output.children) > 0:
-                output = output.concat_children()
+                output = output.concat_children_values()
         elif expression.expr_type == Type.literal:
             output = expression.content
         if output is not None:
@@ -141,6 +141,10 @@ class Interpreter:
 
     def handle_foreach(self, cmd):
         log = {"status": "FOREACH"}
+        target = expressions['item']
+        list_name = expressions['list']
+        replacer = expressions['replacer']
+
         return log
 
     def handle_set_delegation(self, cmd):
