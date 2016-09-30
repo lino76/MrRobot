@@ -18,12 +18,14 @@ class TxnTypes(Enum):
     change_password = "CHANGE_PASSWORD"
     create_principal = "CREATE_PRINCIPAL"
     grant = "GRANT"
+    delegate_add = "ADD_DELEGATE"
 
 
 class Datastore:
 
     def __init__(self):
-        self.authentication = {"admin": Principal(name="admin", password="admin")}
+        self.authentication = {"admin": Principal(name="admin", password="admin"),
+                               "anyone": Principal(name="admin")}
         self.authorization = Vividict()
         self.datatable = Vividict()
         self.context = None
@@ -93,8 +95,23 @@ class Datastore:
                 raise Exception(101, "principal already exists")
 
     @require_context()
-    def set_delegation(self, source_principal, target_principal, role):
-        pass
+    def set_delegation(self, source_principal, target_principal, key, role):
+        # First check if source and target principals exist
+        if self.principle_exists(source_principal) and self.principle_exists(target_principal):
+            # check if current is admin or source
+            if self.is_admin() or self.is_current(source_principal):
+                # check if q has permission to delegate for key
+                if self.has_role(key, Role.delegate, source_principal):
+                    # they are good to go
+                    self.add_transaction(Transaction(op=TxnTypes.delegate_add, key=key,
+                                                     principal=target_principal, roles=Role(role)))
+                else:
+                    raise vault.error.SecurityError(100, "principal requires delegate permission")
+            else:
+                raise vault.error.SecurityError(100, "can only delegate for yourself")
+        else:
+            raise vault.error.VaultError(100, "principals do not exist")
+
 
     @require_context()
     def delete_delegation(self, source_principal, target_principal, role):
@@ -127,6 +144,13 @@ class Datastore:
                 existing = self.authorization[txn.key][txn.principal.name]
                 merged = list(set(existing + txn.roles))
                 self.authorization[txn.key][txn.principal.name] = merged
+            elif txn.op is TxnTypes.delegate_add:
+                existing_roles = self.authorization[txn.key][txn.principal.name]
+                if not isinstance(existing_roles, list):
+                    existing_roles = []
+                if txn.roles not in existing_roles:
+                    existing_roles.append(txn.roles)
+                    self.authorization[txn.key][txn.principal.name] = existing_roles
             else:
                 raise Exception(100, "Unsupported operation")
         return "success"
@@ -134,10 +158,39 @@ class Datastore:
     def cancel(self):
         self.context = None
 
+    def principle_exists(self, principal):
+        # check for stored users
+        if principal.name in self.authentication:
+            return True
+        # check for pending users
+        for txn in self.context.queue:
+            if txn.op is TxnTypes.create_principal and txn.value.name == principal.name:
+                return True
+        # None found
+        return False
+
     def exists(self, key):
         if key in self.datatable:
             return True
         return False
+
+    def is_current(self, principal):
+        if self.context.principal.name == principal.name:
+            return True
+        else:
+            return False
+
+    def has_role(self, key, role, principal):
+        existing = self.authorization[key][principal.name]
+        pending = []
+        for txn in self.context.queue:
+            if txn.op is TxnTypes.grant and txn.principal.name == principal.name and txn.key == key:
+                pending += txn.roles
+        merged = list(set(existing + pending))
+        if role in merged:
+            return True
+        else:
+            return False
 
     def add_transaction(self, txn):
         self.context.queue.append(txn)

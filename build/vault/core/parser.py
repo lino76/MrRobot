@@ -351,7 +351,7 @@ class Parser:
         for line in lines:
             program.commands.append(self.parse_command(line))
 
-        for command in program.commands:
-            print(str(command))
+        # for command in program.commands:
+        #     print(str(command))
 
         return program

@@ -34,7 +34,7 @@ class Interpreter:
                     status = self.command_handlers[cmd.name](cmd)
                 except Exception as e:
                     self.reset()
-                    raise # we're done here
+                    raise  # we're done here
                 if status is not None:
                     self.log.append(status)
         datastore_result = self.datastore.commit()
@@ -121,7 +121,13 @@ class Interpreter:
         return log
 
     def handle_set_delegation(self, cmd):
-        log = {"status": "SET DELEGATION"}
+        log = {"status": "SET_DELEGATION"}
+        expressions = cmd.expressions
+        src_principal = vault.util.Principal(expressions['source_principal'])
+        target_principal = vault.util.Principal(expressions['target_principal'])
+        role = expressions['right']
+        key = expressions['variable']
+        self.datastore.set_delegation(src_principal, target_principal, key, role)
         return log
 
     def handle_delete_delegation(self, cmd):
