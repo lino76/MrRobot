@@ -13,7 +13,6 @@ class Expression:
     def __repr__(self):
         return str(self)
 
-
     def get(self, field=None):
         if self.type == 'value':
             return self.content #maybe this is not that simple, since values can either be literals or have and identifier
@@ -21,7 +20,6 @@ class Expression:
             return self.content[int(field)]
         if self.type == 'record':
             return self.content[str(field)]
-
 
     def set(self, value, field=None):
         if self.type == 'value':

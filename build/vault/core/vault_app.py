@@ -53,7 +53,8 @@ class Vault:
 if __name__ == '__main__':
     from vault.core import Vault, Parser, Program, Datastore
     vault = Vault("admin")
-    # prog = Program('''as principal admin password "admin" do
+
+    # prog1 = Program('''as principal admin password "admin" do
     #     set x = "Success"
     #     change password admin "password"
     #     create principal bob "B0BPWxxd"
@@ -64,7 +65,7 @@ if __name__ == '__main__':
 # Test 1
 #     prog1 = Program('''as principal admin password "admin" do
 #         create principal bob "B0BPWxxd"
-#         set x = "my string"
+#         local x = "my string"
 #         set delegation x admin read -> bob
 #         return x
 #         ***
@@ -90,9 +91,9 @@ if __name__ == '__main__':
         ***
         ''')
 
-    #
-    #     foreach rec in names replacewith rec.name
-    #     local rec = ""
+
+        # foreach rec in names replacewith rec.name
+        # local rec = ""
     #
     result = vault.run(prog1)
     print("output:")

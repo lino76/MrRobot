@@ -125,7 +125,10 @@ class Interpreter:
             raise vault.error.VaultError(100, "cannot create local variable of existing variable")
         # get value of expression
         value_key = expressions['value']
-        value = self.find_value(value_key.content.value)
+        if value_key.content.type is Type.literal:
+            value = value_key.content.value
+        else:
+            value = self.find_value(value_key.content.value)
         self.local[key] = deepcopy(value)
         return log
 
@@ -140,7 +143,10 @@ class Interpreter:
         target_principal = vault.util.Principal(expressions['target_principal'])
         role = expressions['right']
         key = expressions['variable']
-        self.datastore.set_delegation(src_principal, target_principal, key, role)
+        if self.is_global(key):
+            self.datastore.set_delegation(src_principal, target_principal, key, role)
+        else:
+            raise vault.error.VaultError(100, "cannot delegate nonexistant or local variables")
         return log
 
     def handle_delete_delegation(self, cmd):
