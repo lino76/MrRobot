@@ -38,11 +38,17 @@ def exit(code=0, _signo = signal.SIGTERM):
 
 def validate_args(input_args):
     # Validate the port
-    
     try:
         port = str(input_args[0])
     except:
         raise CmdError(255, 'port not found')
+
+    try:
+        # test for spaces
+        if port.find(" ") >= 0:
+            raise CmdError(255, 'Invalid port value')
+    except:
+        raise CmdError(255, 'Invalid port value')
 
     try:
         # test for leading 0
