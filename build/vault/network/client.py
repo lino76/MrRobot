@@ -41,8 +41,12 @@ def compareResponses( server_response, expected_response):
     err_base = "Command "  + "| Responses don't match: "
     if len(server_response) != len(expected_response):
         print(err_base + "different line numbers")
+        print('expected:', expected_response)
+        print('received:', server_response)
         return False
     if server_response != expected_response:
+        print('expected:', expected_response)
+        print('received:', server_response)
         return False
     # for i in range(0, len(server_response)):
     #     if expected_response[i]['status'] != server_response[i]['status']:
@@ -68,11 +72,12 @@ def sendFromFile(testfile):
             data = jsonFile.read()
 
             try:
+                #NOTE : here u can specify what exact part of test u want to run
+                #just append [-1:] - will run last testcase from file
                 programms = json.loads(data)['programs']
                 for program in programms:
                     response = clientSend(program['program'])
                     response = response.split('\n')[:-1]
-                    print (response)
                     response_json = [json.loads(res) for res in response]
                     if not compareResponses(response_json, program['output']):
                         print('NOT MATCH')

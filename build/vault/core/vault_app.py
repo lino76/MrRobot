@@ -13,6 +13,9 @@ class Vault:
         self.datastore = vault.core.Datastore()
 
     def run(self, program):
+        if len(program.src) > 1000000:
+            return self.format_result([{"status": "FAILED"}]), False
+
         print('running program: ', program.src)
 
         print('parsing program..')
