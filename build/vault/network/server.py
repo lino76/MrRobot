@@ -47,7 +47,7 @@ class Server:
         Thread handler that manager 1 connection and close it
         """
         client_socket.setblocking(True)
-        # client_socket.settimeout(30)
+        client_socket.settimeout(30)
         client_socket.settimeout(None)  # TODO THIS IS FOR DEBUGGING
         try:
             data = b''
