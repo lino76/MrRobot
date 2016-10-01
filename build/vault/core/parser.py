@@ -28,7 +28,6 @@ class Parser:
         return lines[:terminator_pos]
 
 
-
     # maybe move this outside or make a static func
     def validate_string_constant(self, string):
         string = self.dequote(string)
@@ -44,6 +43,9 @@ class Parser:
 
     def validate_right(self, string):
         return string == "read" or string == "write" or string == "append" or string == "delegate"
+
+    def validate_tgt(self, string):
+        return string == "all" or self.validate_identifier(string)
 
     def remove_comments(self, string):
         string = string.lstrip()
@@ -216,8 +218,8 @@ class Parser:
         while '' in splitted:
             splitted.remove('')  # remove empty entries in list due to consecutive spaces
 
-        if not self.validate_identifier(splitted[0]):
-            raise VaultError(1, "set delegation first arg not a valid identifier: " + str(splitted))
+        if not self.validate_tgt(splitted[0]):
+            raise VaultError(1, "set delegation first arg not a valid tgt: " + str(splitted))
         expressions['variable'] = splitted[0]
 
         if not self.validate_identifier(splitted[1]):
