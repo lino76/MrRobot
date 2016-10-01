@@ -68,7 +68,7 @@ class Expression:
             if isinstance(child, dict):
                 # if there are non field values then this is probably already scrubbed
                 for k in child.values():
-                    if k is FieldType:
+                    if isinstance(k, FieldType):
                         break
                     else:
                         return self.content
