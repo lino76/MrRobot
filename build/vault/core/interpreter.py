@@ -60,37 +60,31 @@ class Interpreter:
         key = cmd.expressions["key"]
         value = cmd.expressions["value"]
         self.datastore.set(key, value)  # this will de facto check for permission (fail fast)
-        self.cache[key] = value  # this reduces the complexity of the database transaction checks
+        self.cache[key] = value
         return log
 
-    # def handle_return(self, cmd):
-    #     log = {"status": "RETURNING"}
-    #     output = None
-    #     expression = cmd.expressions["return_value"]
-    #     if expression.content.type is not Type.literal:
-    #         output = self.find_value(expression.content.value)
-    #         if output.expr_type == Type.list.value and len(output.children) > 0:
-    #             output = output.concat_children_values()
-    #     elif expression.content.type== Type.literal:
-    #         output = expression.content.value
-    #     if output is not None:
-    #         # TODO there are probably other types
-    #         if isinstance(output, Expression):
-    #             log["output"] = output.content.value
-    #         else:
-    #             log["output"] = output
-    #     return log
+    def evaluate_field(self, expression):
+        # TODO traverse the object graph of expression and evaluate all fields
+        # This will probably be used in set, append, and foreach
+        # it should make copies of anything is takes from other fields
+        # returns the graph with all the right types/values (e.g. fieldvalues)
+        pass
 
     def handle_return(self, cmd):
         log = {"status": "RETURNING"}
         expression = cmd.expressions["return_value"]
         # Find the value
         output = None
+        # Here we basically have to convert our internal repr of object
+        # with the values to be output. we also make copies because these
+        # are generally references and it's the datastore that will actually persist them on commit.
+        # Our typing is inconsistent so it's messy.
         if expression.expr_type == "value":
             field_val = expression.get()
             if field_val.type is Type.field:
                 output = deepcopy(self.find_value(field_val.value))
                 if output.expr_type == Type.list.value:
+                    # children > 0 means this list was appended to and is waiting to be committed
                     if len(output.children) > 0:
                         # compact the appended values
                         output.concat_children()
@@ -101,8 +95,9 @@ class Interpreter:
             if field_val.type is Type.literal:
                 output = expression.content.value
 
-        # Format it
+        # Format the results
         if output is not None:
+            # quite a few results will already be converted already. this is a crude conversion below
             if isinstance(output, Expression):
                 if isinstance(output.content, list):
                     log["output"] = output.value()
@@ -205,17 +200,10 @@ class Interpreter:
         return log
 
     def build_replacement(self, target, item, replacer):
-        # if replacer.expr_type == "value":
-        #     path = replacer.content.value
-        #     keys = path.split('.')
-        # elif replacer.expr_type == "record":
-        #
-        # else:
-        #     keys = [replacer.content.value]
-        # TODO what are we replacing?
+        # add to search path (might want to test first)
         self.local[target] = item
 
-        # TODO What are we replacing it with?
+        # replacment
         if replacer.expr_type == "value":
             field_val = replacer.get()
             if field_val.type is Type.record:
@@ -223,7 +211,7 @@ class Interpreter:
                 keys = path.split('.')
                 r_val = self.find_value_by_path(keys)
             else:
-                #todo
+                # todo other types
                 r_val = field_val.value
         elif replacer.expr_type == "record":
             r_val = {}
@@ -248,7 +236,6 @@ class Interpreter:
 
         del self.local[target]
         return r_val
-
 
     def handle_set_delegation(self, cmd):
         log = {"status": "SET_DELEGATION"}
