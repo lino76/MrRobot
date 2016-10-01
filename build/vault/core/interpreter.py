@@ -59,16 +59,21 @@ class Interpreter:
         output = None
         key = cmd.expressions["key"]
         value = cmd.expressions["value"]
+        # populated_key = self.evaluate_field(key)
+        populated_value = self.evaluate_field(value)
         self.datastore.set(key, value)  # this will de facto check for permission (fail fast)
         self.cache[key] = value
         return log
 
     def evaluate_field(self, expression):
-        # TODO traverse the object graph of expression and evaluate all fields
+        # TODO traverse the object graph of expression and evaluate all fields with whatever data is available
+        # at this moment in time.
         # This will probably be used in set, append, and foreach
         # it should make copies of anything is takes from other fields
         # returns the graph with all the right types/values (e.g. fieldvalues)
-        pass
+        # if isinstance(expression, Expression):
+        #     if expression.type =
+        return expression
 
     def handle_return(self, cmd):
         log = {"status": "RETURNING"}
@@ -79,11 +84,11 @@ class Interpreter:
         # with the values to be output. we also make copies because these
         # are generally references and it's the datastore that will actually persist them on commit.
         # Our typing is inconsistent so it's messy.
-        if expression.expr_type == "value":
+        if expression.type is Type.value:
             field_val = expression.get()
             if field_val.type is Type.field:
                 output = deepcopy(self.find_value(field_val.value))
-                if output.expr_type == Type.list.value:
+                if output.type is Type.list:
                     # children > 0 means this list was appended to and is waiting to be committed
                     if len(output.children) > 0:
                         # compact the appended values
@@ -132,7 +137,7 @@ class Interpreter:
         log = {"status": "APPEND"}
         key = cmd.expressions['key']
         value_to_append = cmd.expressions['value']
-        if value_to_append.expr_type == "value":
+        if value_to_append.type is Type.value:
             field_val = value_to_append.get()
             if field_val.type is Type.field:
                 value_to_append = self.find_value(field_val.value)
@@ -141,7 +146,7 @@ class Interpreter:
             # if local we have to do it all here
             # the big difference is that local fields seem to have no permissions TODO (verify this)
             key_value = self.local[key]
-            if Type(key_value.expr_type) is Type.list:
+            if key_value.type is Type.list:
                 key_value.children.append(value_to_append)
         elif self.is_global(key):
             # here we have to push it down to the datastore because this user might not have READ permission
@@ -166,13 +171,12 @@ class Interpreter:
             raise vault.error.VaultError(100, "cannot create local variable of existing variable")
         # get value of expression
         value_key = expressions['value']
-        if value_key.expr_type == "value":
+        if value_key.type is Type.value:
             field_val = value_key.get()
             if field_val.type is Type.literal:
                 pass
             elif field_val.type is Type.field:
                 value_key = self.find_value(field_val.value)
-
 
         self.local[key] = deepcopy(value_key)
         return log
@@ -183,7 +187,7 @@ class Interpreter:
         list_name = cmd.expressions['list']
         replacer = cmd.expressions['replacer']
         list = self.find_value(list_name)
-        if Type(list.expr_type) is not Type.list:
+        if list.type is not Type.list:
             return vault.error.VaultError(100, "can only foreach on a list")
         else:
             new_list_content = []
@@ -204,7 +208,7 @@ class Interpreter:
         self.local[target] = item
 
         # replacment
-        if replacer.expr_type == "value":
+        if replacer.type is Type.value:
             field_val = replacer.get()
             if field_val.type is Type.record:
                 path = field_val.value
@@ -213,7 +217,7 @@ class Interpreter:
             else:
                 # todo other types
                 r_val = field_val.value
-        elif replacer.expr_type == "record":
+        elif replacer.type is Type.record:
             r_val = {}
             field_val = replacer.get()
             if isinstance(field_val, dict):

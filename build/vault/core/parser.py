@@ -94,7 +94,7 @@ class Parser:
         s = ''.join(splitted)
         # test for empty list
         if s == "[]":
-            return Expression("list", [])
+            return Expression(Type.list, [])
 
         # test for record
 
@@ -114,7 +114,7 @@ class Parser:
                     identifier = fieldval[0]
                     value = self.parse_value(fieldval[1])
                     content[identifier] = value
-                return Expression('record', content)
+                return Expression(Type.record, content)
             except Exception as e:
                 if type(e) is VaultError:
                     raise e
@@ -122,7 +122,7 @@ class Parser:
 
         # Now it can only be a value
         value = self.parse_value(s)
-        return Expression('value', value)
+        return Expression(Type.value, value)
 
     def parse_create_principal(self, splitted):
         expressions = {}

@@ -3,40 +3,43 @@
 
 class Expression:
 
-    def __init__(self, expr_type, content):
-        self.expr_type = expr_type #'value', 'list' (or '[]'), 'record'
+    def __init__(self, type, content):
+        self.type = type #'value', 'list' (or '[]'), 'record'
         self.content = content
         # to nest (e.g. concat) expressions and retain their metadata we'll push them into here
         self.children = []
 
     def __str__(self):
-        return self.expr_type + ": " + str(self.content)
+        return self.type + ": " + str(self.content)
 
     def __repr__(self):
         return str(self)
 
+    def get_type(self):
+        return
+
     def get(self, field=None):
-        if self.expr_type == 'value':
+        if self.type is Type.value:
             return self.content #maybe this is not that simple, since values can either be literals or have and identifier
-        if self.expr_type == 'list':
+        if self.type is Type.list:
             return self.content
-        if self.expr_type == 'record':
+        if self.type is Type.record:
             return self.content
 
     def get_value(self):
-        if self.expr_type == 'value':
+        if self.type is Type.value:
             return self.content  # maybe this is not that simple, since values can either be literals or have and identifier
-        if self.expr_type == 'list':
+        if self.type is Type.list:
             return self.content
-        if self.expr_type == 'record':
+        if self.type is Type.record:
             return self.content
 
     def set(self, value, field=None):
-        if self.expr_type == 'value':
+        if self.type is Type.value:
             self.content = value
-        elif self.expr_type == 'list':
+        elif self.type is Type.list:
             self.content[int(field)] == value
-        elif self.expr_type == 'record':
+        elif self.type is Type.record:
             self.content[int(field)] == value
 
     def append(self, other):
@@ -48,12 +51,12 @@ class Expression:
         result = self.content
         for child in self.children:
             child_val = None
-            if Type(child.expr_type) == Type.record:
+            if child.type is Type.record:
                 val = {}
                 for key in child.content.keys():
                     val[key] = child.content[key].value
                 child_val = val
-            elif Type(child.expr_type) is Type.value:
+            elif child.type is Type.value:
                 if child.content.type is Type.literal:
                     child_val = child.content
             else:
