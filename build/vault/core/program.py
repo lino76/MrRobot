@@ -1,4 +1,6 @@
 '''Represents each of the expressions that can appear in a command'''
+
+
 class Expression:
 
     def __init__(self, expr_type, content):
@@ -51,6 +53,9 @@ class Expression:
                 for key in child.content.keys():
                     val[key] = child.content[key].value
                 child_val = val
+            elif Type(child.expr_type) is Type.value:
+                if child.content.type is Type.literal:
+                    child_val = child.content
             else:
                 child_val = child.content
             result.append(child_val)
@@ -62,26 +67,23 @@ class Expression:
             result.append(child.content)
         return result
 
-    def content_list_value(self):
+    # extract all values from this whole content object
+    def value(self):
         result = []
         for child in self.content:
-            if isinstance(child, dict):
-                # if there are non field values then this is probably already scrubbed
-                for k in child.values():
-                    if isinstance(k, FieldType):
-                        break
-                    else:
-                        return self.content
-
-                val = {}
-                for key in child.keys():
-                    if isinstance(child[key], str):
-                        val[key] = child[key]
-                    else:
-                        val[key] = child[key].value
-                result.append(val)
-            elif child.type is Type.literal:  # TODO REVISIT THIS ONE
+            # child could be a dict, FieldType, or god knows what else
+            if isinstance(child, FieldType):
                 result.append(child.value)
+            elif isinstance(child, dict):
+                val = {}
+                for key, value in child.items():
+                    if isinstance(value, FieldType):
+                        val[key] = value.value
+                    else:
+                        val[key] = child[key]
+                result.append(val)
+            elif isinstance(child, str):
+                result.append(child)
             else:
                 result.append(child.content.value)
         return result
@@ -111,6 +113,7 @@ class Type(Enum):
     field = 'field'
     record = 'record'
     list = 'list'
+    value = 'value'
 
 
 '''Represents each of the commands executed by a program'''

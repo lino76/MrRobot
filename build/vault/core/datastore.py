@@ -106,7 +106,7 @@ class Datastore:
             raise vault.error.SecurityError(100, "DENIED")
         else:
             if key in self.datatable:
-                return self.datastore['key']
+                return self.datatable[key]
             else:
                 #it must be in the queue
                 pass

@@ -92,9 +92,12 @@ class Interpreter:
                 output = deepcopy(self.find_value(field_val.value))
                 if output.expr_type == Type.list.value:
                     if len(output.children) > 0:
-                        output = output.concat_children_values()
+                        # compact the appended values
+                        output.concat_children()
+                        # extract the values
+                        output = output.value()
                     # else:
-                    #     output = output.content_list_value()
+                    #     output = output.value()
             if field_val.type is Type.literal:
                 output = expression.content.value
 
@@ -102,7 +105,7 @@ class Interpreter:
         if output is not None:
             if isinstance(output, Expression):
                 if isinstance(output.content, list):
-                    log["output"] = output.content_list_value()
+                    log["output"] = output.value()
                 else:
                     log["output"] = output.content.value
             else:
@@ -153,6 +156,10 @@ class Interpreter:
             # so it's reference should be in the cache
             if self.is_cached(key):
                 self.cache[key].children.append(value_to_append)
+            else:
+                tmp = self.datastore.get_noperm(key)
+                tmp.children.append(value_to_append)
+                self.cache[key] = tmp
         return log
 
     def handle_local(self, cmd):

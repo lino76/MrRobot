@@ -112,16 +112,40 @@ if __name__ == '__main__':
     #     ***
     #     ''')
 
+    # prog1 = Program('''as principal admin password "admin" do
+    #     local x = { field1="joe" }
+    #     set y = []
+    #     append to y with x
+    #     return y
+    #     ***
+    #     ''')
+    #
+    # prog2 = Program('''as principal admin password "admin" do
+    #     return y
+    #     ***
+    #     ''')
+
     prog1 = Program('''as principal admin password "admin" do
-        local x = { field1="joe" }
-        set y = []
-        append to y with x
-        return y
+        set records = []
+        append to records with { dude="yes" }
+        append to records with "no"
+        set var = "a variable"
+        return var
         ***
         ''')
 
     prog2 = Program('''as principal admin password "admin" do
-        return y
+        foreach y in records replacewith "boring"
+        set var = { well="three" }
+        set newvar = ""
+        local var = ""
+        return "hi"
+        ***
+        ''')
+
+    prog3 = Program('''as principal admin password "admin" do
+        append to records with var
+        return records
         ***
         ''')
 
@@ -134,9 +158,9 @@ if __name__ == '__main__':
     result, exiting = vault.run(prog2)
     print("output:")
     print(result)
-    # result, exiting = vault.run(prog3)
-    # print("output:")
-    # print(result)
+    result, exiting = vault.run(prog3)
+    print("output:")
+    print(result)
 
 
 
