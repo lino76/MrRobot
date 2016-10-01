@@ -42,12 +42,16 @@ class Vault:
 
     def format_result(self, result_log):
         output = ""
-        returning = Template('{"status": "$status", "output": "$output"}\n')
+        returning = Template('{"status": "$status", "output": $output}\n')
         operation = Template('{"status": "$status"}\n')
         for entry in result_log:
             status = entry['status']
             if status == "RETURNING":
-                output += returning.substitute(status=entry['status'], output=entry['output'])
+                if isinstance(entry["output"], list):
+                    out = json.dumps(entry["output"])
+                else:
+                    out = '"' + entry["output"] + '"'
+                output += returning.substitute(status=entry['status'], output=out)
             else:
                 output += operation.substitute(status=entry['status'])
         return output
@@ -66,22 +70,22 @@ if __name__ == '__main__':
     #     ''')
 
 # Test 1
-    prog1 = Program('''as principal admin password "admin" do
-        create principal bob "B0BPWxxd"
-        set x = "my string"
-        set delegation x admin read -> bob
-        return x
-        ***
-        ''')
-    prog2 = Program('''as principal bob password "B0BPWxxd" do
-        return x
-        ***
-        ''')
-    prog3 = Program('''as principal bob password "B0BPWxxd" do
-        set x = "another string"
-        return x
-        ***
-        ''')
+#     prog1 = Program('''as principal admin password "admin" do
+#         create principal bob "B0BPWxxd"
+#         set x = "my string"
+#         set delegation x admin read -> bob
+#         return x
+#         ***
+#         ''')
+#     prog2 = Program('''as principal bob password "B0BPWxxd" do
+#         return x
+#         ***
+#         ''')
+#     prog3 = Program('''as principal bob password "B0BPWxxd" do
+#         set x = "another string"
+#         return x
+#         ***
+#         ''')
 
 # Test 2
 
@@ -96,6 +100,30 @@ if __name__ == '__main__':
     #     ***
     #     ''')
 
+    # prog1 = Program('''as principal admin password "admin" do
+    #     set records = []
+    #     append to records with { name = "mike", date = "1-1-90" }
+    #     append to records with { name = "dave", date = "1-1-85" }
+    #     append to records with { date = "1-1-85" }
+    #     foreach rec in records replacewith rec.date
+    #     foreach rec in records replacewith { a="hum",b=rec }
+    #     set rec = ""
+    #     return records
+    #     ***
+    #     ''')
+
+    prog1 = Program('''as principal admin password "admin" do
+        local x = { field1="joe" }
+        set y = []
+        append to y with x
+        return y
+        ***
+        ''')
+
+    prog2 = Program('''as principal admin password "admin" do
+        return y
+        ***
+        ''')
 
         # foreach rec in names replacewith rec.name
         # local rec = ""
@@ -106,9 +134,9 @@ if __name__ == '__main__':
     result, exiting = vault.run(prog2)
     print("output:")
     print(result)
-    result, exiting = vault.run(prog3)
-    print("output:")
-    print(result)
+    # result, exiting = vault.run(prog3)
+    # print("output:")
+    # print(result)
 
 
 

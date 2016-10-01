@@ -193,8 +193,9 @@ class Datastore:
                 # this was a nice idea but I'm not sure it's going to fly.
                 existing_value = self.datatable[txn.key]
                 appended_value = existing_value.concat_children()
-                existing_value.content = deepcopy(appended_value)
+                existing_value.content = appended_value
                 existing_value.children = []
+                #self.datatable[txn.key] = deepcopy(txn.value)
 
             else:
                 raise Exception(100, "Unsupported operation")

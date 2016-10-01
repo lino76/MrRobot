@@ -14,19 +14,27 @@ class Expression:
         return str(self)
 
     def get(self, field=None):
-        if self.type == 'value':
+        if self.expr_type == 'value':
             return self.content #maybe this is not that simple, since values can either be literals or have and identifier
-        if self.type == 'list':
-            return self.content[int(field)]
-        if self.type == 'record':
-            return self.content[str(field)]
+        if self.expr_type == 'list':
+            return self.content
+        if self.expr_type == 'record':
+            return self.content
+
+    def get_value(self):
+        if self.expr_type == 'value':
+            return self.content  # maybe this is not that simple, since values can either be literals or have and identifier
+        if self.expr_type == 'list':
+            return self.content
+        if self.expr_type == 'record':
+            return self.content
 
     def set(self, value, field=None):
-        if self.type == 'value':
+        if self.expr_type == 'value':
             self.content = value
-        elif self.type == 'list':
+        elif self.expr_type == 'list':
             self.content[int(field)] == value
-        elif self.type == 'record':
+        elif self.expr_type == 'record':
             self.content[int(field)] == value
 
     def append(self, other):
@@ -54,7 +62,19 @@ class Expression:
             result.append(child.content)
         return result
 
-
+    def content_list_value(self):
+        result = []
+        for child in self.content:
+            if isinstance(child, dict):
+                val = {}
+                for key in child.keys():
+                    val[key] = child[key].value
+                result.append(val)
+            elif child.type is Type.literal:  # TODO REVISIT THIS ONE
+                result.append(child.value)
+            else:
+                result.append(child.content.value)
+        return result
 
 
 #TOOD REST OF STUFF
