@@ -63,21 +63,48 @@ class Interpreter:
         self.cache[key] = value  # this reduces the complexity of the database transaction checks
         return log
 
+    # def handle_return(self, cmd):
+    #     log = {"status": "RETURNING"}
+    #     output = None
+    #     expression = cmd.expressions["return_value"]
+    #     if expression.content.type is not Type.literal:
+    #         output = self.find_value(expression.content.value)
+    #         if output.expr_type == Type.list.value and len(output.children) > 0:
+    #             output = output.concat_children_values()
+    #     elif expression.content.type== Type.literal:
+    #         output = expression.content.value
+    #     if output is not None:
+    #         # TODO there are probably other types
+    #         if isinstance(output, Expression):
+    #             log["output"] = output.content.value
+    #         else:
+    #             log["output"] = output
+    #     return log
+
     def handle_return(self, cmd):
         log = {"status": "RETURNING"}
-        output = None
         expression = cmd.expressions["return_value"]
-        if expression.content.type is not Type.literal:
-            print('ret1')
-            output = self.find_value(expression.content.value)
-            if output.expr_type == Type.list.value and len(output.children) > 0:
-                output = output.concat_children_values()
-        elif expression.content.type== Type.literal:
-            output = expression.content.value
+        # Find the value
+        output = None
+        if expression.expr_type == "value":
+            field_val = expression.get()
+            if field_val.type is Type.field:
+                output = deepcopy(self.find_value(field_val.value))
+                if output.expr_type == Type.list.value:
+                    if len(output.children) > 0:
+                        output = output.concat_children_values()
+                    # else:
+                    #     output = output.content_list_value()
+            if field_val.type is Type.literal:
+                output = expression.content.value
+
+        # Format it
         if output is not None:
-            # TODO there are probably other types
             if isinstance(output, Expression):
-                log["output"] = output.content.value
+                if isinstance(output.content, list):
+                    log["output"] = output.content_list_value()
+                else:
+                    log["output"] = output.content.value
             else:
                 log["output"] = output
         return log
@@ -107,6 +134,10 @@ class Interpreter:
         log = {"status": "APPEND"}
         key = cmd.expressions['key']
         value_to_append = cmd.expressions['value']
+        if value_to_append.expr_type == "value":
+            field_val = value_to_append.get()
+            if field_val.type is Type.field:
+                value_to_append = self.find_value(field_val.value)
         # see if the value exists and if we can access it
         if self.is_local(key):
             # if local we have to do it all here
@@ -133,20 +164,84 @@ class Interpreter:
             raise vault.error.VaultError(100, "cannot create local variable of existing variable")
         # get value of expression
         value_key = expressions['value']
-        if value_key.content.type is Type.literal:
-            value = value_key.content.value
-        else:
-            value = self.find_value(value_key.content.value)
-        self.local[key] = deepcopy(value)
+        if value_key.expr_type == "value":
+            field_val = value_key.get()
+            if field_val.type is Type.literal:
+                pass
+            elif field_val.type is Type.field:
+                value_key = self.find_value(field_val.value)
+
+
+        self.local[key] = deepcopy(value_key)
         return log
 
     def handle_foreach(self, cmd):
         log = {"status": "FOREACH"}
-        target = expressions['item']
-        list_name = expressions['list']
-        replacer = expressions['replacer']
-
+        target = cmd.expressions['item']
+        list_name = cmd.expressions['list']
+        replacer = cmd.expressions['replacer']
+        list = self.find_value(list_name)
+        if Type(list.expr_type) is not Type.list:
+            return vault.error.VaultError(100, "can only foreach on a list")
+        else:
+            new_list_content = []
+            for item in list.concat_children():
+                new_list_content.append(self.build_replacement(target, item, replacer))
+            new_list = deepcopy(list)
+            new_list.children = []
+            new_list.content = new_list_content
+            if self.is_global(list_name):
+                self.datastore.set(list_name, new_list)
+                self.cache[list_name] = new_list
+            else:
+                self.local[list_name] = new_list
         return log
+
+    def build_replacement(self, target, item, replacer):
+        # if replacer.expr_type == "value":
+        #     path = replacer.content.value
+        #     keys = path.split('.')
+        # elif replacer.expr_type == "record":
+        #
+        # else:
+        #     keys = [replacer.content.value]
+        # TODO what are we replacing?
+        self.local[target] = item
+
+        # TODO What are we replacing it with?
+        if replacer.expr_type == "value":
+            field_val = replacer.get()
+            if field_val.type is Type.record:
+                path = field_val.value
+                keys = path.split('.')
+                r_val = self.find_value_by_path(keys)
+            else:
+                #todo
+                r_val = field_val.value
+        elif replacer.expr_type == "record":
+            r_val = {}
+            field_val = replacer.get()
+            if isinstance(field_val, dict):
+                for k in field_val.keys():
+                    val = field_val[k]
+                    if val.type is Type.literal:
+                        r_val[k] = val.value
+                    elif val.type is Type.field:
+                        keys = val.value.split('.')
+                        found_val = self.find_value_by_path(keys)
+                        if found_val is not None:
+                            r_val[k] = found_val.value
+                        else:
+                            raise vault.error.VaultError(100, 'replacewith expression not found')
+                    else:
+                        #TODO other types
+                        pass
+        else:
+            pass
+
+        del self.local[target]
+        return r_val
+
 
     def handle_set_delegation(self, cmd):
         log = {"status": "SET_DELEGATION"}
@@ -191,8 +286,21 @@ class Interpreter:
         if self.datastore.exists(key):
             return self.datastore.get(key)
         else:
-            print(key)
             raise Exception(101, "no key found in database")
+
+    def find_value_by_path(self, keys):
+        root_key = keys.pop(0)
+        obj = self.find_value(root_key)
+        while len(keys) > 0:
+            key = keys.pop(0)
+            try:
+                obj = obj[key]
+            except:
+                pass
+        return obj
+
+
+
 
 
 if __name__ == '__main__':

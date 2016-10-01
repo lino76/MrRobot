@@ -48,7 +48,7 @@ class Vault:
             status = entry['status']
             if status == "RETURNING":
                 if isinstance(entry["output"], list):
-                    out = json.dumps(entry["output"])
+                    out = json.dumps(entry["output"], sort_keys=True)
                 else:
                     out = '"' + entry["output"] + '"'
                 output += returning.substitute(status=entry['status'], output=out)
@@ -131,9 +131,9 @@ if __name__ == '__main__':
     result, exiting = vault.run(prog1)
     print("output:")
     print(result)
-    result, exiting = vault.run(prog2)
-    print("output:")
-    print(result)
+    # result, exiting = vault.run(prog2)
+    # print("output:")
+    # print(result)
     # result, exiting = vault.run(prog3)
     # print("output:")
     # print(result)

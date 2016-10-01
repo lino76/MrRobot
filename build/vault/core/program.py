@@ -66,9 +66,19 @@ class Expression:
         result = []
         for child in self.content:
             if isinstance(child, dict):
+                # if there are non field values then this is probably already scrubbed
+                for k in child.values():
+                    if k is FieldType:
+                        break
+                    else:
+                        return self.content
+
                 val = {}
                 for key in child.keys():
-                    val[key] = child[key].value
+                    if isinstance(child[key], str):
+                        val[key] = child[key]
+                    else:
+                        val[key] = child[key].value
                 result.append(val)
             elif child.type is Type.literal:  # TODO REVISIT THIS ONE
                 result.append(child.value)
