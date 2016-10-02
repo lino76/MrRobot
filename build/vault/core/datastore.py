@@ -117,6 +117,8 @@ class Datastore:
     def change_password(self, principal):
         if self.is_admin() or principal.name == self.context.principal.name:
             self.add_transaction(Transaction(op=TxnTypes.change_password, key=principal.name, value=principal))
+        else:
+            raise vault.error.SecurityError(100, "cannot change someone else's password")
 
     @require_context()
     def create_principal(self, principal):
@@ -133,7 +135,7 @@ class Datastore:
             # check if current is admin or source
             if self.is_admin() or self.is_current(source_principal):
                 # check if q has permission to delegate for key
-                if self.has_role(key, Role.delegate, source_principal):
+                if self.is_admin() or self.has_role(key, Role.delegate, source_principal):
                     # they are good to go
                     self.add_transaction(Transaction(op=TxnTypes.delegate_add, key=key,
                                                      principal=target_principal, roles=Role(role)))
@@ -237,6 +239,9 @@ class Datastore:
         for txn in self.context.queue:
             if txn.op is TxnTypes.grant and txn.principal.name == principal.name and txn.key == key:
                 pending += txn.roles
+        # oh boy
+        if isinstance(existing, Vividict):
+            existing = list(existing.items())
         merged = list(set(existing + pending))
         if role in merged:
             return True
