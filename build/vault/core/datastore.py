@@ -188,7 +188,6 @@ class Datastore:
 
     ''' This is where we actually persist the data'''
 
-    @require_context()
     def commit(self):
         for i in range(0, len(self.context.queue)):
             txn = self.context.queue[i]
@@ -256,7 +255,6 @@ class Datastore:
         else:
             return False
 
-    @require_context()
     def check_role(self, key=None, role=None, principal=None):
         if not isinstance(role, list):
             role = [role]
@@ -270,9 +268,9 @@ class Datastore:
                     # for delegates that allow 'target_role'
                     delegated_roles = self.delegation[principal.name][key][delegate]
                     if target_role in delegated_roles:
-                        # delegated_perms = self.get_current_roles(key, Principal(delegate))
-                        if self.check_role(key, target_role, Principal(delegate)):
-                            return True
+                        return True
+                        # if self.check_role(key, target_role, Principal(delegate)):
+                        #     return True
         return False
 
     def get_current_roles(self, key=None, principal=None):
@@ -378,12 +376,9 @@ class Datastore:
     def get_default_delegate(self):
         return self.local["default_delegate"]
 
-
-    @require_context()
     def add_transaction(self, txn):
         self.context.queue.append(txn)
 
-    @require_context()
     def is_admin(self):
         return self.context.principal.name == "admin"
 
