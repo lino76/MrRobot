@@ -314,10 +314,22 @@ class Interpreter:
 
     def handle_delete_delegation(self, cmd):
         log = {"status": "DELETE_DELEGATION"}
+        expressions = cmd.expressions
+        src_principal = vault.util.Principal(expressions['source_principal'])
+        target_principal = vault.util.Principal(expressions['target_principal'])
+        role = expressions['right']
+        key = expressions['variable']
+        if self.is_global(key):
+            self.datastore.delete_delegation(src_principal, target_principal, key, role)
+        else:
+            raise vault.error.VaultError(100, "cannot delegate nonexistant or local variables")
         return log
 
     def handle_default_delegator(self, cmd):
         log = {"status": "DEFAULT_DELEGATOR"}
+        expressions = cmd.expressions
+        principal = vault.util.Principal(expressions['delegator'])
+        self.datastore.default_delegator(principal)
         return log
 
     def is_local(self, key):

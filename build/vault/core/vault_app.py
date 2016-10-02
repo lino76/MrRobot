@@ -197,7 +197,51 @@ if __name__ == '__main__':
     #     ***
     #     ''')
 
-    prog1 = Program('''as principal admin password "admin" do
+    # Test 7
+    # prog1 = Program('''as principal admin password "admin" do
+    #     create principal bob "bob"
+    #     create principal alice "alice"
+    #     set x = "x"
+    #     set y = "y"
+    #     set delegation x admin read -> alice
+    #     set delegation x admin write -> alice
+    #     set delegation x alice read -> bob
+    #     return x
+    #     ***
+    #     ''')
+    #
+    # prog2 = Program('''as principal bob password "bob" do
+    #     change password bob "0123__abcXY"
+    #     return ""
+    #     ***
+    #     ''')
+    #
+    # prog3 = Program('''as principal bob password "0123__abcXY" do
+    #     return ""
+    #     ***
+    #     ''')
+    #
+    # prog4 = Program('''as principal alice password "alice" do
+    #     change password bob "alice"
+    #     return ""
+    #     ***
+    #     ''')
+
+    # prog2 = Program('''as principal admin password "admin" do
+    #     set y = { jim="beam" }
+    #     append to y with "hi" // should fail since y is not a table
+    #     return y
+    #     ***
+    #     ''')
+
+    # Test 9
+    # prog0 = Program('''"as principal admin password "admin" do
+    #     create principal alice "alice"
+    #     default delegator = alice
+    #     ***
+    #     ''')
+
+    prog1 = Program('''"as principal admin password "admin" do
         create principal bob "bob"
         create principal alice "alice"
         set x = "x"
@@ -209,29 +253,37 @@ if __name__ == '__main__':
         ***
         ''')
 
-    prog2 = Program('''as principal bob password "bob" do
-        change password bob "0123__abcXY"
-        return ""
+    prog2 = Program('''"as principal admin password "admin" do
+        set y = []
+        append to y with { x="10", y="10" }
+        set delegation x admin delegate -> alice
+        set delegation y admin delegate -> alice
+        set delegation y admin read -> alice
+        set delegation y admin append -> alice
+        delete delegation x admin read -> bob // should have no effect
+        default delegator = alice
+        create principal charlie "charlie" // delegated alice permissions on x and y
+        return y
         ***
         ''')
 
-    prog3 = Program('''as principal bob password "0123__abcXY" do
-        return ""
+    prog3 = Program('''"as principal alice password "alice" do
+        append to y with { x="0", y="100" }
+        return y
         ***
         ''')
 
-    prog4 = Program('''as principal alice password "alice" do
-        change password bob "alice"
-        return ""
+    prog4 = Program('''"as principal bob password "bob" do
+        return x
         ***
         ''')
 
-    # prog2 = Program('''as principal admin password "admin" do
-    #     set y = { jim="beam" }
-    #     append to y with "hi" // should fail since y is not a table
-    #     return y
-    #     ***
-    #     ''')
+    prog5 = Program('''"as principal charlie password "charlie" do
+        append to y with "charlies"
+        append to y with x
+        return y
+        ***
+        ''')
 
     result, exiting = vault.run(prog1)
     print("output:")
@@ -243,6 +295,9 @@ if __name__ == '__main__':
     print("output:")
     print(result)
     result, exiting = vault.run(prog4)
+    print("output:")
+    print(result)
+    result, exiting = vault.run(prog5)
     print("output:")
     print(result)
 
