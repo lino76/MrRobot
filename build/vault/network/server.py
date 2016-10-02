@@ -47,8 +47,7 @@ class Server:
         Thread handler that manager 1 connection and close it
         """
         client_socket.setblocking(True)
-        client_socket.settimeout(30)
-        client_socket.settimeout(None)  # TODO THIS IS FOR DEBUGGING
+        client_socket.settimeout(0)
         try:
             data = b''
             try:
@@ -79,6 +78,8 @@ class Server:
                 client_socket.shutdown(socket.SHUT_WR)
                 if not client_socket.recv(10):
                     client_socket.close()
+                if shutdown:
+                    exit(0)
         except socket.error:
             print('Socket connection failed, nothing to do')
         except Exception as e:
