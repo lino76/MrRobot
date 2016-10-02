@@ -47,13 +47,14 @@ class Server:
         Thread handler that manager 1 connection and close it
         """
         client_socket.setblocking(True)
-        client_socket.settimeout(30)
-        client_socket.settimeout(None)  # TODO THIS IS FOR DEBUGGING
+        client_socket.settimeout(0)
         try:
             data = b''
             try:
                 while b'***' not in data:
                     tmp = client_socket.recv(1024)
+                    client_socket.settimeout(30)
+
                     if not tmp:
                         break
                     data += tmp
@@ -71,12 +72,14 @@ class Server:
                         print('EXCEPTION', e)
                         client_socket.send("{exception}".encode())
             except socket.timeout as e:
-                print('socket timeout', e)
-                client_socket.send(json.loads({"status": "Timeout"}))
+                print('Socket timeout', e)
+                client_socket.send(('{"status": "TIMEOUT"}\n').encode('utf-8'))
             finally:
                 client_socket.shutdown(socket.SHUT_WR)
                 if not client_socket.recv(10):
                     client_socket.close()
+                if shutdown:
+                    exit(0)
         except socket.error:
             print('Socket connection failed, nothing to do')
         except Exception as e:
