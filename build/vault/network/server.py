@@ -47,14 +47,13 @@ class Server:
         Thread handler that manager 1 connection and close it
         """
         client_socket.setblocking(True)
-        client_socket.settimeout(0)
+        # client_socket.settimeout(30)
+        client_socket.settimeout(None)  # TODO THIS IS FOR DEBUGGING
         try:
             data = b''
             try:
                 while b'***' not in data:
                     tmp = client_socket.recv(1024)
-                    client_socket.settimeout(30)
-
                     if not tmp:
                         break
                     data += tmp
