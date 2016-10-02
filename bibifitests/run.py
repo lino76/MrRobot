@@ -6,8 +6,7 @@ import subprocess
 import sys
 import tempfile
 
-#user = 'ubuntu'
-user = 'jake1164'
+user = 'ubuntu'
 
 if len(sys.argv) != 3:
 	print( "usage: ./run.py <server> <test>")
