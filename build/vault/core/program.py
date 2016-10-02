@@ -1,5 +1,5 @@
 '''Represents each of the expressions that can appear in a command'''
-
+from copy import deepcopy
 
 class Expression:
 
@@ -10,10 +10,18 @@ class Expression:
         self.children = []
 
     def __str__(self):
-        return self.type + ": " + str(self.content)
+        return self.type.name + ": " + str(self.content)
 
     def __repr__(self):
         return str(self)
+
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
 
     def get_type(self):
         return
@@ -42,8 +50,8 @@ class Expression:
         elif self.type is Type.record:
             self.content[int(field)] == value
 
-    def append(self, other):
-        pass
+    def is_appended(self):
+        return len(self.children) > 0
 
     # The idea here is than given an expression and it's concat'd children
     # It could iterate and mash them all together producing the final value
@@ -70,27 +78,87 @@ class Expression:
             result.append(child.content)
         return result
 
-    # extract all values from this whole content object
+    # extract all values from this whole content graph
     def value(self):
-        result = []
-        for child in self.content:
-            # child could be a dict, FieldType, or god knows what else
-            if isinstance(child, FieldType):
-                result.append(child.value)
-            elif isinstance(child, dict):
-                val = {}
-                for key, value in child.items():
-                    if isinstance(value, FieldType):
-                        val[key] = value.value
-                    else:
-                        val[key] = child[key]
-                result.append(val)
-            elif isinstance(child, str):
-                result.append(child)
-            else:
-                result.append(child.content.value)
-        return result
+        content = deepcopy(self.content)
+        # Dict
+        if isinstance(content, dict):
+            return self.depopulate_dict(content)
+        # List
+        elif isinstance(content, list):
+            return self.depopulate_list(content)
+        # FieldType
+        elif isinstance(content, FieldType):
+            return self.depopulate_field(content)
+        # Expression
+        elif isinstance(content, Expression):
+            return self.depopulate_expression(content)
+        # String
+        elif isinstance(content, str):
+            return content
+        else:
+            pass
 
+    def depopulate_expression(self, obj):
+        return obj.value()
+
+    def depopulate_field(self, obj):
+        # TODO this is a mess
+        if isinstance(obj, str):
+            return obj
+        elif isinstance(obj, dict):
+            return self.depopulate_dict(obj.value)
+        elif isinstance(obj.value, dict):
+            return self.depopulate_dict(obj.value)
+        elif isinstance(obj.value, Expression):
+            return self.depopulate_expression(obj.value)
+        elif isinstance(obj, Expression):
+            if isinstance(obj.content, dict):
+                return self.depopulate_dict(obj.content)
+        elif obj.type is Type.literal:
+            return obj.value
+        elif obj.type is Type.list:
+            return obj.value
+        elif obj.type is Type.value:
+            return obj.value
+        elif obj.type is Type.field:
+            if isinstance(obj.value, Expression):
+                return self.depopulate_expression(obj.value)
+            else:
+                return self.depopulate_field(obj.value)
+        elif obj.type is Type.record:
+            if isinstance(obj, dict):
+                return self.depopulate_dict(obj)
+            else:
+                return obj.value
+
+    def depopulate_list(self, obj):
+        val = []
+        for item in obj:
+            if isinstance(item, Expression):
+                val.append(self.depopulate_expression(item.value))
+            elif isinstance(item, FieldType):
+                val.append(self.depopulate_field(item.value))
+            elif isinstance(item, dict):
+                val.append(self.depopulate_dict(item))
+            elif isinstance(item, str):
+                val.append(item)
+        return val
+
+
+    def depopulate_dict(self, obj):
+        val = {}
+        # For every value in the dict, extract the values from that too
+        for k, v in obj.items():
+            if isinstance(v, Expression):
+                val[k] = self.depopulate_expression(v)
+            elif isinstance(v, FieldType):
+                val[k] = self.depopulate_field(v.value)
+            elif isinstance(v, dict):
+                val[k] = self.depopulate_dict(v)
+            elif isinstance(v, str):
+                val[k] = v
+        return val
 
 #TOOD REST OF STUFF
 

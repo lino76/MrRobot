@@ -101,6 +101,7 @@ class Parser:
         if s.startswith("{") and s.endswith("}"):
             try:
                 content = {}
+                identifiers = []
                 fieldvals = s[1:-1].split(",")  # remove braces and split fieldvals
                 for fieldval in fieldvals:
                     fieldval = fieldval.split("=")
@@ -112,6 +113,10 @@ class Parser:
                     if not self.validate_identifier(fieldval[0]):
                         raise VaultError(1, "Fieldval identifier not valid: '" + fieldval[0] + "'")
                     identifier = fieldval[0]
+                    if identifier not in identifiers:
+                        identifiers.append(identifier)
+                    else:
+                        raise VaultError(1, "Fieldval duplicate identifier: '" + fieldval[0] + "'")
                     value = self.parse_value(fieldval[1])
                     content[identifier] = value
                 return Expression(Type.record, content)
@@ -162,6 +167,12 @@ class Parser:
             raise VaultError(1, "set got an invalid identifier: " + str(splitted))
 
         expressions['key'] = splitted[0]
+        # this is just a test. given this expression:
+        # { f="hello", g="there", h="my", f="friend" }
+        # in a dict: f="hello" will get overwritten by f="friend
+        # this should return an error
+        tmp = "".join(splitted)
+
         expressions['value'] = self.parse_expression(" ".join(splitted[1:]))
         return expressions
 

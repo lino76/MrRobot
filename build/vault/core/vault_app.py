@@ -47,7 +47,7 @@ class Vault:
         for entry in result_log:
             status = entry['status']
             if status == "RETURNING":
-                if isinstance(entry["output"], list):
+                if isinstance(entry["output"], list) or isinstance(entry["output"], dict):
                     out = json.dumps(entry["output"], sort_keys=True)
                 else:
                     out = '"' + entry["output"] + '"'
@@ -66,6 +66,11 @@ if __name__ == '__main__':
     #     change password admin "password"
     #     create principal bob "B0BPWxxd"
     #     return x
+    #     ***
+    #     ''')
+
+    # prog1 = Program('''as principal admin password "admin" do
+    #     return "Success"
     #     ***
     #     ''')
 
@@ -99,8 +104,8 @@ if __name__ == '__main__':
     #     return names
     #     ***
     #     ''')
-
-    # prog1 = Program('''as principal admin password "admin" do
+    #
+    # prog2 = Program('''as principal admin password "admin" do
     #     set records = []
     #     append to records with { name = "mike", date = "1-1-90" }
     #     append to records with { name = "dave", date = "1-1-85" }
@@ -112,19 +117,21 @@ if __name__ == '__main__':
     #     ***
     #     ''')
 
-    # prog1 = Program('''as principal admin password "admin" do
-    #     local x = { field1="joe" }
-    #     set y = []
-    #     append to y with x
-    #     return y
-    #     ***
-    #     ''')
-    #
-    # prog2 = Program('''as principal admin password "admin" do
-    #     return y
-    #     ***
-    #     ''')
+    # test 6
+    prog1 = Program('''as principal admin password "admin" do
+        local x = { field1="joe" }
+        set y = []
+        append to y with x
+        return y
+        ***
+        ''')
 
+    prog2 = Program('''as principal admin password "admin" do
+        return y
+        ***
+        ''')
+
+    # Test 3
     # prog1 = Program('''as principal admin password "admin" do
     #     set records = []
     #     append to records with { dude="yes" }
@@ -133,7 +140,7 @@ if __name__ == '__main__':
     #     return var
     #     ***
     #     ''')
-    #
+    # #
     # prog2 = Program('''as principal admin password "admin" do
     #     foreach y in records replacewith "boring"
     #     set var = { well="three" }
@@ -142,7 +149,7 @@ if __name__ == '__main__':
     #     return "hi"
     #     ***
     #     ''')
-    #
+    # #
     # prog3 = Program('''as principal admin password "admin" do
     #     append to records with var
     #     return records
@@ -157,20 +164,38 @@ if __name__ == '__main__':
     #     return z
     #     ***
     #     ''')
+    #
+    # prog2 = Program('''as principal admin password "admin" do
+    #     set z = { f="hi", g="there" }
+    #     set x = { f=z, g="hello" }
+    #     return x
+    #     ***
+    #     ''')
+
+    # prog1 = Program('''as principal admin password "admin" do
+    #     set x = { f="hello", g="there", h="my", f="friend" }
+    #     return x
+    #     ***''')
+
+    # prog1 = Program('''as principal admin password "admin" do
+    #     set z = { f="hi", g="there" }
+    #     return z.h
+    #     ***
+    #     ''')
 
     # Test 5
-    prog1 = Program('''as principal admin password "admin" do
-        set records = []
-        set y = { jim="beam" }
-        append to records with { name = "mike", date = "1-1-90" }
-        append to records with "dave"
-        append to records with records
-        append to records with []
-        append to records with y.jim
-        set y = []
-        return records
-        ***
-        ''')
+    # prog1 = Program('''as principal admin password "admin" do
+    #     set records = []
+    #     set y = { jim="beam" }
+    #     append to records with { name = "mike", date = "1-1-90" }
+    #     append to records with "dave"
+    #     append to records with records
+    #     append to records with []
+    #     append to records with y.jim
+    #     set y = []
+    #     return records
+    #     ***
+    #     ''')
 
         # foreach rec in names replacewith rec.name
         # local rec = ""
@@ -178,9 +203,9 @@ if __name__ == '__main__':
     result, exiting = vault.run(prog1)
     print("output:")
     print(result)
-    # result, exiting = vault.run(prog2)
-    # print("output:")
-    # print(result)
+    result, exiting = vault.run(prog2)
+    print("output:")
+    print(result)
     # result, exiting = vault.run(prog3)
     # print("output:")
     # print(result)

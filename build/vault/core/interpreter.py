@@ -58,53 +58,102 @@ class Interpreter:
         log = {"status": "SET"}
         output = None
         key = cmd.expressions["key"]
-        value = cmd.expressions["value"]
-        # populated_key = self.evaluate_field(key)
-        populated_value = self.evaluate_field(value)
-        self.datastore.set(key, value)  # this will de facto check for permission (fail fast)
-        self.cache[key] = value
+        expression = cmd.expressions["value"]
+        populated_value = self.populate_expression(expression)
+        self.datastore.set(key, populated_value)  # this will de facto check for permission (fail fast)
+        self.cache[key] = populated_value
         return log
 
-    def evaluate_field(self, expression):
-        # TODO traverse the object graph of expression and evaluate all fields with whatever data is available
-        # at this moment in time.
-        # This will probably be used in set, append, and foreach
-        # it should make copies of anything is takes from other fields
-        # returns the graph with all the right types/values (e.g. fieldvalues)
-        # if isinstance(expression, Expression):
-        #     if expression.type =
+    def populate_expression(self, expression):
+        # traverse the object graph of expression and evaluate all fields with whatever data is available
+        expression = deepcopy(expression)
+        if isinstance(expression, Expression):
+            content = expression.get()
+            if expression.type is Type.value:
+                self.populate_field(expression, content)
+            elif expression.type is Type.record:
+                self.populate_field(expression, content)
+            elif expression.type is Type.list:
+                if expression.is_appended():
+                    expression.concat_children()
+                for child in content:
+                    self.populate_field(expression, child)
+
         return expression
+
+    def populate_field(self, parent, field):
+        if isinstance(field, dict):
+            for k, v in field.items():
+                self.populate_field(field, v)
+        elif isinstance(field, list):
+            pass
+        elif isinstance(field, str):
+            pass
+        elif field.type is Type.literal:
+            pass  # literals are ignored
+        elif field.type is Type.record:
+            if isinstance(field, Expression):
+                self.populate_field(field, field.content)
+            else:
+                if isinstance(field.value, FieldType):
+                    return self.populate_field(field, field.value)
+                elif isinstance(field.value, str):
+                    field_path = self.tokenize_field(field.value)
+                    val = self.find_value_by_path(field_path)
+                    self.validate_insert(parent, field, val)
+                    # update the field with the new value
+                    field.value = self.populate_field(field, val)
+                else:
+                    pass
+        elif field.type is Type.field:
+            if isinstance(field.value, str):
+                field_path = self.tokenize_field(field.value)
+                val = self.find_value_by_path(field_path)
+                self.validate_insert(parent, field, val)
+                if isinstance(val, Expression):
+                    if val.is_appended():
+                        val = deepcopy(val)
+                        val.concat_children()
+                        val.children = []
+                field.value = self.populate_field(field, val)
+            else:
+                pass
+        elif field.type is Type.value:
+            if isinstance(field, Expression):
+                return self.populate_field(field, field.content)
+        elif field.type is Type.list:
+            for item in field.content:
+                self.populate_field(field, item)
+        return field
+
+    def validate_insert(self, parent, field, val):
+        if val is None:
+            raise vault.error.VaultError(100, "expression cannot be evaluated (no value found")
+        if val.type is Type.record and isinstance(val, Expression) and isinstance(val.content, dict):
+            if isinstance(parent, dict):
+                raise vault.error.VaultError(100, 'cannot insert a record')
 
     def handle_return(self, cmd):
         log = {"status": "RETURNING"}
         expression = cmd.expressions["return_value"]
         # Find the value
         output = None
-        # Here we basically have to convert our internal repr of object
+        # Here we basically have to convert our internal repr of the object graph
         # with the values to be output. we also make copies because these
         # are generally references and it's the datastore that will actually persist them on commit.
         # Our typing is inconsistent so it's messy.
-        if expression.type is Type.value:
-            field_val = expression.get()
-            if field_val.type is Type.field:
-                output = deepcopy(self.find_value(field_val.value))
-                if output.type is Type.list:
-                    # children > 0 means this list was appended to and is waiting to be committed
-                    if len(output.children) > 0:
-                        # compact the appended values
-                        output.concat_children()
-                        # extract the values
-                        output = output.value()
-                    # else:
-                    #     output = output.value()
-            if field_val.type is Type.literal:
-                output = expression.content.value
+        expression = self.populate_expression(expression)
+        # if expression.is_appended():
+        #     expression.concat_children()
+        output = expression.value()
 
         # Format the results
         if output is not None:
             # quite a few results will already be converted already. this is a crude conversion below
             if isinstance(output, Expression):
                 if isinstance(output.content, list):
+                    log["output"] = output.value()
+                elif isinstance(output.content, dict):
                     log["output"] = output.value()
                 else:
                     log["output"] = output.content.value
@@ -276,6 +325,9 @@ class Interpreter:
             return True
         return False
 
+    def tokenize_field(self, field_val):
+        return field_val.split('.')
+
     def find_value(self, key):
         if key in self.cache:
             return self.cache[key]
@@ -292,9 +344,13 @@ class Interpreter:
         while len(keys) > 0:
             key = keys.pop(0)
             try:
-                obj = obj[key]
+                if isinstance(obj, Expression):
+                    if obj.type is Type.record:
+                        obj = obj.get()[key]
+                else:
+                    obj = obj[key]
             except:
-                pass
+             return None
         return obj
 
 
