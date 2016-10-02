@@ -6,7 +6,7 @@ import subprocess
 import sys
 import tempfile
 
-user = 'ubuntu'
+user = 'jprider'
 
 if len(sys.argv) != 3:
 	print( "usage: ./run.py <server> <test>")
@@ -20,7 +20,7 @@ f = open( testFile, 'r')
 test = json.loads( f.read())
 f.close()
 
-o = {'input': test, 'type': 'build', 'target': serverFile, 'client_user': user}
+o = {'input': test, 'type': 'build', 'target': serverFile, 'client_user': user, 'port': 4000}
 
 f = tempfile.NamedTemporaryFile( delete=False)
 f.write( json.dumps( o))
