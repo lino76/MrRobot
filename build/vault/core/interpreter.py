@@ -190,6 +190,11 @@ class Interpreter:
             field_val = value_to_append.get()
             if field_val.type is Type.field:
                 value_to_append = self.find_value(field_val.value)
+
+        # value_to_append = deepcopy(value_to_append)  # TODO not working right
+        # TODO this has to be populated with the data that exists now or it maybe overwritten
+        value_to_append = self.populate_expression(value_to_append)  # TODO not working quite right
+
         # see if the value exists and if we can access it
         if self.is_local(key):
             # if local we have to do it all here
@@ -204,11 +209,15 @@ class Interpreter:
             # this might work because a value has to be created in a program before it can be appended to
             # so it's reference should be in the cache
             if self.is_cached(key):
-                self.cache[key].children.append(value_to_append)
+                root_val = self.cache[key]
             else:
-                tmp = self.datastore.get_noperm(key)
-                tmp.children.append(value_to_append)
-                self.cache[key] = tmp
+                root_val = self.datastore.get_noperm(key)
+            if value_to_append.type is Type.list:
+                for item in value_to_append.get():
+                    root_val.children.append(item)
+            else:
+                root_val.children.append(value_to_append)
+            self.cache[key] = root_val
         return log
 
     def handle_local(self, cmd):

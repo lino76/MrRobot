@@ -118,18 +118,18 @@ if __name__ == '__main__':
     #     ''')
 
     # test 6
-    prog1 = Program('''as principal admin password "admin" do
-        local x = { field1="joe" }
-        set y = []
-        append to y with x
-        return y
-        ***
-        ''')
-
-    prog2 = Program('''as principal admin password "admin" do
-        return y
-        ***
-        ''')
+    # prog1 = Program('''as principal admin password "admin" do
+    #     local x = { field1="joe" }
+    #     set y = []
+    #     append to y with x
+    #     return y
+    #     ***
+    #     ''')
+    #
+    # prog2 = Program('''as principal admin password "admin" do
+    #     return y
+    #     ***
+    #     ''')
 
     # Test 3
     # prog1 = Program('''as principal admin password "admin" do
@@ -184,31 +184,36 @@ if __name__ == '__main__':
     #     ''')
 
     # Test 5
-    # prog1 = Program('''as principal admin password "admin" do
-    #     set records = []
+    prog1 = Program('''as principal admin password "admin" do
+        set records = []
+        set y = { jim="beam" }
+        append to records with { name = "mike", date = "1-1-90" }
+        append to records with "dave"
+        append to records with records
+        append to records with []
+        append to records with y.jim
+        set y = []
+        return records
+        ***
+        ''')
+
+    # prog2 = Program('''as principal admin password "admin" do
     #     set y = { jim="beam" }
-    #     append to records with { name = "mike", date = "1-1-90" }
-    #     append to records with "dave"
-    #     append to records with records
-    #     append to records with []
-    #     append to records with y.jim
-    #     set y = []
-    #     return records
+    #     append to y with "hi" // should fail since y is not a table
+    #     return y
     #     ***
     #     ''')
 
-        # foreach rec in names replacewith rec.name
-        # local rec = ""
-    #
     result, exiting = vault.run(prog1)
     print("output:")
     print(result)
-    result, exiting = vault.run(prog2)
-    print("output:")
-    print(result)
+    # result, exiting = vault.run(prog2)
+    # print("output:")
+    # print(result)
     # result, exiting = vault.run(prog3)
     # print("output:")
     # print(result)
+
 
 
 

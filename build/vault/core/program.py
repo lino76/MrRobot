@@ -75,7 +75,10 @@ class Expression:
     def concat_children(self):
         result = self.content
         for child in self.children:
-            result.append(child.content)
+            if isinstance(child, Expression):
+                result.append(child.content)
+            else:
+                result.append(child)
         return result
 
     # extract all values from this whole content graph
@@ -143,6 +146,11 @@ class Expression:
                 val.append(self.depopulate_dict(item))
             elif isinstance(item, str):
                 val.append(item)
+            elif isinstance(item, list):
+                # skip empty lists
+                lst = self.depopulate_list(item)
+                if lst:
+                    val.append(lst)
         return val
 
 
@@ -174,6 +182,14 @@ class FieldType:
 
     def __repr__(self):
         return str(self)
+
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            setattr(result, k, deepcopy(v, memo))
+        return result
 
 
 from enum import Enum
