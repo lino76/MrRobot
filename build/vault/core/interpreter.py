@@ -221,11 +221,12 @@ class Interpreter:
                 root_val = self.cache[key]
             else:
                 root_val = self.datastore.get_noperm(key)
-            if value_to_append.type is Type.list:
-                for item in value_to_append.get():
-                    root_val.children.append(item)
-            else:
-                root_val.children.append(value_to_append)
+            if not opt:
+                if value_to_append.type is Type.list:
+                    for item in value_to_append.get():
+                        root_val.children.append(item)
+                else:
+                    root_val.children.append(value_to_append)
             self.cache[key] = root_val
         return log
 
