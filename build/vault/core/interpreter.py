@@ -76,8 +76,8 @@ class Interpreter:
             elif expression.type is Type.list:
                 if expression.is_appended():
                     expression.concat_children()
-                for child in content:
-                    self.populate_field(expression, child)
+                # for child in content:
+                #     self.populate_field(expression, child)
 
         return expression
 
