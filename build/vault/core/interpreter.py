@@ -64,9 +64,11 @@ class Interpreter:
         self.cache[key] = populated_value
         return log
 
-    def populate_expression(self, expression):
+    def populate_expression(self, expression, copy=True):
         # traverse the object graph of expression and evaluate all fields with whatever data is available
-        expression = deepcopy(expression)
+        if copy:
+            expression = deepcopy(expression)
+
         if isinstance(expression, Expression):
             content = expression.get()
             if expression.type is Type.value:
@@ -185,17 +187,24 @@ class Interpreter:
     def handle_append_to(self, cmd):
         log = {"status": "APPEND"}
         key = cmd.expressions['key']
+        opt = False
         value_to_append = cmd.expressions['value']
         if value_to_append.type is Type.value:
             field_val = value_to_append.get()
             if field_val.type is Type.field:
                 value_to_append = self.find_value(field_val.value)
+                if field_val.value == key:
+                    opt = True  # opt (optimize) means we're appending x to x
 
-        # value_to_append = deepcopy(value_to_append)  # TODO not working right
         # TODO this has to be populated with the data that exists now or it maybe overwritten
-        value_to_append = self.populate_expression(value_to_append)  # TODO not working quite right
+        if field_val.value != key:
+            value_to_append = self.populate_expression(value_to_append)
+        else:
+            value_to_append = self.populate_expression(value_to_append, False)
 
-        # see if the value exists and if we can access it
+        # value_to_append = self.populate_expression(value_to_append)
+
+            # see if the value exists and if we can access it
         if self.is_local(key):
             # if local we have to do it all here
             # the big difference is that local fields seem to have no permissions TODO (verify this)
