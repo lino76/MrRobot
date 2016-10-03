@@ -66,6 +66,13 @@ class Interpreter:
 
     def populate_expression(self, expression):
         # traverse the object graph of expression and evaluate all fields with whatever data is available
+        #TODO: problem part
+        print('p1')
+        if isinstance(expression, Expression) and expression.type is Type.list and expression.is_appended():
+            expression = deepcopy(expression) #we need remove this for lists append
+            expression.concat_children()
+            return expression
+        print('p12')
         expression = deepcopy(expression)
         if isinstance(expression, Expression):
             content = expression.get()
