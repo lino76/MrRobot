@@ -64,15 +64,11 @@ class Interpreter:
         self.cache[key] = populated_value
         return log
 
-    def populate_expression(self, expression):
+    def populate_expression(self, expression, copy=True):
         # traverse the object graph of expression and evaluate all fields with whatever data is available
-        #TODO: problem part
-        print('p1')
-        if isinstance(expression, Expression) and expression.type is Type.list and expression.is_appended():
-            expression = deepcopy(expression) #we need remove this for lists append
-            expression.concat_children()
-            return expression
-        print('p12')
+        if copy:
+            expression = deepcopy(expression)
+
         expression = deepcopy(expression)
         if isinstance(expression, Expression):
             content = expression.get()
@@ -192,15 +188,17 @@ class Interpreter:
     def handle_append_to(self, cmd):
         log = {"status": "APPEND"}
         key = cmd.expressions['key']
+        opt = False
         value_to_append = cmd.expressions['value']
         if value_to_append.type is Type.value:
             field_val = value_to_append.get()
             if field_val.type is Type.field:
                 value_to_append = self.find_value(field_val.value)
 
-        # value_to_append = deepcopy(value_to_append)  # TODO not working right
-        # TODO this has to be populated with the data that exists now or it maybe overwritten
-        value_to_append = self.populate_expression(value_to_append)  # TODO not working quite right
+        if not opt:
+            value_to_append = self.populate_expression(value_to_append)
+        else:
+            value_to_append = self.populate_expression(value_to_append, False)
 
         # see if the value exists and if we can access it
         if self.is_local(key):
@@ -219,11 +217,12 @@ class Interpreter:
                 root_val = self.cache[key]
             else:
                 root_val = self.datastore.get_noperm(key)
-            if value_to_append.type is Type.list:
-                for item in value_to_append.get():
-                    root_val.children.append(item)
-            else:
-                root_val.children.append(value_to_append)
+            if not opt:
+                if value_to_append.type is Type.list:
+                    for item in value_to_append.get():
+                        root_val.children.append(item)
+                else:
+                    root_val.children.append(value_to_append)
             self.cache[key] = root_val
         return log
 
