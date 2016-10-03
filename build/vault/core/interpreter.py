@@ -197,7 +197,7 @@ class Interpreter:
                     opt = True  # opt (optimize) means we're appending x to x
 
         # TODO this has to be populated with the data that exists now or it maybe overwritten
-        if field_val.value != key:
+        if not opt:
             value_to_append = self.populate_expression(value_to_append)
         else:
             value_to_append = self.populate_expression(value_to_append, False)
