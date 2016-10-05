@@ -4,5 +4,6 @@
 .vs
 *.idea
 *.pyc
-
+.vscode
+*build/server
 venv
