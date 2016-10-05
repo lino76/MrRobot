@@ -80,15 +80,20 @@ class Server:
         if not os.path.isfile(self.server):            
             raise Exception('Server not found')
 
-    def start_server(self, port):
+    def start_server(self, port, password = None):
         self.port = port
-        self.proc = subprocess.Popen([self.server, str(self.port)])
+        if password:
+            self.proc = subprocess.Popen([self.server, str(self.port), password])
+        else:    
+            self.proc = subprocess.Popen([self.server, str(self.port)])
         time.sleep(2)
 
         self.proc.poll()
 	    # Port already busy, try next port
         if self.proc.returncode == 63:
             return self.start_server( port + 1)
+        if self.proc.returncode != 0:
+            raise Exception(self.proc.returncode)
         return self.port
 
     def stop_server(self):
@@ -181,16 +186,33 @@ class Client:
             print('File does not exist: ', testfile)
 
 def send(teams, team_list, program):
+    # program is a json file in the oracle format. 
+    #Parse the program and pull out the command line arguements
+    args = program['arguments']['argv']
+
+    if args[0] == '%port%':
+        test_port = port
+    else:
+        test_port = args[0]
+
+    password = None
+    if len(args) == 2:
+        password = args[1]
+
     for team in teams:
         # only execute the tests on the specified teams.
         if team_list[0] == 'all' or team in team_list:
             try:
                 server = Server(os.path.join(teams.teams_root, team))
-                server.start_server(port)
+                server.start_server(test_port, password)
                 
                 client = Client()
             except Exception as e:
-                print(e)
+                # test for a returncode here
+                if program['arguments']['return_code'] == e:
+                    print("TEST PASS")
+                else:
+                    print("TEST FAIL: " + e)
             finally:
                 if server is not None:
                     server.stop_server()
@@ -247,19 +269,34 @@ if __name__ == '__main__':
             
             if t_input == '':
                 t_input = 'all'
-            if t_input != 'r' or test_file is None:
+            
+            if t_input == 'r' and test_file is None:
+                print('Rerun is not availible until a sucessful run')
+                continue
+
+            if t_input != 'r':
                 # Return will shortcut rerun last selected test / teams
                 team_list = t_input.split(',')
                 test_file = input('Enter File Name or type exit:')                
-
-            if test_file == 'exit':
-                exit()
-            #print(select)
             
-            test_file = os.path.join(os.path.dirname(__file__), data_path, test_file)
-            if not test_file.endswith(".json"):
-                test_file += ".json"
-            send(teams, team_list, test_file)
+                if test_file == 'exit':
+                    exit()
+                #print(select)
+                try:                
+                    test_file = os.path.join(os.path.dirname(__file__), data_path, test_file)
+
+                    if not test_file.endswith(".json"):
+                        test_file += ".json"
+ 
+                    with open(test_file, "r") as f:
+                        json = json.loads(f.read())
+                except Exception as e:
+                    print(e)
+                    print('file does not exist: ', test_file)
+
+                    continue
+
+            send(teams, team_list, json)
 
 
 

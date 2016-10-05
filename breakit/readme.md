@@ -23,3 +23,18 @@ Command Line Arguments
 -m Manual Program name. If used this is executed from the command line and exits when finished. 
 -t Teams to execute test against, only used in manual mode for executing tests from the command line. 
 
+Input file is expected in the Oracle provided format, ie:
+{
+    "arguments: {
+        "argv": [ "port", "password" ]
+    },
+    "programs": [],
+    "return_code": 255,
+    "output": [
+        { "status" : "SET" },
+        {
+            "status": "Returning",
+            "output": "my string"
+        }
+    ]
+}
