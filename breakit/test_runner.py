@@ -25,7 +25,7 @@ class TeamFolders:
             self.__team_path = teams_folder
         
         self.teams_root = os.path.join(os.path.dirname(__file__), self.teams_root)
-        
+        self.__log_file = os.path.join(self.teams_root, "build.log")
         #check if a build has been executed already
         if force_rebuild or not os.path.isfile(os.path.join(self.teams_root, '.built')):
             self.__rebuild = True
@@ -66,13 +66,17 @@ class TeamFolders:
         if force or not os.path.isfile(os.path.join(build_folder, 'server')):
             try:
                 ret = subprocess.Popen(['make'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=build_folder)                
-                ret.wait()               
+                ret.wait()   
+                self.__log(team + " - Built")            
                 if ret.returncode == 2: # return code 2 is an error, print the standard out.
                     print(ret.stdout.readlines())                    
                     print(ret.returncode)
             except Exception as e:
+                self.__log(team + " - BUILD ERROR: " + str(e))
                 print('Exception raised building {} : '.format(team), e)
-
+    def __log(self, message):        
+        with open(self.__log_file, "a") as f:
+            f.write(message + "\n") 
 class Server:
     host = ''
     port = 1024
@@ -200,9 +204,9 @@ def generate_from_html(html_file):
     try:
         with open(html_file) as f:
             html = f.read()
-        soup = BeautifulSoup(html)
-        input = soup.find('samp', {'class': 'form-control-static'}).string.replace("'", '\"')
-        output = soup.find('pre', {'class': 'form-control-static'}).string.replace("'", '\"')        
+        soup = BeautifulSoup(html, 'html.parser')
+        input = soup.find('samp', {'class': 'form-control-static'}).string
+        output = soup.find('pre', {'class': 'form-control-static'}).string     
         
         i_json = json.loads(output)    
         o_json = json.loads(input)
@@ -210,14 +214,14 @@ def generate_from_html(html_file):
         # Update the input to include the output for each program.        
         for idx,prog in enumerate(o_json.get('programs')):
             new = '{{"output":{}, "program":"{}" }}'.format(json.dumps(i_json.get('output')[idx]), prog)
-            print(new)
-            o_json['programs'][idx] = json.loads(new)
+            o_json['programs'][idx] = json.loads(json.dumps(new))
 
         # Append the return_code
         o_json['return_code'] = i_json.get('return_code')
         
         # Fix the arguments
-        o_json['arguments'] = json.load('{{ "argv":{}}}'.format(o_json.get('arguments')))
+        arg = '{{ "argv":{}}}'.format(o_json.get('arguments'))
+        o_json['arguments'] = json.loads(json.dumps(arg))
 
         with open(json_file, 'w') as f:
             json.dump(o_json, f)
