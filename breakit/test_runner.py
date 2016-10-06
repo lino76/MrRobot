@@ -80,7 +80,7 @@ class Server:
         if not os.path.isfile(self.server):            
             raise Exception('Server not found')
 
-    def start_server(self, port, password = None):
+    def start_server(self, port, password = None):        
         self.port = port
         if password:
             self.proc = subprocess.Popen([self.server, str(self.port), password])
@@ -92,7 +92,7 @@ class Server:
 	    # Port already busy, try next port
         if self.proc.returncode == 63:
             return self.start_server( port + 1)
-        if self.proc.returncode != 0:
+        if self.proc.returncode is not None:
             raise Exception(self.proc.returncode)
         return self.port
 
@@ -105,92 +105,45 @@ class Server:
 class Client:
     host = ''
     port = 1024
+    def __init__(self, port):
+        self.port = port
 
-    def clientSend(self, data):
-        conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        conn.settimeout(30)
-        conn.setblocking(True)
+    def clientSend(self, program):
 
-        conn.connect((socket.gethostname(), port))
+        self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.conn.settimeout(30)
+        self.conn.setblocking(True)
+        self.conn.connect((socket.gethostname(), self.port))
 
-        # Json file has mutiple parts, for now focus on the programs
-        print('[*] Client sending program\n', data)
-
-        conn.send(data.encode('utf-8'))
-
-
-        result = ''
+        print('[*] Client sending program\n', program)
         try:
-            while True:
-                tmp = conn.recv(8)
-                if tmp == b'':
-                    break
-                result += tmp.decode()
-        except Exception as e:
-            print(e)
-        print('[*] Client received response:', result)
-        conn.close()
+            self.conn.send(program.encode('utf-8'))
+
+            result = ''
+            try:
+                while True:
+                    tmp = self.conn.recv(8)
+                    if tmp == b'':
+                        break
+                    result += tmp.decode()
+            except Exception as e:
+                print(e)
+            print('[*] Client received response:', result)
+        finally:
+            try:
+                self.conn.close()
+            except:
+                pass
 
         return result
 
-    def compareResponses(self, server_response, expected_response):
-        err_base = "Command "  + "| Responses don't match: "
-        if len(server_response) != len(expected_response):
-            print(err_base + "different line numbers")
-            print('expected:', expected_response)
-            print('received:', server_response)
-            return False
-        if server_response != expected_response:
-            print('expected:', expected_response)
-            print('received:', server_response)
-            return False
-        # for i in range(0, len(server_response)):77
-        #     if expected_response[i]['status'] != server_response[i]['status']:
-        #         print(err_base + "statuses")
-        #         print("Line " + str(i) + ". Got: "+ server_response[i]['status'] +
-        #             " expected " + expected_response[i]['status'])
-        #         return False
-        #     if expected_response[i].status == "RETURNING":
-        #         if expected_response[i].output != server_response[i].output:
-        #             print(err_base + "output doesn't match")
-        #             print("Got " + str(server_response[i]['output']) + " expected " +
-        #                 str(expected_response[i]['output']))
-        #             return False
-        print("Responses match")
-        return True
 
-
-    def sendFromFile(self, testfile):
-
-        if os.path.isfile(testfile):
-                #if Path.is_file(testfile):
-            with open(testfile, "r") as jsonFile:
-                data = jsonFile.read()
-
-                try:
-                    #NOTE : here u can specify what exact part of test u want to run
-                    #just append [-1:] - will run last testcase from file
-                    programms = json.loads(data)['programs']
-                    for program in programms:
-                        response = clientSend(program['program'])
-                        response = response.split('\n')[:-1]
-                        response_json = [json.loads(res) for res in response]
-                        if not compareResponses(response_json, program['output']):
-                            print('NOT MATCH')
-                            return
-                except Exception as e:
-                    print('expect')
-                    print(e)
-                    raise
-        else:
-            print('File does not exist: ', testfile)
-
-def send(teams, team_list, program):
+def send(teams, team_list, break_data):
     # program is a json file in the oracle format. 
     #Parse the program and pull out the command line arguements
-    args = program['arguments']['argv']
+    args = break_data['arguments']['argv']
 
-    if args[0] == '%port%':
+    if args[0] == '%PORT%':
         test_port = port
     else:
         test_port = args[0]
@@ -204,19 +157,32 @@ def send(teams, team_list, program):
         if team_list[0] == 'all' or team in team_list:
             try:
                 server = Server(os.path.join(teams.teams_root, team))
-                server.start_server(test_port, password)
+                used_port = server.start_server(test_port, password)
                 
-                client = Client()
+                client = Client(used_port)
+
+                for program in break_data.get('programs', []):
+                    response = client.clientSend(program.get('program'))
+                    compare_responses(response, program.get('output'))
             except Exception as e:
                 # test for a returncode here
 
                 if str(program.get('return_code', 0)) == str(e):
                     print("TEST PASS")
                 else:
-                    print("TEST FAIL: " + e)
+                    print("TEST FAIL: " + str(e))
             finally:
                 if server is not None:
                     server.stop_server()
+
+def compare_responses(server_response, client_response):  
+    s_response = server_response.rstrip('\n').replace('\n', ',').strip("'")      
+    s_response = '{{"output":[{}]}}'.format(s_response)
+    s_response = json.loads(s_response)
+    if s_response.get('output') != client_response:
+        raise Exception("TEST FAIL")
+    print('TEST PASS')
+
 
 if __name__ == '__main__':
     print(sys.version)
@@ -226,78 +192,53 @@ if __name__ == '__main__':
     cmd_parser.add_argument('-s', '--source', type=str, dest='team_path', required=False, help='Path to folder containing the folders of each teams code.' )
     cmd_parser.add_argument('-d', type=str, dest="data_path", default=data_path, required=False)        
     cmd_parser.add_argument('-r', '--rebuild', action='store_true', help='Force all known team projects to rebuild.' )
-    # These options are to run a test from the command line, -t is ignored without a -m but is optional, if not include all teams are run
-    # Note these are not implemented yet.
-    cmd_parser.add_argument('-m', type=str, dest="manualprogram", required=False)
-    cmd_parser.add_argument('-t', '--teams', type=str, help='List of teams separated by commas', required=False)
 
     args = cmd_parser.parse_args()
 
     port = args.port
     data_path = args.data_path
-    manualprogram = args.manualprogram
-    team_path = args.team_path        
-
-    if args.teams:
-        target_teams = args.teams.split(',')
-    else:
-        target_teams = None
+    team_path = args.team_path            
     
     # Get all the team folders and compile if required.    
-    # TODO: Implement target teams to limit the execution to a few teams.
     teams = TeamFolders(args.rebuild, team_path)
+    # Force a recompile if flag is passed
     if args.rebuild:
         teams.build_all()
 
-    # If a manual program then execute a single script   
-#    if manualprogram:
+    test_file = None
+    while True:
+        print('available teams:\n', str.join(', ', teams))
         
-#        manualprogram = manualprogram.replace("\\n", "\n")
-    #run_all = args.run_all
-    print('Using port %d with data path of: %s' % (port, data_path))
+        t_input = input('Enter team or teams (separated by comma), enter for all or type "r" to repeat: ')
+            
+        if t_input == '':
+            t_input = 'all'
+            
+        if t_input == 'r' and test_file is None:
+            print('Rerun is not availible until a sucessful run')
+            continue
 
-    if manualprogram is not None:
-        print("sending manual program...")
-        print("program: ", manualprogram)
-#        clientSend(manualprogram)
-    else:
-        print('test file mode..')
-        test_file = None
-        while True:
-            print('available teams:\n', str.join(', ', teams))
-            #t_input = input(' \n## Press Enter to run last team(s) / program selection ##\n or type exit:')
-            t_input = input('Enter team or teams (separated by comma), enter for all or type "r" to repeat: ')
+        if t_input != 'r':
+            # Return will shortcut rerun last selected test / teams and skip asking for inputs
+            team_list = t_input.split(',')
+            test_file = input('Enter File Name or type exit:')                
             
-            if t_input == '':
-                t_input = 'all'
-            
-            if t_input == 'r' and test_file is None:
-                print('Rerun is not availible until a sucessful run')
+            if test_file == 'exit':
+                exit()
+
+            try:                
+                test_file = os.path.join(os.path.dirname(__file__), data_path, test_file)
+
+                if not test_file.endswith(".json"):
+                    test_file += ".json"
+ 
+                with open(test_file, "r") as f:
+                    file_data = json.loads(f.read())
+            except Exception as e:
+                print(e)                
                 continue
 
-            if t_input != 'r':
-                # Return will shortcut rerun last selected test / teams
-                team_list = t_input.split(',')
-                test_file = input('Enter File Name or type exit:')                
-            
-                if test_file == 'exit':
-                    exit()
-                #print(select)
-                try:                
-                    test_file = os.path.join(os.path.dirname(__file__), data_path, test_file)
-
-                    if not test_file.endswith(".json"):
-                        test_file += ".json"
- 
-                    with open(test_file, "r") as f:
-                        json = json.loads(f.read())
-                except Exception as e:
-                    print(e)
-                    print('file does not exist: ', test_file)
-
-                    continue
-
-            send(teams, team_list, json)
+        send(teams, team_list, file_data)
 
 
 
