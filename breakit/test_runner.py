@@ -209,7 +209,8 @@ def send(teams, team_list, program):
                 client = Client()
             except Exception as e:
                 # test for a returncode here
-                if program['arguments']['return_code'] == e:
+
+                if str(program.get('return_code', 0)) == str(e):
                     print("TEST PASS")
                 else:
                     print("TEST FAIL: " + e)
