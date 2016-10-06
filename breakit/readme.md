@@ -3,6 +3,8 @@ scripts against each teams ./server.
 
 Note: This will only execute on linux systems, specifically targeted to run on the provided VM. 
 
+NOTE2: oracle support requires BeautifulSoup4 support.  pip3 install bs4
+
 To use this script place the other teams code in a subdirectory with the default directory 
 being the 'teams' subdirectory, ie:
 teams\team1\build
@@ -16,12 +18,8 @@ Break scripts are placed in a subdirectory with the default subdirectory being '
 Command Line Arguments
 -p default 1024
 -s break it script folder. default 'break_scripts'
--r Rebuild all projects
 -s folder to use holding teams source code. Note this must be the parent folder of a team folder.
- 
-######  Command Line Execution ######
--m Manual Program name. If used this is executed from the command line and exits when finished. 
--t Teams to execute test against, only used in manual mode for executing tests from the command line. 
+-r Rebuild all projects 
 
 Input file is expected in the Oracle provided format, ie:
 {
@@ -38,3 +36,4 @@ Input file is expected in the Oracle provided format, ie:
         }
     ]
 }
+

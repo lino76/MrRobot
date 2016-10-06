@@ -6,9 +6,11 @@ import json
 import subprocess
 import time
 import sys
+from bs4 import BeautifulSoup
 
 data_path = 'break_scripts'
 teams_root = 'teams'
+html_path = data_path
 port = 1024
 
 class TeamFolders:    
@@ -111,6 +113,7 @@ class Client:
     def clientSend(self, program):
 
         self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.conn.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.conn.settimeout(30)
         self.conn.setblocking(True)
         self.conn.connect((socket.gethostname(), self.port))
@@ -183,16 +186,60 @@ def compare_responses(server_response, client_response):
         raise Exception("TEST FAIL")
     print('TEST PASS')
 
+def generate_from_html(html_file):
+
+    html_file = os.path.join(os.path.dirname(__file__), html_path, test_file)
+    json_file = os.path.splitext(os.path.join(os.path.dirname(__file__), data_path, test_file))[0] + '.json'
+    # check both files exist or throw
+    if not os.path.isfile(html_file):
+        raise Exception("HTML File does not exist: " + html_file)
+    
+    if os.path.isfile(json_file):
+        raise Exception("Output file already exists: " + json_file)
+
+    try:
+        with open(html_file) as f:
+            html = f.read()
+        soup = BeautifulSoup(html)
+        input = soup.find('samp', {'class': 'form-control-static'}).string.replace("'", '\"')
+        output = soup.find('pre', {'class': 'form-control-static'}).string.replace("'", '\"')        
+        
+        i_json = json.loads(output)    
+        o_json = json.loads(input)
+
+        # Update the input to include the output for each program.        
+        for idx,prog in enumerate(o_json.get('programs')):
+            new = '{{"output":{}, "program":"{}" }}'.format(json.dumps(i_json.get('output')[idx]), prog)
+            print(new)
+            o_json['programs'][idx] = json.loads(new)
+
+        # Append the return_code
+        o_json['return_code'] = i_json.get('return_code')
+        
+        # Fix the arguments
+        o_json['arguments'] = json.load('{{ "argv":{}}}'.format(o_json.get('arguments')))
+
+        with open(json_file, 'w') as f:
+            json.dump(o_json, f)
+        
+        #Once tested remove this.
+        #os.remove(html_file)
+
+        #save out as json_file 
+        return json_file
+
+    except Exception as e:
+        print(e)
 
 if __name__ == '__main__':
     print(sys.version)
     # Parse the command lines.  Expect a port followed by a data folder path
     cmd_parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-    cmd_parser.add_argument('-p', type=int, dest="port", default=1024)        
+    cmd_parser.add_argument('-p', type=int, dest="port", default=1024, required=False)        
     cmd_parser.add_argument('-s', '--source', type=str, dest='team_path', required=False, help='Path to folder containing the folders of each teams code.' )
     cmd_parser.add_argument('-d', type=str, dest="data_path", default=data_path, required=False)        
-    cmd_parser.add_argument('-r', '--rebuild', action='store_true', help='Force all known team projects to rebuild.' )
-
+    cmd_parser.add_argument('-r', '--rebuild', action='store_true', help='Force all known team projects to rebuild.', required=False)
+    cmd_parser.add_argument('-a', '--html', dest="html_path", default=html_path,  required=False)
     args = cmd_parser.parse_args()
 
     port = args.port
@@ -226,7 +273,13 @@ if __name__ == '__main__':
             if test_file == 'exit':
                 exit()
 
-            try:                
+            try:   
+                # Load an oracle created query, a file with the same name with .json gets created in the data_path and executed
+                if test_file.endswith(".html"):
+                    test_file = generate_from_html(test_file)
+
+
+
                 test_file = os.path.join(os.path.dirname(__file__), data_path, test_file)
 
                 if not test_file.endswith(".json"):
