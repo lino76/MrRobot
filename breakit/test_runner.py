@@ -76,8 +76,7 @@ class TeamFolders:
             try:                
                 for r,d,f in os.walk(self.teams_root):
                     os.chmod(r, 0o777)
-                # Clean up the build before we start. If it failed previous remove the .buildfail file and the server file
-                self.__remove(server)                
+                # Clean up the build before we start. If it failed previous remove the .buildfail file           
                 self.__remove(bf)
                 ret = subprocess.Popen(['make'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=build_folder)                
                 ret.wait()   
