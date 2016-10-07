@@ -186,8 +186,24 @@ class Client:
 
         return result
 
+class Log:
+    def __init__(self, file):
+        self.file = file
+        try:
+            os.remove(file)
+        except: pass
 
-def send(teams, team_list, break_data):
+    def log(self, message):
+        try:
+            with open(self.file, a) as f:
+                if message:
+                    f.write(message + "\n")         
+        except Exception as e:
+            pass        
+
+def send(teams, team_list, script_name, break_data):
+    log = os.path.split(script_name)[0] + '.log'
+    logger = Log(log)
     # program is a json file in the oracle format. 
     #Parse the program and pull out the command line arguements
     args = break_data['arguments']['argv']
@@ -205,6 +221,7 @@ def send(teams, team_list, break_data):
         # only execute the tests on the specified teams.
         if team_list[0] == 'all' or team in team_list:
             print('****** Executing Team {} ******'.format(team))
+            logger.log('****** Executing Team {} ******'.format(team))
             try:
                 server = Server(os.path.join(teams.teams_root, team))
                 used_port = server.start_server(test_port, password)
@@ -214,13 +231,16 @@ def send(teams, team_list, break_data):
                 for program in break_data.get('programs', []):
                     response = client.clientSend(program.get('program'))
                     compare_responses(response, program.get('output'))
+                logger.log("TEST PASS")
             except Exception as e:
                 # test for a returncode here
                 
                 if str(break_data.get('return_code', 0)) == str(e):
                     print("TEST PASS")
+                    logger.log("TEST PASS")
                 else:
                     print("TEST FAIL: " + str(e))
+                    logger.log("TEST FAIL")
             finally:
                 try:                
                     server.stop_server()
@@ -308,7 +328,10 @@ if __name__ == '__main__':
             
         if t_input == '':
             t_input = 'all'
-            
+        
+        if t_input == 'exit' or test_file == 'e':
+            exit()
+
         if t_input == 'r' and test_file is None:
             print('Rerun is not availible until a sucessful run')
             continue
@@ -316,30 +339,29 @@ if __name__ == '__main__':
         if t_input != 'r':
             # Return will shortcut rerun last selected test / teams and skip asking for inputs
             team_list = t_input.split(',')
-            test_file = input('Enter File Name or type exit:')                
+            test_file = input('Enter File Name, type "r" to repeat or type "exit":')                
             
-            if test_file == 'exit':
+            if test_file == 'exit' or test_file == 'e':
                 exit()
 
-            try:   
-                # Load an oracle created query, a file with the same name with .json gets created in the data_path and executed
-                if test_file.endswith(".html"):
-                    test_file = generate_from_html(test_file)
+            try:  
+                if test_file != 'r' or not (test_file == 'r' and not file_data): 
+                    # Load an oracle created query, a file with the same name with .json gets created in the data_path and executed
+                    if test_file.endswith(".html"):
+                        test_file = generate_from_html(test_file)
 
+                    test_file = os.path.join(os.path.dirname(__file__), data_path, test_file)
 
-
-                test_file = os.path.join(os.path.dirname(__file__), data_path, test_file)
-
-                if not test_file.endswith(".json"):
-                    test_file += ".json"
- 
-                with open(test_file, "r") as f:
-                    file_data = json.loads(f.read())
+                    if not test_file.endswith(".json"):
+                        test_file += ".json"
+    
+                    with open(test_file, "r") as f:
+                        file_data = json.loads(f.read())
             except Exception as e:
                 print(e)                
                 continue
 
-        send(teams, team_list, file_data)
+        send(teams, team_list, test_file, file_data)
 
 
 
