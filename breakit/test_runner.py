@@ -65,7 +65,10 @@ class TeamFolders:
         if self.__rebuilt:
             return
         for folder in self.__folders:
-            __build(team, True)
+            try:
+                __build(team, True)
+            except exception as e:
+                print(e)
 
     def __build(self, team, force = False):
         
@@ -79,7 +82,7 @@ class TeamFolders:
                 # Clean up the build before we start. If it failed previous remove the .buildfail file           
                 self.__remove(bf)
                 ret = subprocess.Popen(['make'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=build_folder)                
-                ret.wait()   
+                ret.wait(60) #wait up to 1 min for build to complete   
                 if ret.returncode == 2: # return code 2 is an error, print the standard out.                    
                     print(ret.stdout.readlines())                    
                     print(ret.returncode)
@@ -91,7 +94,7 @@ class TeamFolders:
                 self.__create_file(bf)
                 self.__log(team + " - BUILD ERROR: " + str(e))
                 print('Exception raised building {} : '.format(team), e)
-
+                raise
 
     def __log(self, message):       
         self.__create_file(self.__log_file, message) 
