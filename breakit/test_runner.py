@@ -43,7 +43,7 @@ class TeamFolders:
                 continue
 
             try:
-                if not os.path.isfile(os.path.join(team_folder, '.ignore')):
+                if not os.path.isfile(os.path.join(team_folder, '.ignore')) or not os.path.isfile(os.path.join(self.teams_root, '.buildfail')):
                     # store the teamid and path to folder in dictionary.
                     self.__teams.append(team)
                     if self.__rebuild:
@@ -108,6 +108,8 @@ class TeamFolders:
                     f.write(message + "\n")         
                 else:
                     pass
+        except:
+            pass # Silent pass for now.
 
 
     def __remove(self, file):
