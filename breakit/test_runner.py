@@ -81,7 +81,6 @@ class TeamFolders:
                 self.__remove(bf)
                 ret = subprocess.Popen(['make'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=build_folder)                
                 ret.wait()   
-                print('make complete')
                 if ret.returncode == 2: # return code 2 is an error, print the standard out.                    
                     print(ret.stdout.readlines())                    
                     print(ret.returncode)
@@ -105,14 +104,13 @@ class TeamFolders:
             permissions = 'w'
 
         try:
-            print('writing file: ' + file)
             with open(file, permissions) as f:
                 if message:
                     f.write(message + "\n")         
                 else:
                     pass
         except Exception as e:
-            print(e)
+            pass
 
     def __remove(self, file):
         try:    
