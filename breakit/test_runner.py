@@ -195,14 +195,13 @@ class Log:
 
     def log(self, message):
         try:
-            with open(self.file, a) as f:
-                if message:
-                    f.write(message + "\n")         
+            with open(self.file, 'a') as f:
+                f.write(message + "\n")         
         except Exception as e:
             pass        
 
 def send(teams, team_list, script_name, break_data):
-    log = os.path.split(script_name)[0] + '.log'
+    log = os.path.splitext(script_name)[0] + '.log'
     logger = Log(log)
     # program is a json file in the oracle format. 
     #Parse the program and pull out the command line arguements
