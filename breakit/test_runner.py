@@ -108,9 +108,8 @@ class TeamFolders:
                     f.write(message + "\n")         
                 else:
                     pass
-        except:
-            pass # Silent pass for now.
-
+        except Exception as e:
+            print(e)
 
     def __remove(self, file):
         try:    
