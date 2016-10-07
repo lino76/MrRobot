@@ -70,7 +70,7 @@ class TeamFolders:
         if force or not os.path.isfile(server):
             try:
                 os.stat(build_folder)
-                os.chmod(build_folder, stat.ST_MODE | stat.S_IEXEC)
+                os.chmod(build_folder, stat.ST_MODE | stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
                 ret = subprocess.Popen(['make'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=build_folder)                
                 ret.wait()   
                 os.stat(server)
