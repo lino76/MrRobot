@@ -28,11 +28,12 @@ class TeamFolders:
             
         self.teams_root = os.path.join(os.path.dirname(__file__), self.teams_root)
         self.__log_file = os.path.join(self.teams_root, "build.log")
-        self.remove(self.__log_file)
+        
 
         #check if a build has been executed already
         if force_rebuild or not os.path.isfile(os.path.join(self.teams_root, '.built')):
             self.__rebuild = True
+            self.__remove(self.__log_file)
         
         #for folder in os.listdir(self.__team_path):
         for team in os.listdir(self.teams_root):
@@ -54,7 +55,7 @@ class TeamFolders:
         if self.__rebuild:
             self.__rebuilt = True # Flag to avoid double rebuilding the first time.
             file = os.path.join(self.teams_root, '.built')
-            with open(file, 'w') as f: pass 
+            self.__create_file(file)
 
     def __iter__(self):
         return iter(self.__teams)            
@@ -67,30 +68,49 @@ class TeamFolders:
 
     def __build(self, team, force = False):
         
-        build_folder = (os.path.join(self.teams_root, team, 'build'))
+        build_folder = os.path.join(self.teams_root, team, 'build')
         server = os.path.join(build_folder, 'server')
+        bf = os.path.join(self.teams_root, '.buildfail')
         if force or not os.path.isfile(server):
             try:                
                 for r,d,f in os.walk(self.teams_root):
                     os.chmod(r, 0o777)
                 #os.chmod(self.teams_root, stat.ST_MODE | stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
-                self.remove(server)                
+                self.__remove(server)                
+                self.__remove(bf)
                 ret = subprocess.Popen(['make'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=build_folder)                
                 ret.wait()   
                 os.stat(server)
                 os.chmod(server, stat.ST_MODE | stat.S_IEXEC)
                 self.__log(team + " - Built")            
-                if ret.returncode == 2: # return code 2 is an error, print the standard out.
+                if ret.returncode == 2: # return code 2 is an error, print the standard out.                    
                     print(ret.stdout.readlines())                    
                     print(ret.returncode)
+                    raise Exception('Build Error returned 2')
             except Exception as e:
+                self.__create_file(bf)
                 self.__log(team + " - BUILD ERROR: " + str(e))
                 print('Exception raised building {} : '.format(team), e)
-    def __log(self, message):        
-        with open(self.__log_file, "a") as f:
-            f.write(message + "\n") 
 
-    def remove(self, file):
+
+    def __log(self, message):       
+        self.__create_file(self.__log_file, message + '\n') 
+
+    def __create_file(self, file, message = None):       
+        if message:
+            permissions = 'a'
+        else:
+            permissions = 'w'
+
+        try:
+            with open(self.__log_file, permissions) as f:
+                if message:
+                    f.write(message + "\n")         
+                else:
+                    pass
+
+
+    def __remove(self, file):
         try:    
             os.remove(file)
         except OSError: 
