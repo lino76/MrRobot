@@ -25,9 +25,11 @@ class TeamFolders:
     def __init__(self, force_rebuild, teams_folder = None):
         if teams_folder != None:
             self.__team_path = teams_folder
-        
+            
         self.teams_root = os.path.join(os.path.dirname(__file__), self.teams_root)
         self.__log_file = os.path.join(self.teams_root, "build.log")
+        self.remove(self.__log_file)
+
         #check if a build has been executed already
         if force_rebuild or not os.path.isfile(os.path.join(self.teams_root, '.built')):
             self.__rebuild = True
@@ -72,7 +74,7 @@ class TeamFolders:
                 for r,d,f in os.walk(self.teams_root):
                     os.chmod(r, 0o777)
                 #os.chmod(self.teams_root, stat.ST_MODE | stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
-                os.remove(server)
+                self.remove(server)                
                 ret = subprocess.Popen(['make'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=build_folder)                
                 ret.wait()   
                 os.stat(server)
@@ -87,6 +89,13 @@ class TeamFolders:
     def __log(self, message):        
         with open(self.__log_file, "a") as f:
             f.write(message + "\n") 
+
+    def remove(self, file):
+        try:    
+            os.remove(file)
+        except OSError: 
+            pass
+
 class Server:
     host = ''
     port = 1024
