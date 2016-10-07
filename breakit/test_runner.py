@@ -64,8 +64,9 @@ class TeamFolders:
             __build(team, True)
 
     def __build(self, team, force = False):
-        server = os.path.join(build_folder, 'server')
+        
         build_folder = (os.path.join(self.teams_root, team, 'build'))
+        server = os.path.join(build_folder, 'server')
         if force or not os.path.isfile(server):
             try:
                 os.stat(build_folder)
