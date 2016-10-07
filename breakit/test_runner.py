@@ -38,10 +38,11 @@ class TeamFolders:
         #for folder in os.listdir(self.__team_path):
         for team in os.listdir(self.teams_root):
             team_folder = os.path.join(self.teams_root, team)
-            # if Folder contains .ignore skip the folder.
+            
             if not os.path.isdir(team_folder):
                 continue
 
+            # if Folder contains .ignore skip the folder.
             try:
                 if not os.path.isfile(os.path.join(team_folder, '.ignore')) or not os.path.isfile(os.path.join(self.teams_root, '.buildfail')):
                     # store the teamid and path to folder in dictionary.
@@ -75,18 +76,19 @@ class TeamFolders:
             try:                
                 for r,d,f in os.walk(self.teams_root):
                     os.chmod(r, 0o777)
-                #os.chmod(self.teams_root, stat.ST_MODE | stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
+                # Clean up the build before we start. If it failed previous remove the .buildfail file and the server file
                 self.__remove(server)                
                 self.__remove(bf)
                 ret = subprocess.Popen(['make'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=build_folder)                
                 ret.wait()   
-                os.stat(server)
-                os.chmod(server, stat.ST_MODE | stat.S_IEXEC)
-                self.__log(team + " - Built")            
+                print('make complete')
                 if ret.returncode == 2: # return code 2 is an error, print the standard out.                    
                     print(ret.stdout.readlines())                    
                     print(ret.returncode)
                     raise Exception('Build Error returned 2')
+                os.stat(server)
+                os.chmod(server, stat.ST_MODE | stat.S_IEXEC)
+                self.__log(team + " - Built")            
             except Exception as e:
                 self.__create_file(bf)
                 self.__log(team + " - BUILD ERROR: " + str(e))
@@ -103,7 +105,8 @@ class TeamFolders:
             permissions = 'w'
 
         try:
-            with open(self.__log_file, permissions) as f:
+            print('writing file: ' + file)
+            with open(file, permissions) as f:
                 if message:
                     f.write(message + "\n")         
                 else:
