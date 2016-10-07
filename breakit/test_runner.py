@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 import argparse
 import os.path
 import socket
@@ -6,6 +7,7 @@ import json
 import subprocess
 import time
 import sys
+import stat
 from bs4 import BeautifulSoup
 
 data_path = 'break_scripts'
@@ -67,6 +69,8 @@ class TeamFolders:
             try:
                 ret = subprocess.Popen(['make'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=build_folder)                
                 ret.wait()   
+                os.stat(build_folder)
+                os.chmod(build_folder, stat.ST_MODE | stat.S_IEXEC)
                 self.__log(team + " - Built")            
                 if ret.returncode == 2: # return code 2 is an error, print the standard out.
                     print(ret.stdout.readlines())                    
