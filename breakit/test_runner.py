@@ -204,6 +204,7 @@ def send(teams, team_list, break_data):
     for team in teams:
         # only execute the tests on the specified teams.
         if team_list[0] == 'all' or team in team_list:
+            print('****** Executing Team {} ******'.format(team))
             try:
                 server = Server(os.path.join(teams.teams_root, team))
                 used_port = server.start_server(test_port, password)
@@ -215,14 +216,15 @@ def send(teams, team_list, break_data):
                     compare_responses(response, program.get('output'))
             except Exception as e:
                 # test for a returncode here
-
-                if str(program.get('return_code', 0)) == str(e):
+                
+                if str(break_data.get('return_code', 0)) == str(e):
                     print("TEST PASS")
                 else:
                     print("TEST FAIL: " + str(e))
             finally:
-                if server is not None:
+                try:                
                     server.stop_server()
+                except: pass
 
 def compare_responses(server_response, client_response):  
     s_response = server_response.rstrip('\n').replace('\n', ',').strip("'")      
