@@ -115,7 +115,7 @@ class TeamFolders:
     def __remove(self, file):
         try:    
             os.remove(file)
-        except OSError: 
+        except: 
             pass
 
 class Server:
