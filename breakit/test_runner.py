@@ -64,13 +64,16 @@ class TeamFolders:
             __build(team, True)
 
     def __build(self, team, force = False):
+        server = os.path.join(build_folder, 'server')
         build_folder = (os.path.join(self.teams_root, team, 'build'))
-        if force or not os.path.isfile(os.path.join(build_folder, 'server')):
+        if force or not os.path.isfile(server):
             try:
-                ret = subprocess.Popen(['make'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=build_folder)                
-                ret.wait()   
                 os.stat(build_folder)
                 os.chmod(build_folder, stat.ST_MODE | stat.S_IEXEC)
+                ret = subprocess.Popen(['make'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=build_folder)                
+                ret.wait()   
+                os.stat(server)
+                os.chmod(server, stat.ST_MODE | stat.S_IEXEC)
                 self.__log(team + " - Built")            
                 if ret.returncode == 2: # return code 2 is an error, print the standard out.
                     print(ret.stdout.readlines())                    
