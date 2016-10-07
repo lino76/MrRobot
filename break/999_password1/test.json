@@ -1,0 +1,15 @@
+{
+    "type" : "security",
+    "target_team" : 999,
+    "arguments": {
+        "argv": [
+            "%PORT%",
+            "dogfood" ],
+        "base64": false
+    },
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do\ncreate principal bob \"B0BPWxxd\"\nset x = \"my string\"\nset delegation x admin read -> bob\nreturn x\n***\n"
+        }
+    ]
+}
