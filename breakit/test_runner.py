@@ -80,6 +80,7 @@ class TeamFolders:
 class Server:
     host = ''
     port = 1024
+    proc = None
 
     def __init__(self, build_folder):
         self.server = os.path.join(build_folder, 'build', 'server')       
