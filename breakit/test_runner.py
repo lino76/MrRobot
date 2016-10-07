@@ -45,11 +45,11 @@ class TeamFolders:
             # if Folder contains .ignore skip the folder.
             try:
                 if not os.path.isfile(os.path.join(team_folder, '.ignore')) or not os.path.isfile(os.path.join(self.teams_root, '.buildfail')):
-                    # store the teamid and path to folder in dictionary.
-                    self.__teams.append(team)
                     if self.__rebuild:
                         print('Building team #: ', team)
                         self.__build(team, True)
+                    # store the teamid and path to folder in dictionary.
+                    self.__teams.append(team)                        
             except Exception as e:
                 print(e)
         
@@ -71,7 +71,7 @@ class TeamFolders:
         
         build_folder = os.path.join(self.teams_root, team, 'build')
         server = os.path.join(build_folder, 'server')
-        bf = os.path.join(self.teams_root, '.buildfail')
+        bf = os.path.join(self.teams_root, team, '.buildfail')
         if force or not os.path.isfile(server):
             try:                
                 for r,d,f in os.walk(self.teams_root):
@@ -94,7 +94,7 @@ class TeamFolders:
 
 
     def __log(self, message):       
-        self.__create_file(self.__log_file, message + '\n') 
+        self.__create_file(self.__log_file, message) 
 
     def __create_file(self, file, message = None):       
         if message:
@@ -106,8 +106,6 @@ class TeamFolders:
             with open(file, permissions) as f:
                 if message:
                     f.write(message + "\n")         
-                else:
-                    pass
         except Exception as e:
             pass
 
