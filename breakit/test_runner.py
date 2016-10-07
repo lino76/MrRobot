@@ -68,9 +68,11 @@ class TeamFolders:
         build_folder = (os.path.join(self.teams_root, team, 'build'))
         server = os.path.join(build_folder, 'server')
         if force or not os.path.isfile(server):
-            try:
-                os.stat(build_folder)
-                os.chmod(build_folder, stat.ST_MODE | stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
+            try:                
+                for r,d,f in os.walk(self.teams_root):
+                    os.chmod(r, 0o777)
+                #os.chmod(self.teams_root, stat.ST_MODE | stat.S_IEXEC | stat.S_IREAD | stat.S_IWRITE)
+                os.remove(server)
                 ret = subprocess.Popen(['make'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=build_folder)                
                 ret.wait()   
                 os.stat(server)
