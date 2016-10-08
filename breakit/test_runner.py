@@ -12,7 +12,7 @@ from bs4 import BeautifulSoup
 
 GS = '\033[32m'
 RS = '\033[31m'
-SRS = '\33[41m'
+SRS = '\033[41m'
 END = '\033[0m'
 data_path = 'break_scripts'
 teams_root = 'teams'
@@ -251,7 +251,7 @@ def send(teams, team_list, script_name, break_data):
                     print(GS + "TEST PASS" + END)
                     logger.log("TEST PASS")
                 else:
-                    print(RS + "TEST FAIL: " + str(e) + END)
+                    print(SRS + "TEST FAIL: " + str(e) + END)
                     logger.log("TEST FAIL")
             finally:
                 try:                
