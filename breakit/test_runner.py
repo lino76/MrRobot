@@ -17,7 +17,7 @@ END = '\033[0m'
 data_path = 'break_scripts'
 teams_root = 'teams'
 html_path = data_path
-port = 1024
+port = 22222
 
 class TeamFolders:    
     teams_root = 'teams' #Path to source code of all teams.    
@@ -130,7 +130,7 @@ class TeamFolders:
 
 class Server:
     host = ''
-    port = 1024
+    port = 22222
     proc = None
 
     def __init__(self, build_folder):
@@ -311,7 +311,7 @@ def generate_from_html(html_file):
             json.dump(o_json, f)
         
         #Once tested remove this.
-        #os.remove(html_file)
+        os.remove(html_file)
 
         return json_name
 
