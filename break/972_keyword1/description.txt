@@ -1,0 +1,3 @@
+Creating a principal with a reservered keyword should not be allowed. 
+
+The oracle issues status FAILED, target issues DENIED. 

@@ -1,0 +1,13 @@
+{
+    "type" : "correctness",
+    "target_team" : 972,
+    "arguments": {
+        "argv": [ "%PORT%" ],
+        "base64": false
+    },
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do\ncreate principal all \"B0BPWxxd\"\nreturn \"foobar\"\n***\n"
+        }
+    ]
+}
