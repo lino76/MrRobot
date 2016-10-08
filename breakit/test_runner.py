@@ -138,13 +138,13 @@ class Server:
         if not os.path.isfile(self.server):            
             raise Exception('Server not found')
 
-    def start_server(self, port, password = None):        
+    def start_server(self, port, password = None, inc_stderr = False, inc_stdout = False ):        
         self.port = port
         
         if password:            
-            self.proc = subprocess.Popen([self.server, str(self.port), password], stdout=False)
+            self.proc = subprocess.Popen([self.server, str(self.port), password], stdout=inc_stdout, stderr=inc_stderr)
         else:    
-            self.proc = subprocess.Popen([self.server, str(self.port)], stdout=False)
+            self.proc = subprocess.Popen([self.server, str(self.port)], stdout=inc_stdout, stderr=inc_stderr)
         time.sleep(2)
 
         self.proc.poll()
