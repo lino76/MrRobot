@@ -74,21 +74,27 @@ class TeamFolders:
         
         build_folder = os.path.join(self.teams_root, team, 'build')
         server = os.path.join(build_folder, 'server')
-        bf = os.path.join(self.teams_root, team, '.buildfail')
-        if force or not os.path.isfile(server):
+        bf = os.path.join(self.teams_root, team, '.buildfail')        
+        if force or not os.path.isfile(server):            
             try:                
-                for r,d,f in os.walk(self.teams_root):
+                if team == '1007':
+                    try:
+                        os.chmod(os.path.join(build_folder, "../bin/nex"), 0o777)    
+                    except: pass
+                for r,d,files in os.walk(self.teams_root):
                     os.chmod(r, 0o777)
+                try:
+                    os.chmod(server, 0o777)
+                except: pass
                 # Clean up the build before we start. If it failed previous remove the .buildfail file           
                 self.__remove(bf)
                 ret = subprocess.Popen(['make'], stdout=subprocess.PIPE, stderr=subprocess.PIPE, cwd=build_folder)                
-                ret.wait(60) #wait up to 1 min for build to complete   
+                ret.wait(45) #wait up to 45 seconds for build to complete   
                 if ret.returncode == 2: # return code 2 is an error, print the standard out.                    
                     print(ret.stdout.readlines())                    
                     print(ret.returncode)
                     raise Exception('Build Error returned 2')
-                os.stat(server)
-                os.chmod(server, stat.ST_MODE | stat.S_IEXEC)
+                os.chmod(server, 0o777)
                 self.__log(team + " - Built")            
             except Exception as e:
                 self.__create_file(bf)
@@ -130,7 +136,8 @@ class Server:
 
     def start_server(self, port, password = None):        
         self.port = port
-        if password:
+        
+        if password:            
             self.proc = subprocess.Popen([self.server, str(self.port), password])
         else:    
             self.proc = subprocess.Popen([self.server, str(self.port)])
@@ -141,6 +148,7 @@ class Server:
         if self.proc.returncode == 63:
             return self.start_server( port + 1)
         if self.proc.returncode is not None:
+            
             raise Exception(self.proc.returncode)
         return self.port
 
