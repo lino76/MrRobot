@@ -140,7 +140,7 @@ class Server:
 
     def start_server(self, port, password = None):        
         self.port = port
-        
+        print('using port: ', self.port)
         if password:            
             self.proc = subprocess.Popen([self.server, str(self.port), password], stdout=False, stderr=False)
         else:    
@@ -152,8 +152,8 @@ class Server:
         if self.proc.returncode == 63:
             return self.start_server( port + 1)
         if self.proc.returncode is not None:
-            
-            raise Exception(self.proc.returncode)
+            print('proc code should be None, but received: ', self.proc.returncode)
+            #raise Exception(self.proc.returncode)
         return self.port
 
     def stop_server(self):
@@ -164,7 +164,7 @@ class Server:
 
 class Client:
     host = ''
-    port = 1024
+    port = 22222
     def __init__(self, port):
         self.port = port
 
@@ -174,7 +174,7 @@ class Client:
         self.conn.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.conn.settimeout(30)
         self.conn.setblocking(True)
-        self.conn.connect((socket.gethostname(), self.port))
+        self.conn.connect((self.host, self.port))
 
         #print('[*] Client sending program\n', program)
         try:
@@ -322,14 +322,15 @@ if __name__ == '__main__':
     print(sys.version)
     # Parse the command lines.  Expect a port followed by a data folder path
     cmd_parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
-    cmd_parser.add_argument('-p', type=int, dest="port", default=1024, required=False)        
+    cmd_parser.add_argument('-p', type=int, dest="port", required=False)        
     cmd_parser.add_argument('-s', '--source', type=str, dest='team_path', required=False, help='Path to folder containing the folders of each teams code.' )
     cmd_parser.add_argument('-d', type=str, dest="data_path", default=data_path, required=False)        
     cmd_parser.add_argument('-r', '--rebuild', action='store_true', help='Force all known team projects to rebuild.', required=False)
     cmd_parser.add_argument('-a', '--html', dest="html_path", default=html_path,  required=False)
     args = cmd_parser.parse_args()
 
-    port = args.port
+    if args.port:
+        port = args.port
     data_path = args.data_path
     team_path = args.team_path            
     
