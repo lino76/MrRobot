@@ -138,13 +138,13 @@ class Server:
         if not os.path.isfile(self.server):            
             raise Exception('Server not found')
 
-    def start_server(self, port, password = None, inc_stderr = False, inc_stdout = False ):        
+    def start_server(self, port, password = None):        
         self.port = port
         
         if password:            
-            self.proc = subprocess.Popen([self.server, str(self.port), password], stdout=inc_stdout, stderr=inc_stderr)
+            self.proc = subprocess.Popen([self.server, str(self.port), password], stdout=False, stderr=False)
         else:    
-            self.proc = subprocess.Popen([self.server, str(self.port)], stdout=inc_stdout, stderr=inc_stderr)
+            self.proc = subprocess.Popen([self.server, str(self.port)], stdout=False, stderr=False)
         time.sleep(2)
 
         self.proc.poll()
@@ -189,7 +189,7 @@ class Client:
                     result += tmp.decode()
             except Exception as e:
                 print(e)
-            print('[*] Client received response:', result)
+            #print('[*] Client received response:', result)
         finally:
             try:
                 self.conn.close()
@@ -228,6 +228,7 @@ def send(teams, team_list, script_name, break_data):
     if len(args) == 2:
         password = args[1]
 
+    print('\33[44m################### SCRIPT ' + script_name + ' ###################' + END)
     for team in teams:
         # only execute the tests on the specified teams.
         if team_list[0] == 'all' or team in team_list:
@@ -239,8 +240,8 @@ def send(teams, team_list, script_name, break_data):
                 
                 client = Client(used_port)
 
-                for program in break_data.get('programs', []):
-                    response = client.clientSend(program.get('program'))
+                for program in break_data.get('programs', []):                    
+                    response = client.clientSend(program.get('program'))                    
                     compare_responses(response, program.get('output'))
                 print(GS + "TEST PASS" + END)
                 logger.log("TEST PASS")
@@ -258,11 +259,16 @@ def send(teams, team_list, script_name, break_data):
                     server.stop_server()
                 except: pass
 
-def compare_responses(server_response, client_response):  
+def compare_responses(server_response, expected_response):  
     s_response = server_response.rstrip('\n').replace('\n', ',').strip("'")      
     s_response = '{{"output":[{}]}}'.format(s_response)
     s_response = json.loads(s_response)
-    if s_response.get('output') != client_response:
+
+    if s_response.get('output') != expected_response:
+        print('EXPECTING: ')
+        print(expected_response)
+        print('RECEIVED: ')
+        print(s_response.get('output'))
         raise Exception("TEST FAIL")
    #print('TEST PASS')
 
