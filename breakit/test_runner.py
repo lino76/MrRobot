@@ -262,7 +262,7 @@ def compare_responses(server_response, client_response):
     print('TEST PASS')
 
 def generate_from_html(html_file):
-
+    json_name = os.path.splitext(html_file)[0] + '.json'
     html_file = os.path.join(os.path.dirname(__file__), html_path, test_file)
     json_file = os.path.splitext(os.path.join(os.path.dirname(__file__), data_path, test_file))[0] + '.json'
     # check both files exist or throw
@@ -284,15 +284,17 @@ def generate_from_html(html_file):
 
         # Update the input to include the output for each program.        
         for idx,prog in enumerate(o_json.get('programs')):
-            new = '{{"output":{}, "program":"{}" }}'.format(json.dumps(i_json.get('output')[idx]), prog)
-            o_json['programs'][idx] = json.loads(json.dumps(new))
+            new = '{{"output":{}, "program":"{}" }}'.format(json.dumps(i_json.get('output')[idx]), prog.replace('\n', '\\n').replace('\"', '\\\"'))
+            t = json.loads(new)
+            o_json['programs'][idx] = t
+
 
         # Append the return_code
         o_json['return_code'] = i_json.get('return_code')
         
         # Fix the arguments
-        arg = '{{ "argv":{}}}'.format(o_json.get('arguments'))
-        o_json['arguments'] = json.loads(json.dumps(arg))
+        arg = json.loads('{{ "argv":{}}}'.format(o_json.get('arguments')).replace("\'", '\"'))
+        o_json['arguments'] = arg 
 
         with open(json_file, 'w') as f:
             json.dump(o_json, f)
@@ -300,8 +302,7 @@ def generate_from_html(html_file):
         #Once tested remove this.
         #os.remove(html_file)
 
-        #save out as json_file 
-        return json_file
+        return json_name
 
     except Exception as e:
         print(e)
@@ -340,7 +341,7 @@ if __name__ == '__main__':
             exit()
 
         if t_input == 'r' and test_file is None:
-            print('Rerun is not availible until a sucessful run')
+            print('Rerun is not available until a successful run')
             continue
 
         if t_input != 'r':
