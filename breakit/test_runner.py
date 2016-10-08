@@ -10,6 +10,10 @@ import sys
 import stat
 from bs4 import BeautifulSoup
 
+GS = '\033[32m'
+RS = '\033[31m'
+SRS = '\33[41m'
+END = '\033[0m'
 data_path = 'break_scripts'
 teams_root = 'teams'
 html_path = data_path
@@ -138,9 +142,9 @@ class Server:
         self.port = port
         
         if password:            
-            self.proc = subprocess.Popen([self.server, str(self.port), password])
+            self.proc = subprocess.Popen([self.server, str(self.port), password], stdout=False)
         else:    
-            self.proc = subprocess.Popen([self.server, str(self.port)])
+            self.proc = subprocess.Popen([self.server, str(self.port)], stdout=False)
         time.sleep(2)
 
         self.proc.poll()
@@ -172,7 +176,7 @@ class Client:
         self.conn.setblocking(True)
         self.conn.connect((socket.gethostname(), self.port))
 
-        print('[*] Client sending program\n', program)
+        #print('[*] Client sending program\n', program)
         try:
             self.conn.send(program.encode('utf-8'))
 
@@ -227,7 +231,7 @@ def send(teams, team_list, script_name, break_data):
     for team in teams:
         # only execute the tests on the specified teams.
         if team_list[0] == 'all' or team in team_list:
-            print('****** Executing Team {} ******'.format(team))
+            print(GS + '****** Executing Team {} ******'.format(team) + END)
             logger.log('****** Executing Team {} ******'.format(team))
             try:
                 server = Server(os.path.join(teams.teams_root, team))
@@ -238,15 +242,16 @@ def send(teams, team_list, script_name, break_data):
                 for program in break_data.get('programs', []):
                     response = client.clientSend(program.get('program'))
                     compare_responses(response, program.get('output'))
+                print(GS + "TEST PASS" + END)
                 logger.log("TEST PASS")
             except Exception as e:
                 # test for a returncode here
                 
                 if str(break_data.get('return_code', 0)) == str(e):
-                    print("TEST PASS")
+                    print(GS + "TEST PASS" + END)
                     logger.log("TEST PASS")
                 else:
-                    print("TEST FAIL: " + str(e))
+                    print(RS + "TEST FAIL: " + str(e) + END)
                     logger.log("TEST FAIL")
             finally:
                 try:                
@@ -259,7 +264,7 @@ def compare_responses(server_response, client_response):
     s_response = json.loads(s_response)
     if s_response.get('output') != client_response:
         raise Exception("TEST FAIL")
-    print('TEST PASS')
+   #print('TEST PASS')
 
 def generate_from_html(html_file):
     json_name = os.path.splitext(html_file)[0] + '.json'
