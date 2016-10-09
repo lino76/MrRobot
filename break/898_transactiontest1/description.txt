@@ -1,0 +1,9 @@
+log on as admin, create alice, set variable msg, do not give alice any access to msg
+Log on as alice, return msg
+
+Does not get passed the first half of test...
+
+EXPECTING:
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'output': 'Success', 'status': 'RETURNING'}]
+RECEIVED:
+[{'status': 'FAILED'}]
