@@ -1,0 +1,7 @@
+Creating a principal with a reservered keyword should result in status failed.
+
+Output Differs:
+ORACLE:
+[{'status': 'FAILED'}]
+TEAM:
+[{'status': 'DENIED'}]
