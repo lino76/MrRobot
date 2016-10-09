@@ -304,6 +304,7 @@ def send(teams, team_list, script_name, break_data):
     print('\n')
     if failed:
         print(SRS + 'Failing Teams:' + ",".join(failed) + END)
+    return failed
 
 def compare_responses(server_response, expected_response):  
     s_response = server_response.rstrip('\n').replace('\n', ',').strip("'")      
@@ -364,6 +365,48 @@ def generate_from_html(html_file):
     except Exception as e:
         print(e)
 
+
+def generate_break(teams, input_file):    
+    name = os.path.splitext(os.path.basename(input_file))[0]
+    for team in set(teams):
+        try:
+            folder = '{}_{}'.format(team, name)
+            print(folder)
+            folder = os.path.join(os.path.dirname(__file__), '../break', folder)
+            print(folder)
+
+            # Create folder
+            os.mkdir(folder)
+            # Create text file 
+            with open(os.path.join(folder, 'description.txt'), 'w') as f:
+                f.write('\n\n')
+
+            # Create the test.json file.
+            with open(input_file, 'r') as f:
+                i_json = json.loads(f.read())
+            
+            o_json = {}
+
+            
+            o_json["type"] = ""
+            o_json["target_team"] = int(team)
+            o_json["arguments"] = i_json['arguments']
+            o_json["arguments"]["base64"] = False
+            o_json["programs"] = i_json["programs"]
+
+            for idx,prog in enumerate(o_json.get('programs')):
+                #new = '{{"output":{}, "program":"{}" }}'.format(json.dumps(i_json.get('output')[idx]), prog.replace('\n', '\\n').replace('\"', '\\\"'))
+                new = '{{"program":"{}"}}'.format(prog['program'].replace('\n', '\\n').replace('\"', '\\\"'))
+                t = json.loads(new)
+                o_json['programs'][idx] = t
+            
+            with open(os.path.join(folder, 'test.json'), 'w') as f:
+                json.dump(o_json, f, indent=4, sort_keys=False)            
+
+        except Exception as e:
+            print('Error while generating break folder / file: ', e)
+
+
 if __name__ == '__main__':
     print(sys.version)
     # Parse the command lines.  Expect a port followed by a data folder path
@@ -387,6 +430,7 @@ if __name__ == '__main__':
         teams.build_all()
 
     test_file = None
+    failed = []
     while True:
         print('available teams:\n', str.join(', ', teams))
         
@@ -395,7 +439,7 @@ if __name__ == '__main__':
         if t_input == '':
             t_input = 'all'
         
-        if t_input == 'exit' or test_file == 'e':
+        if t_input == 'exit' or t_input == 'e':
             exit()
 
         if t_input == 'r' and test_file is None:
@@ -405,14 +449,30 @@ if __name__ == '__main__':
         if t_input != 'r':
             # Return will shortcut rerun last selected test / teams and skip asking for inputs
             team_list = t_input.split(',')
-            test_file = input('Enter File Name, type "r" to repeat or type "exit":')                
+            f_input = input('Enter File Name, type "r" to repeat or type "exit":')                
             
-            if test_file == 'exit' or test_file == 'e':
+            if not f_input or (f_input == 'r' and not test_file):
+                print('Rerun is not available until a successful run')
+                continue
+
+            # Check for exit in script
+            if f_input == 'exit' or f_input == 'e':
                 exit()
 
+            if f_input == 'gb' and set(team_list).issubset(failed):
+                conf = input('Generate a Break using file {} for team(s) {}, are you sure (Y)?'.format(test_file, str.join(', ', team_list)))
+                if conf.upper() == 'Y' or conf.upper() == 'YES':
+                    generate_break(team_list, test_file)
+                continue
+            elif f_input == 'gb':
+                print('Generate Break not available until you reproduce a bug.')
+                continue
+
             try:  
-                if test_file != 'r' or not (test_file == 'r' and not file_data): 
+                if f_input != 'r': 
                     # Load an oracle created query, a file with the same name with .json gets created in the data_path and executed
+                    test_file = f_input
+
                     if test_file.endswith(".html"):
                         test_file = generate_from_html(test_file)
 
@@ -420,14 +480,16 @@ if __name__ == '__main__':
 
                     if not test_file.endswith(".json"):
                         test_file += ".json"
-    
-                    with open(test_file, "r") as f:
-                        file_data = json.loads(f.read())
+                
+                # Reload file even if rerun selected, allowed changes to file between runs.
+                with open(test_file, "r") as f:
+                    file_data = json.loads(f.read())
+
             except Exception as e:
                 print(e)                
                 continue
 
-        send(teams, team_list, test_file, file_data)
+        failed = send(teams, team_list, test_file, file_data)
 
 
 
