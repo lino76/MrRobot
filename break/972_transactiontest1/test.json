@@ -1,0 +1,24 @@
+{
+    "target_team": 972,
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do\ncreate principal bob \"pswd\"\nset x = \"my string\"\nreturn \"foobar\"\n***\n"
+        },
+        {
+            "program": "as principal bob password \"pswd\" do\nset y = \"bob was here\"\nset x = \"here too\"\nreturn \"foobar\"\n***\n"
+        },
+        {
+            "program": "as principal admin password \"admin\" do\nreturn x\n***\n"
+        },
+        {
+            "program": "as principal admin password \"admin\" do\nreturn y\n***\n"
+        }
+    ],
+    "arguments": {
+        "base64": false,
+        "argv": [
+            "%PORT%"
+        ]
+    },
+    "type": "security"
+}

@@ -1,0 +1,7 @@
+log on as admin, Create bob, create variable x, do not give bob any access to x
+Log on as bob, set a new variable, attempt set variable x, return a string
+
+[{'status': 'DENIED'}]
+RECEIVED:
+[{'status': 'SET'}, {'status': 'SET'}, {'status': 'RETURNING', 'output': 'foobar'}]
+
