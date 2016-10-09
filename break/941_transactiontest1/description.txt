@@ -1,0 +1,7 @@
+log on as admin, create alice, set variable msg, do not give alice any access to msg
+Log on as alice, return msg
+
+EXPECTING:
+[{'status': 'DENIED'}]
+RECEIVED:
+[{'status': 'FAILED'}]
