@@ -8,6 +8,8 @@ import subprocess
 import time
 import sys
 import stat
+from subprocess import DEVNULL
+from threading import Timer
 from bs4 import BeautifulSoup
 
 GS = '\033[32m'
@@ -132,19 +134,22 @@ class Server:
     host = ''
     port = 22222
     proc = None
+    max = 100
+    start_try = 0
 
     def __init__(self, build_folder):
         self.server = os.path.join(build_folder, 'build', 'server')       
         if not os.path.isfile(self.server):            
             raise Exception('Server not found')
 
-    def start_server(self, port, password = None):        
+    def start_server(self, port, password = None): 
+        self.start_try = self.start_try + 1
         self.port = port
         print('using port: ', self.port)
         if password:            
-            self.proc = subprocess.Popen([self.server, str(self.port), password], stdout=False, stderr=False)
+            self.proc = subprocess.Popen([self.server, str(self.port), password], stdout=DEVNULL, stderr=DEVNULL)
         else:    
-            self.proc = subprocess.Popen([self.server, str(self.port)], stdout=False, stderr=False)
+            self.proc = subprocess.Popen([self.server, str(self.port)], stdout=DEVNULL, stderr=DEVNULL)
         time.sleep(2)
 
         self.proc.poll()
@@ -153,50 +158,87 @@ class Server:
             return self.start_server( port + 1)
         if self.proc.returncode is not None:
             print('proc code should be None, but received: ', self.proc.returncode)
+            try:
+                self.proc.kill()
+            except: pass
+            if self.start_try < self.max:
+                return self.start_server( port + 1)
             #raise Exception(self.proc.returncode)
         return self.port
 
     def stop_server(self):
         self.proc.terminate()
-        self.proc.wait()
+        self.proc.wait(10)
+        self.proc = None
         print( "server exited with return code: " + str(self.proc.returncode))
 
 
 class Client:
     host = ''
     port = 22222
+    wait = True  
+
     def __init__(self, port):
         self.port = port
 
-    def clientSend(self, program):
+    def clientSend(self, program):       
+        retry_count = 8
+        retry = True
+        result = ''
+        # Wait 2 min and if it doesn't stop then force close the port        
+        self.failsafe = Timer(120, self.stop)
+        self.failsafe.start()
 
         self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.conn.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.conn.settimeout(30)
-        self.conn.setblocking(True)
-        self.conn.connect((self.host, self.port))
-
-        #print('[*] Client sending program\n', program)
-        try:
-            self.conn.send(program.encode('utf-8'))
-
-            result = ''
+        self.conn.setblocking(False)
+        while retry:             
             try:
-                while True:
-                    tmp = self.conn.recv(8)
-                    if tmp == b'':
-                        break
-                    result += tmp.decode()
+                if retry_count == 1:
+                    self.conn.setblocking(True)
+                self.conn.connect((self.host, self.port))
             except Exception as e:
-                print(e)
-            #print('[*] Client received response:', result)
-        finally:
-            try:
-                self.conn.close()
-            except:
                 pass
+            try:
+                self.conn.send(program.encode('utf-8'))    
+                try:
+                    while self.wait:
+                        try:
+                            tmp = self.conn.recv(8)
+                            if tmp == b'':
+                                break
+                            result += tmp.decode()
+                        except socket.error:
+                            time.sleep(2) # No data, continue
 
+                except socket.timeout as t:
+                    print('timed out')
+                except Exception as e:
+                    print(e)
+
+                #print('stop trying')
+                retry = False
+            except:
+                retry_count = retry_count - 1
+                time.sleep(10)
+                if retry_count == 0:
+                    print('stop retrying')
+                    retry = False   
+        try:
+            self.failsafe.cancel()
+            self.conn.close()
+        except:
+            pass
         return result
+
+
+    def stop(self):
+        try:
+            print('stopping connection')
+            self.wait = False
+        except Exception as e:
+            print(e)
+
 
 class Log:
     def __init__(self, file):
@@ -218,7 +260,7 @@ def send(teams, team_list, script_name, break_data):
     # program is a json file in the oracle format. 
     #Parse the program and pull out the command line arguements
     args = break_data['arguments']['argv']
-
+    failed = []
     if args[0] == '%PORT%':
         test_port = port
     else:
@@ -237,11 +279,10 @@ def send(teams, team_list, script_name, break_data):
             try:
                 server = Server(os.path.join(teams.teams_root, team))
                 used_port = server.start_server(test_port, password)
-                
                 client = Client(used_port)
-
-                for program in break_data.get('programs', []):                    
-                    response = client.clientSend(program.get('program'))                    
+                
+                for program in break_data.get('programs', []):   
+                    response = client.clientSend(program.get('program')) 
                     compare_responses(response, program.get('output'))
                 print(GS + "TEST PASS" + END)
                 logger.log("TEST PASS")
@@ -254,10 +295,15 @@ def send(teams, team_list, script_name, break_data):
                 else:
                     print(SRS + "TEST FAIL: " + str(e) + END)
                     logger.log("TEST FAIL")
+                    failed.append(team)
             finally:
                 try:                
                     server.stop_server()
                 except: pass
+
+    print('\n')
+    if failed:
+        print(SRS + 'Failing Teams:' + ",".join(failed) + END)
 
 def compare_responses(server_response, expected_response):  
     s_response = server_response.rstrip('\n').replace('\n', ',').strip("'")      
