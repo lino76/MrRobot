@@ -1,0 +1,18 @@
+{
+    "target_team": 941,
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do \n create principal alice \"alices_password\"\n set msg = \"Assigned message to msg\"\nreturn \"Success\"\n***\n"
+        },
+        {
+            "program": "as principal alice password \"alices_password\" do \nreturn msg\n***\n"
+        }
+    ],
+    "arguments": {
+        "base64": false,
+        "argv": [
+            "%PORT%"
+        ]
+    },
+    "type": "security"
+}
