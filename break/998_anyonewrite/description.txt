@@ -1,0 +1,7 @@
+Giving anybody write access to a variable means anybody can modify the variable.
+
+EXPECTING:
+[{'status': 'SET'}, {'status': 'SET'}, {'status': 'RETURNING', 'output': 'foobar'}]
+RECEIVED:
+[{'status': 'DENIED'}]
+
