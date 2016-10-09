@@ -1,0 +1,6 @@
+Changing the admin password does not prevent someone from logging in with the old administrator password.
+
+ORACLE:
+[{'status': 'DENIED'}]
+TEAM:
+[{'status': 'FAILED'}]
