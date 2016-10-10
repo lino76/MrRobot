@@ -8,7 +8,7 @@
     "arguments": {
         "base64": false,
         "argv": [
-            1024
+            "1024"
         ]
     },
     "type": "crash"
