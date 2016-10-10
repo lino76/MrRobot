@@ -313,9 +313,9 @@ def compare_responses(server_response, expected_response):
 
     if s_response.get('output') != expected_response:
         print(RS + 'ORACLE: ' + END)
-        print(RS + expected_response + END)
+        print(expected_response)
         print(RS + 'RECEIVED: ' + END)
-        print(RS + s_response.get('output') + END)
+        print(s_response.get('output'))
         raise Exception("TEST FAIL")
     else:
         print(s_response.get('output'))       
