@@ -1,0 +1,7 @@
+998 No delegation set to read variables, but was able to return value
+
+
+EXPECTING:
+[{'status': 'DELETE_DELEGATION'}, {'output': 'foo', 'status': 'RETURNING'}]
+RECEIVED:
+[{'status': 'DENIED'}]
