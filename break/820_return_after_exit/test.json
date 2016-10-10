@@ -1,0 +1,16 @@
+{
+    "target_team": 820,
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do\nexit\nreturn \"a\"\n***\n"
+        }
+    ],
+    "arguments": {
+        "base64": false,
+        "argv": [
+            "%PORT%"
+        ]
+    },
+    "type": "correctness"
+}
+
