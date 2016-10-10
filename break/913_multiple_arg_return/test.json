@@ -1,0 +1,15 @@
+{
+    "target_team": 913,
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do\n return \"a\" \"b\"\n***\n"
+        },
+    ],
+    "arguments": {
+        "base64": false,
+        "argv": [
+            "%PORT%"
+        ]
+    },
+    "type": "correctness"
+}
