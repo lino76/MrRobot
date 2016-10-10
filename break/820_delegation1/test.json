@@ -1,0 +1,24 @@
+{
+    "target_team": 820,
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do\ncreate principal bob \"pswd\"\nset x = \"999\"\nset delegation x admin write -> bob\nreturn x\n***\n"
+        },
+        {
+            "program": "as principal bob password \"pswd\" do\nset y = \"bob was here\"\nset x = \"here too\"\nreturn x\n***\n"
+        },
+	{
+            "program": "as principal bob password \"pswd\" do\ndelete delegation x bob write -> bob\nreturn y\n***\n"
+        },
+	{
+            "program": "as principal bob password \"pswd\" do\nreturn x\n***\n"
+        }
+    ],
+    "arguments": {
+        "base64": false,
+        "argv": [
+            "%PORT%"
+        ]
+    },
+    "type": "security"
+}

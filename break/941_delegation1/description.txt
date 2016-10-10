@@ -1,0 +1,7 @@
+Try to return variable incorrect status
+
+
+EXPECTING:
+[{'status': 'DENIED'}]
+RECEIVED:
+[{'status': 'FAILED'}]
