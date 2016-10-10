@@ -1,0 +1,21 @@
+{
+    "arguments": {
+        "argv": [
+            "%PORT%"
+        ],
+        "base64": false
+    },
+    "type": "corectness",
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do \n create principal bob \"foo\"\nreturn \"foo\"\n***"
+        },
+        {
+            "program": "as principal admin password \"admin\" do \n change password anyone \"bar\"\nreturn \"bar\"\n***"
+        },
+        {
+            "program": "as principal anyone password \"bar\" do \n return \"worked\"\n***"
+        }
+    ],
+    "target_team": 849
+}
