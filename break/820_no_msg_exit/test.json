@@ -4,7 +4,7 @@
         {
             "program": "as principal admin password \"admin\" do\nexit\n***\n"
         }
-    ,
+    ],
     "arguments": {
         "base64": false,
         "argv": [
