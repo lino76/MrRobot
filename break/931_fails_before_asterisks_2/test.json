@@ -2,7 +2,7 @@
     "target_team": 931,
     "programs": [
         {
-            "program": "as principal admin password \"admin\" do\nexit\nexit\n"
+            "program": "as principal admin password \"admin\" do\nexit\nexit\n***\n"
         }
     ],
     "arguments": {
