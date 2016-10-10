@@ -1,0 +1,9 @@
+Unable to login as anyone but nothing in the spec prevents it (and you can login to anyone on oracle).
+
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'RETURNING', 'output': 'foo'}]
+[{'status': 'CHANGE_PASSWORD'}, {'status': 'RETURNING', 'output': 'bar'}]
+ORACLE:
+[{'status': 'RETURNING', 'output': 'worked'}]
+RECEIVED:
+[{'status': 'DENIED'}]
+
