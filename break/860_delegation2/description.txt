@@ -1,0 +1,7 @@
+Unable to set variables with values after delegation was set
+
+
+EXPECTING:
+[{'status': 'SET'}, {'status': 'SET'}, {'output': 'bob was here', 'status': 'RETURNING'}]
+RECEIVED:
+[{'status': 'DENIED'}]

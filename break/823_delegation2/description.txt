@@ -1,0 +1,6 @@
+No delegation set to read variables, but was able to return value
+
+EXPECTING:
+[{'status': 'DENIED'}]
+RECEIVED:
+[{'output': 'here too', 'status': 'RETURNING'}]

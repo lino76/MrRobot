@@ -1,0 +1,6 @@
+No delegation set to read variables, Incorrect return status
+
+EXPECTING:
+[{'status': 'DENIED'}]
+RECEIVED:
+[{'status': 'FAILED'}]
