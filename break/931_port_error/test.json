@@ -1,0 +1,15 @@
+{
+    "target_team": 931,
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do\n return \"a\"\n***\n"
+        }
+    ],
+    "arguments": {
+        "base64": false,
+        "argv": [
+            1024
+        ]
+    },
+    "type": "crash"
+}
