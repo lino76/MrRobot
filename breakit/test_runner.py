@@ -310,17 +310,15 @@ def compare_responses(server_response, expected_response):
     s_response = server_response.rstrip('\n').replace('\n', ',').strip("'")      
     s_response = '{{"output":[{}]}}'.format(s_response)
     s_response = json.loads(s_response)
-    failed = False
 
     if s_response.get('output') != expected_response:
-        print('ORACLE: ')
-        print(expected_response)
-        failed = True
-
-    print('RECEIVED: ')
-    print(s_response.get('output'))
-    if failed:
+        print(RS + 'ORACLE: ' + END)
+        print(RS + expected_response + END)
+        print(RS + 'RECEIVED: ' + END)
+        print(RS + s_response.get('output') + END)
         raise Exception("TEST FAIL")
+    else:
+        print(s_response.get('output'))       
 
 
 def generate_from_html(html_file):
