@@ -1,0 +1,7 @@
+Delete Delegation not processed, incorrect response
+
+
+EXPECTING:
+[{'status': 'DELETE_DELEGATION'}, {'output': 'foo', 'status': 'RETURNING'}]
+RECEIVED:
+[]

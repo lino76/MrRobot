@@ -1,0 +1,18 @@
+{
+    "target_team": 1028,
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do\ncreate principal alice \"alicepassword\"\nset x = \"my string\"\nset delegation x admin write -> bob\nreturn \"foobar\"\n***\n"
+        },
+        {
+            "program": "as principal alice password \"alicepassword\" do\nset y = \"alice was here\"\nset x = \"here too\"\nreturn \"foobar\"\n***\n"
+        }
+    ],
+    "arguments": {
+        "base64": false,
+        "argv": [
+            "%PORT%"
+        ]
+    },
+    "type": "security"
+}

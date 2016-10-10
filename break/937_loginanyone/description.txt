@@ -1,0 +1,8 @@
+Unable to change anyone password but nothing in the spec says you can't change the passord.
+
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'RETURNING', 'output': 'foo'}]
+ORACLE:
+[{'status': 'CHANGE_PASSWORD'}, {'status': 'RETURNING', 'output': 'bar'}]
+RECEIVED:
+[{'status': 'FAILED'}]
+

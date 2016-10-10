@@ -1,0 +1,6 @@
+Program fails after existing
+
+EXPECTING:
+[{'status': 'EXITING'}]
+RECEIVED:
+[{'status': 'EXIT'}]

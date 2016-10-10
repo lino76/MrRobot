@@ -1,0 +1,7 @@
+Try to delete own permissions incorrect return status
+
+
+EXPECTING:
+[{'status': 'FAILED'}]
+RECEIVED:
+[]

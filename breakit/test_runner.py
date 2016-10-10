@@ -451,7 +451,7 @@ if __name__ == '__main__':
         if t_input != 'r':
             # Return will shortcut rerun last selected test / teams and skip asking for inputs
             team_list = t_input.split(',')
-            f_input = input('Enter File Name, type "r" to repeat or type "exit":')                
+            f_input = input('Enter File Name, type "r" to repeat, type "gb" to create Break Submission or type "exit":')                
             
             if not f_input or (f_input == 'r' and not test_file):
                 print('Rerun is not available until a successful run')

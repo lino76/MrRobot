@@ -1,0 +1,16 @@
+{
+    "target_team": 931,
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do \n create principal alice \"alices_password\"\n set x = \"my string\"\n set y = {f1 = x, f2 = \"field2\"}\n set delegation x admin read -> alice\nreturn \"y.f1\"\n***"
+        }
+    ],
+    "arguments": {
+        "base64": false,
+        "argv": [
+            "%PORT%"
+        ]
+    },
+    "type": "security"
+}
+

@@ -1,0 +1,6 @@
+exit not printing output
+
+expected {"EXITING"}
+
+got no output
+

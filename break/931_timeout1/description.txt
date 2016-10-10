@@ -1,0 +1,6 @@
+program timeout
+
+EXPETED:
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'status': 'SET'}, {'status': 'SET_DELEGATION'}, {'output': 'y.f1', 'status': 'RETURNING'}]
+RECEIVED:
+[{'status': 'TIMEOUT'}]
