@@ -8,6 +8,7 @@ import subprocess
 import time
 import sys
 import stat
+from itertools import chain
 from subprocess import DEVNULL
 from threading import Timer
 from bs4 import BeautifulSoup
@@ -48,21 +49,28 @@ class TeamFolders:
             if not os.path.isdir(team_folder):
                 continue
 
+            if os.path.isfile(os.path.join(team_folder, '.ignore')) or os.path.isfile(os.path.join(self.teams_root, '.buildfail')):
+                continue
+
             # if Folder contains .ignore skip the folder.
             try:
-                if not os.path.isfile(os.path.join(team_folder, '.ignore')) or not os.path.isfile(os.path.join(self.teams_root, '.buildfail')):
-                    if self.__rebuild:
-                        print('Building team #: ', team)
-                        self.__build(team, True)
-                    # store the teamid and path to folder in dictionary.
-                    self.__teams.append(team)                        
+                if self.__rebuild:
+                    print('Building team #: ', team)
+                    self.__build(team, True)
+                # store the teamid and path to folder in dictionary.
+                self.__teams.append(team)                        
             except Exception as e:
                 print(e)
         
+        # Sort the teams
+        #[x[1] for x in sorted(chain.from_iterable(self.__teams), key=lambda x:int(x[0]))]
+        self.__teams = sorted(self.__teams, key=lambda x:int(x))
+
         if self.__rebuild:
             self.__rebuilt = True # Flag to avoid double rebuilding the first time.
             file = os.path.join(self.teams_root, '.built')
             self.__create_file(file)
+
 
     def __iter__(self):
         return iter(self.__teams)            
