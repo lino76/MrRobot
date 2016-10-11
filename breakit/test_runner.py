@@ -203,7 +203,7 @@ class Client:
         self.conn.settimeout(90)
         self.conn.setblocking(False)
         while retry:             
-            print("Running" + "." * retry_count, end="\r")
+            print("Sending" + "." * retry_count, end="\r")
             try:
                 if retry_count == 1:
                     self.conn.setblocking(True)
@@ -212,7 +212,9 @@ class Client:
                 pass
             try:
                 self.conn.send(program.encode('utf-8'))    
-                try:                    
+                try:              
+                    print()      
+                    rec_count = 1
                     while self.wait:
                         try:
                             tmp = self.conn.recv(8)
@@ -220,8 +222,8 @@ class Client:
                                 break
                             result += tmp.decode()
                         except socket.error:
-                            retry_count += 1
-                            print("Running" + "." * retry_count, end="\r")
+                            rec_count += 1
+                            print("Receiving" + "." * rec_count, end="\r")
                             time.sleep(2) # No data, continue
 
                 except socket.timeout as t:
