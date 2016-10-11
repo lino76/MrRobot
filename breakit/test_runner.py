@@ -185,12 +185,12 @@ class Client:
         retry_count = 8
         retry = True
         result = ''
-        # Wait 2 min and if it doesn't stop then force close the port        
-        self.failsafe = Timer(120, self.stop)
+        # Wait 4 min and if it doesn't stop then force close the port        
+        self.failsafe = Timer(240, self.stop)
         self.failsafe.start()
 
         self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.conn.settimeout(30)
+        self.conn.settimeout(90)
         self.conn.setblocking(False)
         while retry:             
             try:

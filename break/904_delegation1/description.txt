@@ -1,0 +1,7 @@
+create user and set delegation to write for user who does not exist and tried to set data with user that does exist.
+
+
+EXPECTING:
+[{'status': 'FAILED'}]
+RECEIVED:
+[{'status': 'DENIED'}]
