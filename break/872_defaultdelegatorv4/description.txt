@@ -1,0 +1,12 @@
+User created with default delegate permission to write a variable not given to newly created user.
+
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'status': 'SET_DELEGATION'}, {'status': 'SET_DELEGATION'}, {'output': 'bob', 'status': 'RETURNING'}]
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET_DELEGATION'}, {'output': 'create john', 'status': 'RETURNING'}]
+[{'status': 'DEFAULT_DELEGATOR'}, {'output': 'default bob', 'status': 'RETURNING'}]
+[{'status': 'CREATE_PRINCIPAL'}, {'output': 'create jill', 'status': 'RETURNING'}]
+
+ ORACLE:
+[{'status': 'SET'}, {'output': 'jill write', 'status': 'RETURNING'}]
+RECEIVED:
+[{'status': 'DENIED'}]
+
