@@ -1,0 +1,12 @@
+admin, create bob, create x, x write -> bob
+admin, create john, x admin read -> john
+admin, set default delegator to bob (bob does not have delegate)
+admin, create jill
+jill, write x (jill does not inherit bobs rights as per mike H)
+john, read x (permissions should stay same)
+
+
+Giving bob write permission is not sufficient. Bob needs to have delegate permission to delegate his write permission to someone else. Just because you made Bob the defaul$
+
+
+

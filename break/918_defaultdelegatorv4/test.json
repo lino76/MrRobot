@@ -1,0 +1,30 @@
+{
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do\ncreate principal bob \"pswd\"\nset x = \"999\"\nset delegation x admin write -> bob\nset delegation x admin delegate -> bob\nreturn \"bob\"\n***\n"
+        },
+        {
+            "program": "as principal admin password \"admin\" do\ncreate principal john \"pswd\"\nset delegation x admin read -> john\nreturn \"create john\"\n***\n"
+        },
+        {
+            "program": "as principal admin password \"admin\" do\ndefault delegator = bob\nreturn \"default bob\"\n***\n"
+        },
+        {
+            "program": "as principal admin password \"admin\" do\ncreate principal jill \"pswd\"\nreturn \"create jill\"\n***\n"
+        },
+        {
+            "program": "as principal jill password \"pswd\" do\nset x = \"jill was here\"\nreturn \"jill write\"\n***\n"
+        },
+        {
+            "program": "as principal john password \"pswd\" do\nreturn x\n***\n"
+        }
+    ],
+    "arguments": {
+        "argv": [
+            "%PORT%"
+        ],
+        "base64": false
+    },
+    "target_team": 918,
+    "type": "security"
+}

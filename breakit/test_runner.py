@@ -8,6 +8,7 @@ import subprocess
 import time
 import sys
 import stat
+from itertools import chain
 from subprocess import DEVNULL
 from threading import Timer
 from bs4 import BeautifulSoup
@@ -48,21 +49,28 @@ class TeamFolders:
             if not os.path.isdir(team_folder):
                 continue
 
+            if os.path.isfile(os.path.join(team_folder, '.ignore')) or os.path.isfile(os.path.join(self.teams_root, '.buildfail')):
+                continue
+
             # if Folder contains .ignore skip the folder.
             try:
-                if not os.path.isfile(os.path.join(team_folder, '.ignore')) or not os.path.isfile(os.path.join(self.teams_root, '.buildfail')):
-                    if self.__rebuild:
-                        print('Building team #: ', team)
-                        self.__build(team, True)
-                    # store the teamid and path to folder in dictionary.
-                    self.__teams.append(team)                        
+                if self.__rebuild:
+                    print('Building team #: ', team)
+                    self.__build(team, True)
+                # store the teamid and path to folder in dictionary.
+                self.__teams.append(team)                        
             except Exception as e:
                 print(e)
         
+        # Sort the teams
+        #[x[1] for x in sorted(chain.from_iterable(self.__teams), key=lambda x:int(x[0]))]
+        self.__teams = sorted(self.__teams, key=lambda x:int(x))
+
         if self.__rebuild:
             self.__rebuilt = True # Flag to avoid double rebuilding the first time.
             file = os.path.join(self.teams_root, '.built')
             self.__create_file(file)
+
 
     def __iter__(self):
         return iter(self.__teams)            
@@ -145,7 +153,8 @@ class Server:
     def start_server(self, port, password = None): 
         self.start_try = self.start_try + 1
         self.port = port
-        print('using port: ', self.port)
+        #print('using port: ', self.port)
+        print("Starting" + "." * self.start_try, end="\r")
         if password:            
             self.proc = subprocess.Popen([self.server, str(self.port), password], stdout=DEVNULL, stderr=DEVNULL)
         else:    
@@ -157,7 +166,7 @@ class Server:
         if self.proc.returncode == 63:
             return self.start_server( port + 1)
         if self.proc.returncode is not None:
-            print('proc code should be None, but received: ', self.proc.returncode)
+            #print('proc code should be None, but received: ', self.proc.returncode)
             try:
                 self.proc.kill()
             except: pass
@@ -181,7 +190,8 @@ class Client:
     def __init__(self, port):
         self.port = port
 
-    def clientSend(self, program):       
+    def clientSend(self, program):   
+        print()    
         retry_count = 8
         retry = True
         result = ''
@@ -193,6 +203,7 @@ class Client:
         self.conn.settimeout(90)
         self.conn.setblocking(False)
         while retry:             
+            print("Sending" + "." * retry_count, end="\r")
             try:
                 if retry_count == 1:
                     self.conn.setblocking(True)
@@ -201,7 +212,9 @@ class Client:
                 pass
             try:
                 self.conn.send(program.encode('utf-8'))    
-                try:
+                try:              
+                    print()      
+                    rec_count = 1
                     while self.wait:
                         try:
                             tmp = self.conn.recv(8)
@@ -209,6 +222,8 @@ class Client:
                                 break
                             result += tmp.decode()
                         except socket.error:
+                            rec_count += 1
+                            print("Receiving" + "." * rec_count, end="\r")
                             time.sleep(2) # No data, continue
 
                 except socket.timeout as t:
@@ -270,11 +285,11 @@ def send(teams, team_list, script_name, break_data):
     if len(args) == 2:
         password = args[1]
 
-    print('\33[44m################### SCRIPT ' + script_name + ' ###################' + END)
+    print('\n\33[44m################### SCRIPT ' + script_name + ' ###################' + END ,'\n')
     for team in teams:
         # only execute the tests on the specified teams.
         if team_list[0] == 'all' or team in team_list:
-            print(GS + '****** Executing Team {} ******'.format(team) + END)
+            print('\n', GS + '****** Executing Team {} ******'.format(team) + END ,'\n')
             logger.log('****** Executing Team {} ******'.format(team))
             try:
                 server = Server(os.path.join(teams.teams_root, team))
@@ -284,16 +299,16 @@ def send(teams, team_list, script_name, break_data):
                 for program in break_data.get('programs', []):   
                     response = client.clientSend(program.get('program')) 
                     compare_responses(response, program.get('output'))
-                print(GS + "TEST PASS" + END)
+                print('\n', GS + "TEST PASS" + END)
                 logger.log("TEST PASS")
             except Exception as e:
                 # test for a returncode here
                 
                 if str(break_data.get('return_code', 0)) == str(e):
-                    print(GS + "TEST PASS" + END)
+                    print('\n',GS + "TEST PASS" + END)
                     logger.log("TEST PASS")
                 else:
-                    print(SRS + "TEST FAIL: " + str(e) + END)
+                    print('\n',SRS + "TEST FAIL: " + str(e) + END)
                     logger.log("TEST FAIL")
                     failed.append(team)
             finally:
@@ -301,7 +316,7 @@ def send(teams, team_list, script_name, break_data):
                     server.stop_server()
                 except: pass
 
-    print('\n')
+    print('\n', script_name)    
     if failed:
         print(SRS + 'Failing Teams:' + ",".join(failed) + END)
     return failed
@@ -312,7 +327,7 @@ def compare_responses(server_response, expected_response):
     s_response = json.loads(s_response)
 
     if s_response.get('output') != expected_response:
-        print(RS + 'ORACLE: ' + END)
+        print('\n', RS + 'ORACLE: ' + END)
         print(expected_response)
         print(RS + 'RECEIVED: ' + END)
         print(s_response.get('output'))
