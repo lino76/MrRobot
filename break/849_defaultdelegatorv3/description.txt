@@ -1,0 +1,21 @@
+
+admin, create bob, create x, x write -> bob
+
+admin, create john, x admin read -> john
+
+admin, set default delegator to bob (so all new p have write -> x)
+
+admin, create jill
+
+john, read x (permissions should stay same)
+
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'status': 'SET_DELEGATION'}, {'output': 'bob', 'status': 'RETURNING'}]
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET_DELEGATION'}, {'output': 'create john', 'status': 'RETURNING'}]
+[{'status': 'DEFAULT_DELEGATOR'}, {'output': 'default bob', 'status': 'RETURNING'}]
+[{'status': 'CREATE_PRINCIPAL'}, {'output': 'create jill', 'status': 'RETURNING'}]
+ORACLE:
+[{'status': 'DENIED'}]
+RECEIVED:
+[{'status': 'SET'}, {'output': 'john write', 'status': 'RETURNING'}]
+
+
