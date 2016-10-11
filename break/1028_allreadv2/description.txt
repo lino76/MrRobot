@@ -1,0 +1,11 @@
+
+Set delegation should fail since its not formatted correctly
+
+[{'status': 'CREATE_PRINCIPAL'}, {'output': 'create jack', 'status': 'RETURNING'}]
+[{'status': 'CREATE_PRINCIPAL'}, {'output': 'create jill', 'status': 'RETURNING'}]
+[{'status': 'SET'}, {'output': 'variable x', 'status': 'RETURNING'}]
+ ORACLE:
+[{'status': 'FAILED'}]
+RECEIVED:
+[{'status': 'SET_DELEGATION'}, {'output': 'all read x', 'status': 'RETURNING'}]
+
