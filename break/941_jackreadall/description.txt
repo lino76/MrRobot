@@ -1,0 +1,12 @@
+setting read delegation on all variables fails.
+
+[{'status': 'CREATE_PRINCIPAL'}, {'output': 'create jack', 'status': 'RETURNING'}]
+[{'status': 'SET'}, {'status': 'SET'}, {'status': 'SET'}, {'output': 'vars', 'status': 'RETURNING'}]
+[{'status': 'CREATE_PRINCIPAL'}, {'output': 'create jill', 'status': 'RETURNING'}]
+ORACLE:
+[{'status': 'SET_DELEGATION'}, {'output': 'jack all read x', 'status': 'RETURNING'}]
+RECEIVED:
+[{'status': 'FAILED'}]
+
+
+

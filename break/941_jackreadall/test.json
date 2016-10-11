@@ -1,0 +1,30 @@
+{
+    "arguments": {
+        "argv": [
+            "%PORT%"
+        ],
+        "base64": false
+    },
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do\ncreate principal jack \"pswd\"\nreturn \"create jack\"\n***\n"
+        },
+        {
+            "program": "as principal admin password \"admin\" do\nset a = \"jr\"\nset b = \"jr\"\nset c = \"jr\"\nreturn \"vars\"\n***\n"
+        },
+        {
+            "program": "as principal admin password \"admin\" do\ncreate principal jill \"pswd\"\nreturn \"create jill\"\n***\n"
+        },
+        {
+            "program": "as principal admin password \"admin\" do\nset delegation all admin read -> jack\nreturn \"jack all read x\"\n***\n"
+        },
+        {
+            "program": "as principal jack password \"pswd\" do\nreturn b\n***\n"
+        },
+        {
+            "program": "as principal jill password \"pswd\" do\nreturn b\n***\n"
+        }
+    ],
+    "type": "security",
+    "target_team": 941
+}

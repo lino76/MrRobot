@@ -1,0 +1,11 @@
+status denied when trying to read variable after giving jack read to all variables.
+
+[{'status': 'CREATE_PRINCIPAL'}, {'output': 'create jack', 'status': 'RETURNING'}]
+[{'status': 'SET'}, {'status': 'SET'}, {'status': 'SET'}, {'output': 'vars', 'status': 'RETURNING'}]
+[{'status': 'CREATE_PRINCIPAL'}, {'output': 'create jill', 'status': 'RETURNING'}]
+[{'status': 'SET_DELEGATION'}, {'output': 'jack all read x', 'status': 'RETURNING'}]
+ORACLE:
+[{'output': 'jr', 'status': 'RETURNING'}]
+RECEIVED:
+[{'status': 'DENIED'}]
+
