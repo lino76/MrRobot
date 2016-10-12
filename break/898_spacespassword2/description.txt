@@ -1,0 +1,6 @@
+create user with spaces for password .
+
+EXPECTED:
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'status': 'SET_DELEGATION'}, {'output': 'Assigned message to msg', 'status': 'RETURNING'}]
+RECEIVED:
+[{'status': 'FAILED'}]
