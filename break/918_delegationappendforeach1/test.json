@@ -1,0 +1,18 @@
+{
+    "target_team": 918,
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do \n create principal alice \"alices_password\"\n set records = []\n set delegation records admin read -> alice\n set delegation records admin write -> alice\n return \"Success\"\n***\n"
+        },
+        {
+            "program": "as principal alice password \"alices_password\" do\n append to records with {name = \"bob\", date = \"1-12-90\"}\n append to records with {name = \"david\", date = \"1-5-95\"}\n append to records with {name = \"john\", date = \"1-7-99\"}\n local names = records\n foreach rec in names replacewith rec.name\n return names\n***\n"
+        }
+    ],
+    "arguments": {
+        "base64": false,
+        "argv": [
+            "%PORT%"
+        ]
+    },
+    "type": "security"
+}

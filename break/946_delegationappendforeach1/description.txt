@@ -1,0 +1,7 @@
+Created new user and set delegation set to read/write to variables, but was able to return value
+
+
+EXPECTING:
+[{'status': 'APPEND'}, {'status': 'APPEND'}, {'status': 'APPEND'}, {'status': 'LOCAL'}, {'status': 'FOREACH'}, {'output': ['bob', 'david', 'john'], 'status': 'RETURNING'}]
+RECEIVED:
+[{'status': 'DENIED'}]
