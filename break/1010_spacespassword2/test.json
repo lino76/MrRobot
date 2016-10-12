@@ -1,0 +1,15 @@
+{
+    "arguments": {
+        "argv": [
+            "%PORT%"
+        ],
+        "base64": false
+    },
+    "type": "correctness",
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do \n create principal bob \" \"\n set msg = \"Assigned message to msg\"\n set delegation msg admin read -> bob\n return msg\n***"
+        }
+    ],
+    "target_team": 1010
+}
