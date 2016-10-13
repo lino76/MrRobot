@@ -1,0 +1,7 @@
+Created new user and set delegation to anyone to variable, but was unable to append
+
+
+EXPECTING:
+[{'status': 'APPEND'}, {'status': 'APPEND'}, {'status': 'APPEND'}, {'status': 'RETURNING', 'output': 'Test Append Anyone'}]
+RECEIVED:
+[{'status': 'DENIED'}]
