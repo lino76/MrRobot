@@ -1,0 +1,18 @@
+{
+    "arguments": {
+        "argv": [
+            "%PORT%"
+        ],
+        "base64": false
+    },
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do \n create principal alice \"alices_password\"\n set records = []\n set delegation records admin append -> anyone\ndelete delegation records admin append -> anyone\nreturn \"Success\"\n***\n"
+        },
+        {
+            "program": "as principal alice password \"alices_password\" do\n append to records with {name = \"bob\", date = \"1-12-90\"}\n append to records with {name = \"david\", date = \"1-5-95\"}\n append to records with {name = \"john\", date = \"1-7-99\"}\nreturn \"Test Append Anyone\"\n***\n"
+        }
+    ],
+    "type": "security",
+    "target_team": 858
+}

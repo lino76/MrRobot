@@ -1,0 +1,7 @@
+create user, set delegate append anyone delete delegate anyone try to append
+
+EXPECTED:
+[{'status': 'DENIED'}]
+RECEIVED:
+[{'status': 'APPEND'}, {'status': 'APPEND'}, {'status': 'APPEND'}, {'output': 'Test Append Anyone', 'status': 'RETURNING'}]
+
