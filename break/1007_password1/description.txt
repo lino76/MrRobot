@@ -1,0 +1,6 @@
+Administrator password set at command line different than admin internal to file for admin principal.
+
+EXPECTED:
+[]
+RECEIVED:
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'status': 'SET_DELEGATION'}, {'output': 'my string', 'status': 'RETURNING'}]
