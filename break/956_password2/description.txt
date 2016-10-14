@@ -1,0 +1,7 @@
+start server with password. set admin password differently than password passed into program
+create new user and password and set delegation, return x
+
+EXPECTING:
+[]
+RECEIVED:
+[{'status': 'DENIED'}]
