@@ -1,0 +1,4 @@
+Administrator password set by command line is not obeyed by admin principal. 
+This allows access to data which is a security violation.
+
+The oracle issues status DENIED, target doesn't. 
