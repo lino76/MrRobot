@@ -1,0 +1,6 @@
+Administrator password set at command line. Use admin as password for admin account. 
+
+EXPECTED:
+[]
+RECEIVED:
+[{'status': 'DENIED'}]
