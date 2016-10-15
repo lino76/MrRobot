@@ -1,0 +1,7 @@
+Created new user and set delegation set to read/write to variables, but was able to return value
+
+
+EXPECTING:
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'status': 'SET_DELEGATION'}, {'status': 'SET_DELEGATION'}, {'status': 'RETURNING', 'output': 'Success'}]
+RECEIVED:
+[]
