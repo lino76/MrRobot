@@ -1,0 +1,7 @@
+Create principles alice/bob, set msg and delegation to alice, set to bob to try and return msg
+
+
+EXPECTING:
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'status': 'SET_DELEGATION'}, {'status': 'RETURNING', 'output': 'Success'}]
+RECEIVED:
+[{'status': 'DENIED'}]
