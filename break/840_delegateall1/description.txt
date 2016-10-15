@@ -1,0 +1,6 @@
+create two users and set delegation to all for one user and read variables
+
+EXPECTING:
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'status': 'SET_DELEGATION'}, {'status': 'SET'}, {'output': 'Success', 'status': 'RETURNING'}]
+RECEIVED:
+[{'status': 'FAILED'}]
