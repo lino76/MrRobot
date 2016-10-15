@@ -1,0 +1,6 @@
+set empty admin password and pass in admin password
+
+EXPECTING:
+[{'status': 'DENIED'}]
+RECEIVED:
+[{'status': 'FAILED'}]
