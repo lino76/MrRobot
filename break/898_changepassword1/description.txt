@@ -1,0 +1,7 @@
+Create user and change password. try to read variable with old password
+
+
+EXPECTING:
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'status': 'SET_DELEGATION'}, {'status': 'CHANGE_PASSWORD'}, {'status': 'RETURNING', 'output': 'Success'}]                      
+RECEIVED:
+[{'status': 'FAILED'}] 
