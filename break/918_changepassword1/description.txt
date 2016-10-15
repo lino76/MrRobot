@@ -1,0 +1,7 @@
+create principal and user, set msg, set delegation and change password multiple times for user and admin only once. return message
+
+
+EXPECTING:
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'status': 'SET_DELEGATION'}, {'status': 'CHANGE_PASSWORD'}, {'status': 'CHANGE_PASSWORD'}, {'status': 'CHANGE_PASSWORD'}, {'status': 'CHANGE_PASSWORD'}, {'status': 'RETURNING', 'output': 'Success'}]
+RECEIVED:
+[{'status': 'FAILED'}]

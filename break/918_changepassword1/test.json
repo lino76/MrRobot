@@ -1,0 +1,18 @@
+{
+    "target_team": 918,
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do \n create principal alice \"alices_password\"\nset msg = \"Assigned message to msg\"\n set delegation msg admin read -> alice\n change password alice \"new_password_one\" \nchange password alice \"new_password_two\" \nchange password alice \"new_password_three\" \nchange password admin \"new_password\" \nreturn \"Success\"\n***\n"
+        },
+        {
+            "program": "as principal admin password \"admin\" do \nreturn msg\n***\n"
+        }
+    ],
+    "arguments": {
+        "base64": false,
+        "argv": [
+            "%PORT%"
+        ]
+    },
+    "type": "correctness"
+}
