@@ -14,5 +14,5 @@
             "%PORT%"
         ]
     },
-    "type": "security"
+    "type": "correctness"
 }
