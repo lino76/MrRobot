@@ -1,0 +1,7 @@
+create user alice and bob, create msg and set delegation all for alice, have alice set delegation to bob to read and write to msg, bob to concat msg and other variable created local and return z
+
+EXPECTED:
+[{'status': 'SET'}, {'status': 'SET'}, {'status': 'RETURNING', 'output': 'Assigned message to local Successful ConCat '}]
+RECEIVED:
+[{'status': 'DENIED'}]
+
