@@ -1,0 +1,27 @@
+{
+    "target_team": 918,
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do\ncreate principal bob \"pswd\"\nset a = \"12345\"\nset delegation a admin write -> bob\nreturn a\n***\n"
+        },
+	{
+            "program": "as principal admin password \"admin\" do\nset b = \"67890\"\nset delegation b admin write -> bob\nreturn b\n***\n"
+        },
+        {
+            "program": "as principal admin password \"admin\" do\nset c = \"abc\"\nreturn c\n***\n"
+        },
+	{
+            "program": "as principal bob password \"pswd\" do\nlocal z = concat(a,b)\nreturn z\n***\n"
+        },
+	{
+            "program": "as principal bob password \"pswd\" do\nset e = split(z,\"foo \")\nreturn {z=b, b=z, \"foo\", c}\n***\n"
+        }
+    ],
+    "arguments": {
+        "base64": false,
+        "argv": [
+            "%PORT%"
+        ]
+    },
+    "type": "security"
+}

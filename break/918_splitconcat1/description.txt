@@ -1,0 +1,7 @@
+Split and concat tests
+
+
+EXPECTING:
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'status': 'SET_DELEGATION'}, {'status': 'RETURNING', 'output': '12345'}]
+RECEIVED:
+[{'status': 'DENIED'}]
