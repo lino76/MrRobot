@@ -1,0 +1,6 @@
+create new principal name greater than 255 characters
+
+EXPECTING:
+[{'status': 'FAILED'}]
+RECEIVED:
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'CHANGE_PASSWORD'}, {'output': 'Success', 'status': 'RETURNING'}]

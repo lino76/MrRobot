@@ -1,0 +1,15 @@
+{
+    "target_team": 946,
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do \n create principal alicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealicealice \"alices_password\"\nchange password admin \"newpass\" \nreturn \"Success\"\n***\n"
+        }
+    ],
+    "arguments": {
+        "base64": false,
+        "argv": [
+            "%PORT%"
+        ]
+    },
+    "type": "correctness"
+}
