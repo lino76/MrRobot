@@ -1,0 +1,7 @@
+create user alice and bob, create msg and set delegation all for alice, have alice set delegation to bob to read msg.
+
+EXPECTED:
+[{'status': 'RETURNING', 'output': 'Assigned message to local'}]
+RECEIVED:
+[{'status': 'DENIED'}]
+

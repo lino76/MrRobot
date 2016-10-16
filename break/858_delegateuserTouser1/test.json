@@ -1,0 +1,18 @@
+{
+    "arguments": {
+        "argv": [
+            "%PORT%"
+        ],
+        "base64": false
+    },
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do \n create principal alice \"alices_password\"\n create principal bob \"bobs_password\"\nset msg = \"Assigned message to local\"\n set delegation all admin read -> alice\nset delegation msg alice read -> bob\nreturn \"Success\"\n***"
+        },
+        {
+            "program": "as principal bob password \"bobs_password\" do \nreturn msg\n***"
+        }
+    ],
+    "type": "security",
+    "target_team": 858
+}
