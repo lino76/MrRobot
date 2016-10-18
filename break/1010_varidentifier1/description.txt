@@ -1,0 +1,6 @@
+var identifier equal to 255 characters including asterisk
+
+EXPECTED:
+[{'status': 'FAILED'}]
+RECEIVED:
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'status': 'SET_DELEGATION'}, {'output': 'hello', 'status': 'RETURNING'}]
