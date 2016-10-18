@@ -1,0 +1,6 @@
+set variables and concat. create new user and set delgation to read
+
+EXPECTED:
+[{'status': 'SET'}, {'status': 'SET'}, {'output': 'hello there', 'status': 'RETURNING'}]
+RECEIVED:
+[{'status': 'FAILED'}]
