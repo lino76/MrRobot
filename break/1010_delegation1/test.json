@@ -1,0 +1,18 @@
+{
+    "arguments": {
+        "argv": [
+            "%PORT%"
+        ],
+        "base64": false
+    },
+    "type": "correctness",
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do \nset x = { f1 = \"hello\" , f2 = \"there\" }\nset y = let z = concat(x.f1,\" \") in concat(z,x.f2)\nreturn y\n***\n"
+        },
+	{
+	    "program": "as principal admin password \"admin\" do \ncreate principal bob \"bobs_password\"\nset delegation y admin read -> bob\nreturn y\n***"
+	}
+    ],
+    "target_team": 1010
+}
