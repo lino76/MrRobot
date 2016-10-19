@@ -1,0 +1,7 @@
+create user set change admin passwrod and delete delegation and try to append
+
+
+EXPECTING:
+[{'status': 'FAILED'}]
+RECEIVED:
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'status': 'SET_DELEGATION'}, {'status': 'CHANGE_PASSWORD'}, {'output': 'Success', 'status': 'RETURNING'}]

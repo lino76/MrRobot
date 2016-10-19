@@ -1,0 +1,21 @@
+{
+    "target_team": 931,
+    "programs": [
+        {
+            "program": "as principal admin password \"admin\" do \n create principal alice \"alices_password\"\n set records = []\n set delegation records admin append -> anyone\nchange password admin \"***admin***\"\nreturn \"Success\"\n***\n" 
+        },
+	{
+            "program": "as principal admin password \"admin\" do \n delete delegation records admin append -> anyone\nreturn \"Success\"\n***\n" 
+        },
+	{
+            "program": "as principal alice password \"alices_password\" do\n append to records with {name = \"bob\", date = \"1-12-90\"}\n append to records with {name = \"david\", date = \"1-5-95\"}\n append to records with {name = \"john\", date = \"1-7-99\"}\nreturn \"Test Append Anyone\"\n***\n" 
+        }
+    ],
+    "arguments": {
+        "base64": false,
+        "argv": [
+            "%PORT%"
+        ]
+    },
+    "type": "correctness"
+}
