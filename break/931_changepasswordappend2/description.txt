@@ -1,6 +1,7 @@
-var identifier equal to 255 characters including asterisk
+create user set change admin passwrod and delete delegation and try to append
 
-EXPECTED:
+
+EXPECTING:
 [{'status': 'FAILED'}]
 RECEIVED:
-[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'status': 'SET_DELEGATION'}, {'output': 'hello', 'status': 'RETURNING'}]
+[{'status': 'CREATE_PRINCIPAL'}, {'status': 'SET'}, {'status': 'SET_DELEGATION'}, {'status': 'CHANGE_PASSWORD'}, {'output': 'Success', 'status': 'RETURNING'}]
