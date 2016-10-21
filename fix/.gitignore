@@ -1,0 +1,9 @@
+
+*.pyproj
+*.sln
+.vs
+*.idea
+*.pyc
+.vscode
+*build/server
+venv
