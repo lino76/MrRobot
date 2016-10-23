@@ -1,0 +1,1 @@
+{"type": "security", "arguments": ["%PORT%", "pass2"], "target_team": 837, "programs": ["as principal admin password \"pass2\" do\ncreate principal alice \"alices_password\"\ncreate principal alice \"alices_password\"\nreturn \"success\"\n***"]}

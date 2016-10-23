@@ -1,0 +1,1 @@
+{"type": "security", "arguments": ["%PORT%"], "target_team": 837, "programs": ["as principal admin password \"admin\" do\ncreate principal test \"test\"\nset r = \"XX\"\nreturn r\n***\n", "as principal test password \"test\" do\ncreate principal teste \"teste\"\nreturn \"success\"\n***\n"]}

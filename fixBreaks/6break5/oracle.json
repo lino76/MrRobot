@@ -1,0 +1,1 @@
+{"type": "security", "arguments": ["%PORT%"], "target_team": 837, "programs": ["as principal admin password \"admin\" do\n set x = \"ok\"\ncreate principal bob \"bob\"\n set delegation x bob read -> bob\nreturn x\n***", "as principal bob password \"bob\" do\nreturn x\n***"]}

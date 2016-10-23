@@ -1,0 +1,1 @@
+{"type": "correctness", "arguments": ["%PORT%", "pass2"], "target_team": 837, "programs": ["as principal admin password \"pass2\" do\nset l_pass = \"local_pass\"\nreturn l_pass\n***", "as principal admin password \"pass2\" do\nreturn l_pass\n***"]}

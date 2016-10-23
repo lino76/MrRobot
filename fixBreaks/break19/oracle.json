@@ -1,0 +1,1 @@
+{"type": "correctness", "arguments": ["%PORT%"], "target_team": 837, "programs": ["as principal admin password \"admin\" do\ncreate principal user1 \"pass1\"\nset msg=\"TEST\"\nset delegation msg admin read->user1\nset delegation msg admin write->user1\nreturn msg\n***\n", "as principal user1 password \"pass1\" do\ndelete delegation msg admin read->user1\nreturn msg\n***\n"]}

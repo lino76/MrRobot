@@ -1,0 +1,1 @@
+{"arguments": ["%PORT%"], "type": "correctness", "target_team": 837, "programs": ["as principal admin password \"admin\" do\nexit\n***\n"]}

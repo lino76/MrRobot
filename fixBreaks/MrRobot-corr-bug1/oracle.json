@@ -1,0 +1,1 @@
+{"type": "correctness", "arguments": ["%PORT%", "password", "olakase"], "target_team": 837, "programs": ["as principal admin password \"admin\" do\nset x = \"olakase\"//hellotherecomment\nreturn x\n***"]}

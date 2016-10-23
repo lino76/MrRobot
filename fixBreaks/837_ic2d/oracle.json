@@ -1,0 +1,1 @@
+{"type": "security", "arguments": ["%PORT%"], "target_team": 837, "programs": ["as principal admin password \"admin\" do\ncreate principal bob \"B0BPWxxd\"\nreturn \"ok\"\n***\n", "as principal admin password \"admin\" do\nchange password bob \"\"\n // invalid comment\nreturn \"fail\"\n***\n", "as principal bob password \"\" do\nreturn \"ok\"\n***\n"]}

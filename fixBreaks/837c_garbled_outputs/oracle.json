@@ -1,0 +1,1 @@
+{"type": "correctness", "arguments": ["%PORT%"], "target_team": 837, "programs": ["as principal admin password \"admin\" do\ncreate principal A \"Ap\"\ncreate principal B \"Bp\"\ncreate principal C \"Cp\"\ncreate principal D \"Dp\"\ncreate principal E \"Ep\"\nreturn \"Created Principals ABCDE\"\n***\n"]}

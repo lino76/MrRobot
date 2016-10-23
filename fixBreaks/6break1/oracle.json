@@ -1,0 +1,1 @@
+{"type": "security", "arguments": ["%PORT%", "whyUIgnoreMe"], "target_team": 837, "programs": ["as principal admin password \"admin\" do\nreturn \"ok\"\n***"]}
