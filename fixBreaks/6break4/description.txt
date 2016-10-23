@@ -1,0 +1,35 @@
+BUG
+any input which does not contain "***" causes the handler thread to crash with results in no response from server
+
+
+See:
+server.py:54-81
+	    try:
+                while b'***' not in data: //loc a: loops while not "***" in data (not triggereg because of loc b)
+                    tmp = client_socket.recv(1024)
+                    if not tmp: 
+                        break  //loc b: breaks look when no data is recieved (check in loc a doen't matter)
+                    data += tmp
+                    print("[*] Received in socket", data)
+
+                if data and b'***' in data: //loc c: this is false, so code is not executed
+                    udata = data.decode()
+                    program = Program(udata)
+                    print("[*] Received: \n%s" % program.get_src())
+
+                    try:
+                        result, shutdown = self.vault.run(program) //loc d: variable shutdown is not defined before this line
+                        client_socket.send(result.encode('utf-8'))
+                    except NetworkError as e:
+                        print('EXCEPTION', e)
+                        client_socket.send("{exception}".encode())
+            except socket.timeout as e:
+                print('Socket timeout', e)
+                client_socket.send(('{"status": "TIMEOUT"}\n').encode('utf-8'))
+            finally:	//this gets executed
+                client_socket.shutdown(socket.SHUT_WR)
+                if not client_socket.recv(10):
+                    client_socket.close()
+                if shutdown:  //loc e: thread crashes here, because of access to undefined variable. server does not respond at all to client
+                    exit(0)
+

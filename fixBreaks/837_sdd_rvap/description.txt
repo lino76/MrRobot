@@ -1,0 +1,1 @@
+After the first program, variable x must be readable by anyone. However, in the target submission, it is not readable by bob in the second program (the target returns DENIED).

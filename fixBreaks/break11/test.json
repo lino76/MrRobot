@@ -1,0 +1,11 @@
+{ "type":"correctness","target_team":837,
+ "arguments": {
+        "argv": ["%PORT%"],
+        "base64": false
+    },
+ 
+"programs":[
+{"program":"as principal user2 password \"pass2\" do\nlocal x=\"5\"\nreturn x\n***\n","base64":false}
+] 
+}
+

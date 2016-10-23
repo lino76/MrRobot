@@ -1,0 +1,2 @@
+Availability security violation was found when server issued "DENIED" for an invalid login when it should issue "FAILED" for invalid character "\r".
+According to the specification regarding: "\n refers to the newline character (character code 10). (Note: \r is not supported.)"

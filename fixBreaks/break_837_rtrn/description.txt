@@ -1,0 +1,1 @@
+It is not the append statement that fails. You return x in the last statement, and returning x requires read access.

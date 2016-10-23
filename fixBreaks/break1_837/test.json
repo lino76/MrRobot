@@ -1,0 +1,11 @@
+{
+	"type": "correctness",
+	"target_team": 837,
+	"arguments": {
+		"argv": ["%PORT%"]
+	},
+	"programs": [
+	{"program": "as principal admin password \"admin\" do\nset x=\"hello\"\ndefault delegator=admin\ncreate principal bob \"bob\"\nreturn x\n***\n"},
+	{"program": "as principal bob password \"bob\" do\nset x=\"bobhello\"\nreturn x\n***\n"}
+	]
+}

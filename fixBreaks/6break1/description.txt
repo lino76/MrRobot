@@ -1,0 +1,8 @@
+BUG
+admin password which is specified as commandline argument is ignored
+
+See
+vault/core/datastore.py:31-32
+
+ self.authentication = {"admin": Principal(name="admin", password="admin"), //database is always using hardcoded password for admin
+                               "anyone": Principal(name="admin")}

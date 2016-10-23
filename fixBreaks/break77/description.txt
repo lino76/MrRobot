@@ -1,0 +1,7 @@
+* Circular delegations no properly checked.
+
+According to the specification, a principal p has right r on x if there exists
+some q that has right r on x and a delegation assertion x q r -> p exists. This
+is not the case if a circular delegation is defined for variable x (bob ->
+alice, alice -> bob), so the program should be denied access. Instead, the
+program successfully runs.

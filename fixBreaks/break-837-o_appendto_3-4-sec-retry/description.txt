@@ -1,0 +1,4 @@
+Per spec, a principal is allowed to append to a list only when he has either write or append permissions on.
+
+Expected output: [{u'status': u'APPEND'}, {u'status': u'RETURNING', u'output': u'success'}]
+Real output: [{u'status': u'DENIED'}]

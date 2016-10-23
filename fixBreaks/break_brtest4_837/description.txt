@@ -1,0 +1,1 @@
+Circular delegate assertions. This program was not able to identify a circular loop of delegations which lead to no real delegation, as the actual delegation is already removed by admin. This leads to a security error. The access to x should be denied for all u1, u2 and u3.

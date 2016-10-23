@@ -1,0 +1,2 @@
+An availability security violation since server should return "DENIED" when since the principal is not admin.
+According to the specification: "Security violation unless the current principal is admin or q; if the principal is q and <tgt> is the variable x, then q must have delegate permission on x."

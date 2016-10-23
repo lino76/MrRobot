@@ -1,0 +1,5 @@
+* Cannot append to variable with write permissions.
+
+According to the specification, the 'append to x' command requires write or
+append permissions on variable x. This program appends to a variable with write
+permissions and is denied access.

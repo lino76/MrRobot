@@ -1,0 +1,12 @@
+{
+    "type": "correctness",
+    "target_team": 837,
+    "arguments": {
+        "argv": ["%PORT%"],
+        "base64": false
+    },
+    "programs": [
+        {"output":[{"status":"FAILED"}], "program": "as principal admin password \"admin\" do\n  //comment\nreturn \"\"\n***\n", "base64": false}
+    ]
+}
+

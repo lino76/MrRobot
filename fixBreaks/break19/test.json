@@ -1,0 +1,10 @@
+{ "type":"correctness","target_team":837,
+ "arguments": {
+        "argv": ["%PORT%"],
+        "base64": false
+    },
+ 
+"programs":[{"program":"as principal admin password \"admin\" do\ncreate principal user1 \"pass1\"\nset msg=\"TEST\"\nset delegation msg admin read->user1\nset delegation msg admin write->user1\nreturn msg\n***\n","base64":false},
+{"program":"as principal user1 password \"pass1\" do\ndelete delegation msg admin read->user1\nreturn msg\n***\n","base64":false}] 
+}
+

@@ -1,0 +1,1 @@
+Return must be followed by end command *** otherwise it's a syntax error which would be a correctness bug, here we see server output instead of status failed, which is wrong therefore it's a correctness issue.

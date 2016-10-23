@@ -1,0 +1,1 @@
+This program is ignoring input admin password which leads to authentication that should be denied. Based on the spec, the server should be started with admin password equal to the one given in args, but it is giving access to the program that tries to authenticate admin with its default password.

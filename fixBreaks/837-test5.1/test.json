@@ -1,0 +1,39 @@
+{
+"type": "security",
+"target_team": 837,
+"arguments": {"argv": ["%PORT%"]}, 
+ "programs": [
+ 	{"output": [
+ 		{"status": "CREATE_PRINCIPAL"},
+        {"status": "CREATE_PRINCIPAL"},
+        {"status": "CREATE_PRINCIPAL"},
+        {"status": "CREATE_PRINCIPAL"},
+ 		{"status": "SET"},
+        {"status": "SET"},
+ 		{"status": "RETURNING", "output":"abc"}
+ 		],
+ 	 "program": "as principal admin password \"admin\" do\ncreate principal bob \"bob\"\ncreate principal chris \"chris\"\ncreate principal dave \"dave\"\ncreate principal admin2 \"admin2\"\nset x = \"abc\"\nset y = \"yyy\"\nreturn x\n***\n"
+ 	},
+    {"output": [
+        {"status": "SET_DELEGATION"},
+        {"status": "SET_DELEGATION"},
+        {"status": "RETURNING", "output":""}
+        ],
+     "program": "as principal admin password \"admin\" do\nset delegation x admin delegate -> admin2\nset delegation x admin read -> admin2\nreturn \"\"\n***\n"
+    },
+    {"output": [
+        {"status": "SET_DELEGATION"},
+        {"status": "SET_DELEGATION"},
+        {"status": "SET_DELEGATION"},
+        {"status": "SET_DELEGATION"},
+        {"status": "RETURNING", "output":""}
+        ],
+     "program": "as principal admin password \"admin\" do\nset delegation x admin2 read -> bob\nset delegation x admin2 read -> chris\nset delegation x bob read -> dave\nset delegation x chris read -> dave\nreturn \"\"\n***\n"
+    },
+    {"output": [
+        {"status": "DELETE_DELEGATION"},
+        {"status": "RETURNING", "output":""}
+        ],
+     "program": "as principal admin2 password \"admin2\" do\ndelete delegation x admin2 read -> bob\nreturn \"\"\n***\n"
+    }
+ ]}

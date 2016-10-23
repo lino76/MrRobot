@@ -1,0 +1,4 @@
+The second program should return 'DENIED' because principal anyone doesn't exists and is trying to create new principal.
+
+Team 837
+Output does not match, program returns 'FAILED'.

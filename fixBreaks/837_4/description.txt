@@ -1,0 +1,1 @@
+The server should outputs "ok", but it returns DENIED. "the target's status is DENIED, but the oracle's status isn't DENIED (availability security violation)" 

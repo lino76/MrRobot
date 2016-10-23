@@ -1,0 +1,4 @@
+Return status for the third program should be 'DENIED', because alice doesn't have delegate permision on x.
+
+Team 837
+Return status is 'FAILED'.

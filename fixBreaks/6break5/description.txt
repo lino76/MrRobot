@@ -1,0 +1,6 @@
+BUG: 
+When delegating permission to a variable from SUser to RUser, the database doesn't save the origin of the permission (SUser).
+That way it is impossible to check whether the permission chain to RUser is still valid.
+This allows making circles for example bob can inherit read permission from himself on a variable 
+he doesn't own if admin executes "set delegation x bob read->bob".
+According to the Specs this is not a valid delegation assertions which would allow bob to read x.

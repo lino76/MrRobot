@@ -1,0 +1,4 @@
+Per spec, only admin principals are able to create new users.
+
+Expected output: [{u'status': u'DENIED'}]
+Real output: [{u'status': u'CREATE_PRINCIPAL'}, {u'status': u'RETURNING', u'output': u''}]

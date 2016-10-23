@@ -1,0 +1,7 @@
+As per description available at https://builditbreakit.org/static/doc/fall2016/index.html#h.iugyafcagh1a, the failure conditions are checked in the order listed.
+
+In the case of changing password, you can see the order of failure conditions is listed as follows:
+
+Failure conditions:
+1.Fails if p does not exist
+2.Security violation if the current principal is neither admin nor p itself.

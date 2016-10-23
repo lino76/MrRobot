@@ -1,0 +1,4 @@
+* Non-admin principal allowed to create principals.
+
+According to the specification, only the admin principal can create other principals.
+The data server allows any principal to issue create principal commands.

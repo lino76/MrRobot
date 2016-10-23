@@ -1,0 +1,4 @@
+Correctness violation
+A program with only a comment is not allowed by the grammar.
+Actual result: program succeeds (but no output)
+Expected result : FAILED

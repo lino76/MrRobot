@@ -1,0 +1,4 @@
+This test shows an availability security violation.
+When givin READ permission to anyone on a variable, any principal should
+have access to its content. However, in this case we get a DENIED
+status.

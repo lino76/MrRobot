@@ -1,0 +1,1 @@
+No special permission is needed if the current principal is p (bob): any non-admin principal bob can always deny himself rights

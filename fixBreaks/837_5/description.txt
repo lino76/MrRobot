@@ -1,0 +1,1 @@
+The server returns DENIED when trying to delete previous delegated right when should returns SET_DELEGATION. As consequence, the server should return DENIED when the principal tries to access the identifier, but the server returns the data. 

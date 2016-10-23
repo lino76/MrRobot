@@ -1,0 +1,2 @@
+command "exit" should cause the server to exit. Command reports
+success but the server stays alive.

@@ -1,0 +1,2 @@
+command "exit" should cause the server to exit with code 0. Server
+instead hangs for serveral seconds before crashing with code 1.

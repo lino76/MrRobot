@@ -1,0 +1,2 @@
+Integrity violation
+Granted append permission, but application allows to read (Oracle denies)  

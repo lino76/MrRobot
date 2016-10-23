@@ -1,0 +1,17 @@
+BUG: 
+It is not possible to delete delegations where src can be any user and dst is currecnt principal.
+
+See:
+vault/core/datastore.py:157-168
+    def delete_delegation(self, source_principal, target_principal, key, role):
+        if self.is_admin(): //does not check if target_principal is current principal
+            if self.principle_exists(source_principal):
+                self.add_transaction(Transaction(op=TxnTypes.delegate_remove,
+                                                 key=key,
+                                                 source_principal=source_principal,
+                                                 principal=target_principal,
+                                                 roles=Role(role)))
+            else:
+                raise vault.error.VaultError(100, "principal does not exist")
+        else:
+            raise vault.error.SecurityError(100, "only admin can set the default delegator") //obvoiusly leftover from copy and paste

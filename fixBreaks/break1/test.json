@@ -1,0 +1,1 @@
+{"target_team": 837, "type": "security", "arguments": {"base64": false, "argv": ["%PORT%", "otherpass"]}, "programs": [{"base64": false, "program": "as principal admin password \"admin\" do\nset x = \"x\"\nreturn x\n***\n"}]}

@@ -1,0 +1,1 @@
+the last program in the test needs to do operations and retrun a value. instead - the server returns DENIED

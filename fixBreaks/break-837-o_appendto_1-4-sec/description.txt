@@ -1,0 +1,4 @@
+Per spec, the program should fail when appending to a non-existent variable.
+
+Expected output: [{u'status': u'FAILED'}]
+Real output: [{u'status': u'DENIED'}]

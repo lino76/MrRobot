@@ -1,0 +1,10 @@
+BUG
+any existing user is able to create new users
+
+See
+vault/core/interpreter.py:175-179
+    def handle_create_principal(self, cmd):
+        log = {"status": "CREATE_PRINCIPAL"}
+        principal = vault.util.Principal(cmd.expressions['principal'], cmd.expressions['password'])
+        self.datastore.create_principal(principal) //there are no checks whether current principal is admin
+        return log

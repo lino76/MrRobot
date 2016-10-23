@@ -1,0 +1,1 @@
+Status should be denied if wrong admin password is provided.

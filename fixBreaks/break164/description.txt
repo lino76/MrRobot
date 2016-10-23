@@ -1,0 +1,3 @@
+Return status of the last program should be 'DENIED' because exit command is only allowed if the current principal is admin, otherwise it is a security violation.
+Team 837 returns
+{"status":"FAILED"}

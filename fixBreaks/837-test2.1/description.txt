@@ -1,0 +1,8 @@
+Security violation
+The server does not follow the trust transitivity rule. If I create
+a transitivity rule and then delete the permission paths for a read
+right, it does not remove the read permission if I delete a path that
+occurs before it. So if x->y->z, and I delete x->y, z still has access
+although it shouldn't.
+Actual result: program succeeds
+Expected result : DENIED

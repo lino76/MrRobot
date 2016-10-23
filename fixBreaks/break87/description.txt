@@ -1,0 +1,9 @@
+Password is specified as a second argument, but in both programs, different password is used. Return status should be 'denied'.
+
+Team 837
+First program returns:
+{"status":"CREATE_PRINCIPAL"}
+{"status":"SET"}
+{"status":"RETURNING","output":"x"}
+Second program returns:
+{"status":"RETURNING","output":"x"}

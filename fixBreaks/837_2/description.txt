@@ -1,0 +1,1 @@
+When a principal that is not admin attempts to change the password of a non-existing principal, the server outputs DENIED instead of FAILED. The specification defines that such failures should take precedence over security violations.

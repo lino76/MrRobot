@@ -1,0 +1,13 @@
+{
+    "type": "security",
+    "target_team": 837,
+    "arguments": {
+        "argv": ["%PORT%"],
+        "base64": false
+    },
+    "programs": [
+	{"output":[{"status":"CREATE_PRINCIPAL"},{"status":"RETURNING", "output":""}], "program": "as principal admin password \"admin\" do\ncreate principal bob \"bob\"\nreturn \"\"\n***\n", "base64":false},
+        {"output":[{"status":"DENIED"}], "program": "as principal bob password \"bob\" do\ncreate principal dave \"dave\"\nreturn \"\"\n***\n", "base64": false}
+    ]
+}
+

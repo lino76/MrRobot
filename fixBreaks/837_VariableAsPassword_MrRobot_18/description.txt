@@ -1,0 +1,2 @@
+Security violation was found since server allows logging in with the wrong password which happens to be the name of a variable that contains the correct password string.
+According to the specification the password must be a string s: as principal p password s do \n <cmd> ***

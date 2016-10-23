@@ -1,0 +1,1 @@
+In the second program, the line 'set x = "a"' should only affect the local variable x. Therefore, no global variable x exists when the third program is started. Therefore, bob should be able to create a new global variable x and the program should return normally with status RETURNING. However, the target returns DENIED.

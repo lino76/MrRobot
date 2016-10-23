@@ -1,0 +1,12 @@
+{
+    "type": "security",
+    "target_team": 837,
+    "arguments": {
+        "argv": ["%PORT%"],
+        "base64": false
+    },
+    "programs": [
+      { "program": "as principal admin password \"admin\" do\ncreate principal test \"test\"\nset r = \"XX\"\nreturn r\n***\n", "base64": false},
+      { "program": "as principal test password \"test\" do\ncreate principal teste \"teste\"\nreturn \"success\"\n***\n", "base64": false }
+    ]
+}

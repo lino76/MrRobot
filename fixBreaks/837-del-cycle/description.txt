@@ -1,0 +1,1 @@
+This test case allows principal 'alice' to read the value of 'x', despite alice not having read permissions on 'x' as defined in the spec.

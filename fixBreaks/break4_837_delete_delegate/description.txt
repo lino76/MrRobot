@@ -1,0 +1,1 @@
+In delete delegation, when the <tgt> is 'all' is not covered.

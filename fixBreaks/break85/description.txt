@@ -1,0 +1,5 @@
+* Invalid return status in 'filtereach' command.
+
+According to the specification, the 'filtereach y in x' command results in a
+security violation if the current principal does not have read and write
+permission on x. Instead, the program fails.

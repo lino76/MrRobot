@@ -1,0 +1,9 @@
+{
+    "type": "security",
+    "target_team": 837,
+    "arguments": {"argv": ["%PORT%", "admin"],"base64": false},
+    "programs": [
+        {"program": "as principal admin password \"admin\" do\ncreate principal bob \"pw\"\ncreate principal jill \"pw\"\nreturn \"hi\"\n***", "base64": false},
+	{"program": "as principal bob password \"pd\" do\nreturn \"cool\"\r\n***", "base64": false}
+    ]
+}

@@ -1,0 +1,5 @@
+* Program fails when setting delegations without the right permissions.
+
+According to the specification, attempting to set delegations without the
+right permissions should constitute a security violation. Instead, the program
+fails.

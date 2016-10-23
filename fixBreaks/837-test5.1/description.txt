@@ -1,0 +1,6 @@
+Security violation
+The server denies a principal from removing a right that they have.
+admin delegated the read right to x for admin2 -> bob.  However,
+admin2 cannot delete this right although it should be able to.
+Actual result: DENIED
+Expected result : should be allowed

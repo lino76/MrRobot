@@ -1,0 +1,12 @@
+
+{
+    "type": "correctness",
+    "target_team": 837,
+    "arguments": {
+         "argv": ["%PORT%"],
+         "base64": false
+    },
+    "programs": [
+         {"program": "as principal admin password \"admin\" do\ncreate principal A \"Ap\"\ncreate principal B \"Bp\"\ncreate principal C \"Cp\"\ncreate principal D \"Dp\"\ncreate principal E \"Ep\"\nreturn \"Created Principals ABCDE\"\n***\n", "base64": false}     ]
+}
+

@@ -1,0 +1,1 @@
+User2 shoudl not be able to append to variable msg as he has no write or append permissions. The return code should be "DENIED".

@@ -1,0 +1,3 @@
+The target returns FAILED when trying to set delegation on all
+variabled. set delegation all should return SET_DELEGATION and give
+the right on all variables.

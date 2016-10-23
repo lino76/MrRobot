@@ -1,0 +1,2 @@
+An availability security violation was found when the admin password is set as a commandline argument but the server does not respect that argument.
+According to the specification: The administrator password is an optional argument (it is "admin" if the argument is missing[1]).

@@ -1,0 +1,14 @@
+{
+    "type": "correctness",
+    "target_team": 837,
+    "arguments": {
+        "argv": ["%PORT%"],
+        "base64": false
+    },
+    "programs": [
+        {"program": "as principal admin password \"admin\" do\ncreate principal bob \"bob\"\nreturn \"end of 1.\"\n***\n", "base64" :false},
+        {"program": "as principal bob password \"bob\" do\nexit\n***\n", "base64" :false},
+        {"program": "as principal admin password \"admin\" do\nreturn \"still here\"\n***\n", "base64" :false}
+    ]
+}
+
