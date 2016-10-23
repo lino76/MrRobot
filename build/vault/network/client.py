@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import argparse
 import os.path
+import os
 #from pathlib import Path, PurePath
 import socket
 import json
@@ -9,7 +10,16 @@ host = ''
 port = 1024
 data_path = '../../../bibifitests'
 
+import signal
+
+def handler(signum, frame):
+    print ("Forever is over!")
+    raise Exception("end of time")
+
+signal.signal(signal.SIGALRM, handler)
+
 def clientSend(data):
+    signal.alarm(10)
     conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     conn.settimeout(30)
     conn.setblocking(True)
@@ -79,13 +89,18 @@ def sendFromFile(testfile):
                     response = clientSend(program['program'])
                     response = response.split('\n')[:-1]
                     response_json = [json.loads(res) for res in response]
+                    if 'output' not in program.keys():
+                        print('No output key for this test')
+                        return
                     if not compareResponses(response_json, program['output']):
                         print('NOT MATCH')
                         return
+                    else:
+                        return "MATCHED"
             except Exception as e:
                 print('expect')
                 print(e)
-                raise
+                return
     else:
         print('File does not exist: ', testfile)
 
@@ -96,17 +111,37 @@ if __name__ == '__main__':
     cmd_parser.add_argument('-p', type=int, dest="port", default=1024)
     cmd_parser.add_argument('-d', type=str, dest="data_path", default=data_path, required=False)
     cmd_parser.add_argument('-m', type=str, dest="manualprogram", required=False)
+    cmd_parser.add_argument('-r', type=bool, dest="run_all", required=False)
+
     #cmd_parser.add_argument('-a', dest='run_all', action='store_true')
     args = cmd_parser.parse_args()
 
     port = args.port
     data_path = args.data_path
     manualprogram = args.manualprogram
+
     if manualprogram:
         manualprogram = manualprogram.replace("\\n", "\n")
-    #run_all = args.run_all
+    run_all = args.run_all
 
     print('Using port %d with data path of: %s' % (port, data_path))
+    if run_all:
+        all_tests = [x[0] for x in os.walk(os.path.join(os.path.dirname(__file__), data_path))]
+
+        print('print running all tests')
+        matched, failed = [], []
+        for select in all_tests:
+            print(select)
+            test_file = os.path.join( select, 'test')
+            test_file += ".json"
+            result = sendFromFile(test_file)
+            if 'MATCHED' == result:
+                matched.append(select.split('/')[-1])
+            else:
+                failed.append(select.split('/')[-1])
+
+        print('ALL Failed tests', failed)
+        print('ALL matched tests', matched)
 
     if manualprogram is not None:
         print("sending manual program...")
@@ -119,7 +154,7 @@ if __name__ == '__main__':
             if select == 'exit':
                 exit()
             print(select)
-            test_file = os.path.join(os.path.dirname(__file__), data_path, select)
+            test_file = os.path.join(os.path.dirname(__file__), data_path, select, 'test')
             if not test_file.endswith(".json"):
                 test_file += ".json"
             sendFromFile(test_file)
