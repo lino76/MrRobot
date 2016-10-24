@@ -5,19 +5,21 @@ import os
 #from pathlib import Path, PurePath
 import socket
 import json
-from eventlet.timeout import with_timeout
 import subprocess
 host = ''
 port = 1024
 data_path = '../../../fixBreaks'
 server_path = '../../../build'
+
+#UNIX only
 #import signal
+#signal.signal(signal.SIGALRM, handler)
 
 def handler(signum, frame):
     print ("Forever is over!")
     raise Exception("end of time")
 
-#signal.signal(signal.SIGALRM, handler)
+
 
 def clientSend(data):
     #signal.alarm(10)
@@ -140,6 +142,7 @@ if __name__ == '__main__':
             test_file += ".json"
             #TODO: WINDOWS STYLE
             proc = subprocess.Popen(['c:\Python3\python', server, str(port)])
+            #TODO: UNIX STYLE
             result = sendFromFile(test_file)
             if 'MATCHED' == result:
                 matched.append(select.split('/')[-1])
