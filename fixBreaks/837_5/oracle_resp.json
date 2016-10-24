@@ -1,0 +1,49 @@
+{
+  "return_code": 0,
+  "output": [
+    [
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "RETURNING",
+        "output": "msg"
+      }
+    ],
+    [
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "RETURNING",
+        "output": "ok"
+      }
+    ],
+    [
+      {
+        "status": "DELETE_DELEGATION"
+      },
+      {
+        "status": "RETURNING",
+        "output": "ok"
+      }
+    ],
+    [
+      {
+        "status": "DENIED"
+      }
+    ]
+  ]
+}

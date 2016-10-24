@@ -1,0 +1,68 @@
+{
+  "return_code": 0,
+  "output": [
+    [
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "RETURNING",
+        "output": "abc"
+      }
+    ],
+    [
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "RETURNING",
+        "output": ""
+      }
+    ],
+    [
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "RETURNING",
+        "output": ""
+      }
+    ],
+    [
+      {
+        "status": "DELETE_DELEGATION"
+      },
+      {
+        "status": "RETURNING",
+        "output": ""
+      }
+    ]
+  ]
+}

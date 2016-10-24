@@ -1,0 +1,28 @@
+{
+  "return_code": 0,
+  "output": [
+    [
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "RETURNING",
+        "output": "TEST"
+      }
+    ],
+    [
+      {
+        "status": "DENIED"
+      }
+    ]
+  ]
+}

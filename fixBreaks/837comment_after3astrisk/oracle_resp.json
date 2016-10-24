@@ -1,0 +1,14 @@
+{
+  "return_code": 0,
+  "output": [
+    [
+      {
+        "status": "SET"
+      },
+      {
+        "status": "RETURNING",
+        "output": "x"
+      }
+    ]
+  ]
+}

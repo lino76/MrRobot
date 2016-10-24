@@ -1,0 +1,233 @@
+{
+  "return_code": 0,
+  "output": [
+    [
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "RETURNING",
+        "output": "Created Principals ABC"
+      }
+    ],
+    [
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "RETURNING",
+        "output": [
+          "ADlist_item1",
+          "ADlist_item2",
+          "ADlist_item3",
+          {
+            "key": "1",
+            "val": "A"
+          },
+          {
+            "key": "2",
+            "val": "B"
+          },
+          {
+            "key": "3",
+            "val": "C"
+          },
+          {
+            "key": "4",
+            "val": "D"
+          },
+          {
+            "key": "5",
+            "val": "E"
+          },
+          {
+            "key": "6",
+            "val": "F"
+          },
+          {
+            "key": "7",
+            "val": "G"
+          },
+          {
+            "key": "8",
+            "val": "H"
+          }
+        ]
+      }
+    ],
+    [
+      {
+        "status": "SET"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "FOREACH"
+      },
+      {
+        "status": "RETURNING",
+        "output": [
+          {
+            "key2": "A",
+            "val2": "1"
+          },
+          {
+            "key2": "B",
+            "val2": "2"
+          },
+          {
+            "key2": "C",
+            "val2": "3"
+          },
+          {
+            "key2": "D",
+            "val2": "4"
+          },
+          {
+            "key2": "E",
+            "val2": "5"
+          },
+          {
+            "key2": "F",
+            "val2": "6"
+          },
+          {
+            "key2": "G",
+            "val2": "7"
+          },
+          {
+            "key2": "H",
+            "val2": "8"
+          }
+        ]
+      }
+    ]
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "return_code": 0,
+  "output": [
+    [
+      {
+        "status": "SET"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "RETURNING",
+        "output": "my secret"
+      }
+    ],
+    [
+      {
+        "status": "DENIED"
+      }
+    ]
+  ]
+}

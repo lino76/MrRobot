@@ -1,0 +1,40 @@
+{
+  "return_code": 0,
+  "output": [
+    [
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "DEFAULT_DELEGATOR"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "DEFAULT_DELEGATOR"
+      },
+      {
+        "status": "DELETE_DELEGATION"
+      },
+      {
+        "status": "RETURNING",
+        "output": "TEST"
+      }
+    ],
+    [
+      {
+        "status": "FAILED"
+      }
+    ]
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "return_code": 0,
+  "output": [
+    [
+      {
+        "status": "SET"
+      },
+      {
+        "status": "DELETE_DELEGATION"
+      },
+      {
+        "status": "RETURNING",
+        "output": "Done"
+      }
+    ],
+    [
+      {
+        "status": "RETURNING",
+        "output": "xVal"
+      }
+    ]
+  ]
+}

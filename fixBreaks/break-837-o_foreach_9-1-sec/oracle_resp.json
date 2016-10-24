@@ -1,0 +1,43 @@
+{
+  "return_code": 0,
+  "output": [
+    [
+      {
+        "status": "SET"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "SET_DELEGATION"
+      },
+      {
+        "status": "RETURNING",
+        "output": "success"
+      }
+    ],
+    [
+      {
+        "status": "FAILED"
+      }
+    ]
+  ]
+}

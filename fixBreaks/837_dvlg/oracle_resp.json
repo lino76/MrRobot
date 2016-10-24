@@ -1,0 +1,38 @@
+{
+  "return_code": 0,
+  "output": [
+    [
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "RETURNING",
+        "output": "ok"
+      }
+    ],
+    [
+      {
+        "status": "CHANGE_PASSWORD"
+      },
+      {
+        "status": "LOCAL"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "RETURNING",
+        "output": "ok"
+      }
+    ],
+    [
+      {
+        "status": "SET"
+      },
+      {
+        "status": "RETURNING",
+        "output": "b"
+      }
+    ]
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "return_code": 0,
+  "output": [
+    [
+      {
+        "status": "SET"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "RETURNING",
+        "output": "hello"
+      }
+    ],
+    [
+      {
+        "status": "SET"
+      },
+      {
+        "status": "RETURNING",
+        "output": "bob string"
+      }
+    ]
+  ]
+}

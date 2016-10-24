@@ -1,0 +1,24 @@
+{
+  "return_code": 0,
+  "output": [
+    [
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "RETURNING",
+        "output": "ok"
+      }
+    ],
+    [
+      {
+        "status": "FAILED"
+      }
+    ],
+    [
+      {
+        "status": "DENIED"
+      }
+    ]
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "return_code": 0,
+  "output": [
+    [
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "CREATE_PRINCIPAL"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "RETURNING",
+        "output": "Created Principals ABCDE"
+      }
+    ],
+    [
+      {
+        "status": "SET"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "RETURNING",
+        "output": "Prepared A"
+      }
+    ],
+    [
+      {
+        "status": "SET"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "APPEND"
+      },
+      {
+        "status": "SET"
+      },
+      {
+        "status": "RETURNING",
+        "output": "Prepared B"
+      }
+    ]
+  ]
+}
