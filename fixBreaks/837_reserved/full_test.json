@@ -1,0 +1,1 @@
+{"type": "correctness", "target_team": 837, "programs": [{"base64": false, "output": [{"status": "FAILED"}], "program": "as principal admin password \"admin\" do\nset filtereach=\"meow\"\nreturn filtereach\n***"}], "arguments": {"base64": false, "argv": ["%PORT%"]}}

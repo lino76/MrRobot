@@ -5,23 +5,25 @@ import os
 #from pathlib import Path, PurePath
 import socket
 import json
-
+from eventlet.timeout import with_timeout
+import subprocess
 host = ''
 port = 1024
-data_path = '../../../bibifitests'
-
-import signal
+data_path = '../../../fixBreaks'
+server_path = '../../../build'
+#import signal
 
 def handler(signum, frame):
     print ("Forever is over!")
     raise Exception("end of time")
 
-signal.signal(signal.SIGALRM, handler)
+#signal.signal(signal.SIGALRM, handler)
 
 def clientSend(data):
-    signal.alarm(10)
+    #signal.alarm(10)
+
     conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    conn.settimeout(30)
+    conn.settimeout(5)
     conn.setblocking(True)
 
     conn.connect((socket.gethostname(), port))
@@ -44,7 +46,6 @@ def clientSend(data):
         print(e)
     print('[*] Client received response:', result)
     conn.close()
-
     return result
 
 def compareResponses( server_response, expected_response):
@@ -96,7 +97,8 @@ def sendFromFile(testfile):
                         print('NOT MATCH')
                         return
                     else:
-                        return "MATCHED"
+                        continue
+                return "MATCHED"
             except Exception as e:
                 print('expect')
                 print(e)
@@ -109,7 +111,7 @@ if __name__ == '__main__':
     # Parse the command lines.  Expect a port followed by a data folder path
     cmd_parser = argparse.ArgumentParser(formatter_class=argparse.RawTextHelpFormatter)
     cmd_parser.add_argument('-p', type=int, dest="port", default=1024)
-    cmd_parser.add_argument('-d', type=str, dest="data_path", default=data_path, required=False)
+    cmd_parser.add_argument('-s', type=str, dest="server_path", default=server_path, required=False)
     cmd_parser.add_argument('-m', type=str, dest="manualprogram", required=False)
     cmd_parser.add_argument('-r', type=bool, dest="run_all", required=False)
 
@@ -117,7 +119,7 @@ if __name__ == '__main__':
     args = cmd_parser.parse_args()
 
     port = args.port
-    data_path = args.data_path
+    server_path = args.server_path
     manualprogram = args.manualprogram
 
     if manualprogram:
@@ -125,21 +127,26 @@ if __name__ == '__main__':
     run_all = args.run_all
 
     print('Using port %d with data path of: %s' % (port, data_path))
+
     if run_all:
+        server = os.path.join(os.path.dirname(__file__), server_path, 'main.py')
         all_tests = [x[0] for x in os.walk(os.path.join(os.path.dirname(__file__), data_path))]
 
         print('print running all tests')
         matched, failed = [], []
         for select in all_tests:
             print(select)
-            test_file = os.path.join( select, 'test')
+            test_file = os.path.join( select, 'full_test')
             test_file += ".json"
+            #TODO: WINDOWS STYLE
+            proc = subprocess.Popen(['c:\Python3\python', server, str(port)])
             result = sendFromFile(test_file)
             if 'MATCHED' == result:
                 matched.append(select.split('/')[-1])
             else:
                 failed.append(select.split('/')[-1])
-
+            proc.terminate()
+            proc.wait(10)
         print('ALL Failed tests', failed)
         print('ALL matched tests', matched)
 
@@ -154,7 +161,7 @@ if __name__ == '__main__':
             if select == 'exit':
                 exit()
             print(select)
-            test_file = os.path.join(os.path.dirname(__file__), data_path, select, 'test')
+            test_file = os.path.join(os.path.dirname(__file__), data_path, select, 'full_test')
             if not test_file.endswith(".json"):
                 test_file += ".json"
             sendFromFile(test_file)

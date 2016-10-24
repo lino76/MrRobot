@@ -1,0 +1,1 @@
+{"type": "correctness", "target_team": 837, "programs": [{"base64": false, "output": [{"output": "Hello", "status": "RETURNING"}], "program": "as principal admin password \"admin\" do\nreturn \"Hello\"\n***aaaaaa\n"}], "arguments": {"base64": false, "argv": ["%PORT%"]}}

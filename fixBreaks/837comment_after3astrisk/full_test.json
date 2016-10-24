@@ -1,0 +1,1 @@
+{"type": "correctness", "target_team": 837, "programs": [{"base64": false, "output": [{"status": "SET"}, {"output": "x", "status": "RETURNING"}], "program": "as principal admin password \"admin\" do\nset x = \"x\"\nreturn x\n***\n //comment after *** aaa@@@####\u00a7\u00a7\u00a7\u00a7"}], "arguments": {"base64": false, "argv": ["%PORT%"]}}

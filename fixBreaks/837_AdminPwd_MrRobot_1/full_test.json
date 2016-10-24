@@ -1,0 +1,1 @@
+{"type": "security", "target_team": 837, "programs": [{"base64": false, "output": [{"status": "DENIED"}], "program": "as principal admin password \"admin\" do\ncreate principal bob \"bpwd\"\nreturn \"hi\"\n***\n"}], "arguments": {"base64": false, "argv": ["%PORT%", "add"]}}

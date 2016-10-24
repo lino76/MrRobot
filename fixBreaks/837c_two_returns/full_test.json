@@ -1,0 +1,1 @@
+{"type": "correctness", "target_team": 837, "programs": [{"base64": false, "output": [{"status": "FAILED"}], "program": "as principal admin password \"admin\" do\nreturn \"ret1\"\nreturn \"ret2\"\n***\n"}], "arguments": {"base64": false, "argv": ["%PORT%"]}}

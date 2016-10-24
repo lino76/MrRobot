@@ -1,0 +1,1 @@
+{"target_team": 837, "type": "correctness", "programs": [{"base64": false, "output": [{"status": "FAILED"}], "program": "as principal admin password \"admin\" do\n   set x = \"hello\"\n   set y = \"there\"\n   return x\n   return y\n***\n"}], "arguments": {"base64": false, "argv": ["%PORT%"]}}

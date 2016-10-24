@@ -1,0 +1,1 @@
+{"type": "correctness", "target_team": 837, "programs": [{"base64": false, "output": [{"status": "FAILED"}], "program": "as principal user2 password \"pass2\" do\nlocal x=\"5\"\nreturn x\n***\n"}], "arguments": {"base64": false, "argv": ["%PORT%"]}}

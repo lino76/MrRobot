@@ -1,0 +1,1 @@
+{"type": "security", "target_team": 837, "programs": [{"output": [{"status": "DENIED"}], "program": "as principal admin password \"admin\" do\ncreate principal bob \"B0BPWxxd\"\nset x =\"x\"\nreturn x\n***\n"}, {"output": [{"status": "DENIED"}], "program": "as principal admin password \"admin\" do\n return x\n***\n"}], "arguments": {"argv": ["%PORT%", "password"]}}

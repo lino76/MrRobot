@@ -1,0 +1,1 @@
+{"type": "security", "target_team": 837, "programs": [{"output": [{"status": "FAILED"}], "program": "as principal admin password \"pass2\" do\ncreate principal alice \"alices_password\"\ncreate principal alice \"alices_password\"\nreturn \"success\"\n***"}], "arguments": {"base64": false, "argv": ["%PORT%", "pass2"]}}
