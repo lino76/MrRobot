@@ -125,6 +125,10 @@ class Parser:
                     raise e
                 raise VaultError(1, "Malformed expression: " + s + "got exception: " + str(e))
 
+        # test for string literal
+        elif s.startswith('"') and s != splitted:
+            s = ' '.join(splitted)
+
         # Now it can only be a value
         value = self.parse_value(s)
         return Expression(Type.value, value)
