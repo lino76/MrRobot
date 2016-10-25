@@ -27,6 +27,11 @@ class Parser:
             raise Exception(101, "invalid program, missing terminator")
         return lines[:terminator_pos]
 
+    def validate_line_content(self, lines):
+        for line in lines:
+            if line == "":
+                raise Exception(101, "invalid program, empty lines are invalid")
+        return lines
 
     # maybe move this outside or make a static func
     def validate_string_constant(self, string):
@@ -351,10 +356,10 @@ class Parser:
         lines = []
         for line in lines_tmp:
             line = self.remove_comments(line)
-            if line != "":
-                lines.append(line)
+            lines.append(line)
         # validate the terminator and remove it (or fail)
         lines = self.validate_terminator(lines)
+        lines = self.validate_line_content(lines)
         principal, password = self.parse_prog(lines.pop(0))
 
         program.principal = principal
