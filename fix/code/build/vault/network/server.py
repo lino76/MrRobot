@@ -1,7 +1,7 @@
 import socket
 import threading
 import simplejson as json
-
+import os
 from vault.error import CmdError, NetworkError, SecurityError
 from vault.core import Vault, Program
 
@@ -50,6 +50,7 @@ class Server:
         # client_socket.settimeout(30)
         client_socket.settimeout(None)  # TODO THIS IS FOR DEBUGGING
         try:
+            shutdown = False
             data = b''
             try:
                 while b'***' not in data:
@@ -78,7 +79,7 @@ class Server:
                 if not client_socket.recv(10):
                     client_socket.close()
                 if shutdown:
-                    exit(0)
+                    os._exit(0)
         except socket.error:
             print('Socket connection failed, nothing to do')
         except Exception as e:
