@@ -130,6 +130,8 @@ class Datastore:
                 self.add_transaction(Transaction(op=TxnTypes.create_principal, key=principal.name, value=principal))
             else:
                 raise vault.SecurityError(101, "principal already exists")
+        else:
+            raise vault.error.SecurityError(101, "only admin can create principals")
 
     @require_context()
     def set_delegation(self, source_principal, target_principal, key, role):
