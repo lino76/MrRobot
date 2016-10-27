@@ -1,5 +1,6 @@
-#!/usr/bin/bash
+#!/bin/bash
 
 for i in $(ls *.json); do
-	./run.py $1 $i
+        echo $i
+	./run.py $1 ../build/server $i
 done
