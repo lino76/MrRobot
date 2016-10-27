@@ -139,7 +139,6 @@ if __name__ == '__main__':
         for select in all_tests:
             print(select)
             test_file = os.path.join(root, select)
-            #TODO: WINDOWS STYLE
             proc = subprocess.Popen(['c:\Python3\python', server, str(port)])
             #TODO: UNIX STYLE
             result = sendFromFile(test_file)
@@ -158,12 +157,18 @@ if __name__ == '__main__':
 
         print('print running all tests')
         matched, failed = [], []
-        for select in all_tests:
+        for select in all_tests[1:]:
             print(select)
             test_file = os.path.join( select, 'full_test')
             test_file += ".json"
+            argv = [str(port)]
             #TODO: WINDOWS STYLE
-            proc = subprocess.Popen(['c:\Python3\python', server, str(port)])
+            with open(test_file, "r") as jsonFile:
+                data = jsonFile.read()
+                argv_file = json.loads(data)['arguments']['argv'][1:]
+                argv.extend(argv_file)
+            #TODO: WINDOWS STYLE
+            proc = subprocess.Popen(['c:\Python3\python', server, *argv])
             #TODO: UNIX STYLE
             result = sendFromFile(test_file)
             if 'MATCHED' == result:
