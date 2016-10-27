@@ -1,1 +1,1 @@
-{"type": "correctness", "target_team": 837, "programs": [{"base64": false, "program": "as principal admin password \"admin\" do\nset x = \"olakase\"//hellotherecomment\nreturn x\n***"}], "arguments": {"base64": false, "argv": ["%PORT%", "password", "olakase"]}}
+{"type": "correctness", "target_team": 837, "programs": [{"base64": false,"output": [], "program": "as principal admin password \"admin\" do\nset x = \"olakase\"//hellotherecomment\nreturn x\n***"}], "arguments": {"base64": false, "argv": ["%PORT%", "password", "olakase"]}}
