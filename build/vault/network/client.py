@@ -8,8 +8,9 @@ import json
 import subprocess
 host = ''
 port = 1024
+bibifi_path = '../../../bibifitests'
 data_path = '../../../fixBreaks'
-server_path = '../../../build'
+server_path = '../../../fix/code/build'
 
 #UNIX only
 #import signal
@@ -116,7 +117,7 @@ if __name__ == '__main__':
     cmd_parser.add_argument('-s', type=str, dest="server_path", default=server_path, required=False)
     cmd_parser.add_argument('-m', type=str, dest="manualprogram", required=False)
     cmd_parser.add_argument('-r', type=bool, dest="run_all", required=False)
-
+    cmd_parser.add_argument('-b', type=bool, dest="bibifi", required=False)
     #cmd_parser.add_argument('-a', dest='run_all', action='store_true')
     args = cmd_parser.parse_args()
 
@@ -127,9 +128,30 @@ if __name__ == '__main__':
     if manualprogram:
         manualprogram = manualprogram.replace("\\n", "\n")
     run_all = args.run_all
-
+    bibifi = args.bibifi
     print('Using port %d with data path of: %s' % (port, data_path))
-
+    if bibifi:
+        server = os.path.join(os.path.dirname(__file__), server_path, 'main.py')
+        root,_,files = list(os.walk(os.path.join(os.path.dirname(__file__), bibifi_path)))[0]
+        all_tests = [x for x in files if all([x.lower().endswith(".json"), not any( y in x.lower() for y in ['perf', 'let', 'filter', 'timeout', 'func'])])]
+        print('print running all tests', all_tests)
+        matched, failed = [], []
+        for select in all_tests:
+            print(select)
+            test_file = os.path.join(root, select)
+            #TODO: WINDOWS STYLE
+            proc = subprocess.Popen(['c:\Python3\python', server, str(port)])
+            #TODO: UNIX STYLE
+            result = sendFromFile(test_file)
+            if 'MATCHED' == result:
+                matched.append(select.split('/')[-1])
+            else:
+                failed.append(select.split('/')[-1])
+            proc.terminate()
+            proc.wait(10)
+        print('ALL Failed tests', failed)
+        print('ALL matched tests', matched)
+        exit()
     if run_all:
         server = os.path.join(os.path.dirname(__file__), server_path, 'main.py')
         all_tests = [x[0] for x in os.walk(os.path.join(os.path.dirname(__file__), data_path))]
