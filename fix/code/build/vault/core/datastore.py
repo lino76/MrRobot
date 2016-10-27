@@ -27,8 +27,8 @@ class TxnTypes(Enum):
 
 class Datastore:
 
-    def __init__(self):
-        self.authentication = {"admin": Principal(name="admin", password="admin"),
+    def __init__(self, password):
+        self.authentication = {"admin": Principal(name="admin", password=password),
                                "anyone": Principal(name="admin")}
         self.authorization = Vividict()
         self.delegation = Vividict({"anyone": Vividict()})
