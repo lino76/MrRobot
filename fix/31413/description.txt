@@ -1,0 +1,1 @@
+Description: 31314 exposed an issue whereby a non-admin user attempting to create a new principal was not shown a denied error messages and was allowed to proceed. No principal was actually created in this case only the error message and program termination was missing.
