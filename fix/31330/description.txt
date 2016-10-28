@@ -1,0 +1,3 @@
+Description: 31330 exposes a bug whereby a program with invalid empty lines is allowed to execute.
+
+This fix checks for empty lines (preceeding ***) and terminates the program if they are found.
