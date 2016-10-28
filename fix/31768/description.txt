@@ -1,0 +1,3 @@
+Description: 31768 calls out a missed requirement regarding variables named after optional keywords. The spec says "keywords for optional features cannot be used for program-defined variables WHETHER OR NOT YOU IMPLEMENT THOSE FEATURES."
+
+This fix adds the optional keywords to the list of reserved words and stop them from being used as variable names.
