@@ -10,7 +10,7 @@ class Vault:
 
     def __init__(self, password):
         self.password = password
-        self.datastore = vault.core.Datastore()
+        self.datastore = vault.core.Datastore(password)
 
     def run(self, program):
         if len(program.src) > 1000000:
