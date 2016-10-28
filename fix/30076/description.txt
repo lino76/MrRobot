@@ -1,0 +1,3 @@
+Description: 31637 exposed a bug whereby the commandline provided admin password was not getting set resulting in 'admin' being the admin password for all cases.
+
+This fix sets the cmdline provided password if provided.
