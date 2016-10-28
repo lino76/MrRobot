@@ -8,10 +8,11 @@ from vault.error import VaultError
 class Parser:
     def __init__(self):
         self.placeholder = None
-        self.reserved_words = ["all", "append", "as", "change", "create", "default",
-                               "delegate", "delegation", "delegator", "delete", "do", "exit", "foreach",
-                               "in", "local", "password", "principal", "read", "replacewith", "return",
-                               "set", "to", "write", "***"]
+        self.reserved_words = ["all", "append", "as", "change", "concat", "create", "default",
+                               "delegate", "delegation", "delegator", "delete", "do", "exit", "equal",
+                               "filtereach", "foreach", "in", "let", "local", "notequal", "password", "principal",
+                               "read", "replacewith", "return", "set", "split", "to", "tolower",  "with", "write",
+                               "***"]
 
     def is_quoted(self, s):
         return s[0] == s[-1] and s.startswith("'")
