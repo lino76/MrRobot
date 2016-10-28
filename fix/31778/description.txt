@@ -1,0 +1,3 @@
+Description: 31778 identifies an issue whereby string literal values e.g. return "foo bar" or set x="foo bar" were removing all spaces within the string literal.
+
+This fix preserves the spaces within doublequoted string literal values
