@@ -1,0 +1,1 @@
+Description: 31314 exposed an issue when command "exit" should cause the server to exit with code 0
