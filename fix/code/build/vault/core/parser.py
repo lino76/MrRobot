@@ -55,19 +55,21 @@ class Parser:
 
     def remove_comments(self, string):
         string = string.lstrip()
+        line_comment = False
         if string.startswith("//"):
             if not self.validate_comment(string):
                 raise VaultError(1, "Comment not valid: " + string)
             else:
-                return ""
+                line_comment = True
+                return "", line_comment
         if "//" in string:
             uncommented = string.split("//")[0]
             comment = string[len(uncommented):]
             if not self.validate_comment(comment):
                 raise VaultError(1, "Comment not valid: " + string)
             else:
-                return uncommented
-        return string
+                return uncommented, line_comment
+        return string, line_comment
 
     def parse_value(self, string):
         # values can be either identifiers, record.field or string literals
@@ -360,8 +362,9 @@ class Parser:
         lines_tmp = program.src.split("\n")
         lines = []
         for line in lines_tmp:
-            line = self.remove_comments(line)
-            lines.append(line)
+            line, line_comment = self.remove_comments(line)
+            if not line_comment:
+                lines.append(line)
         # validate the terminator and remove it (or fail)
         lines = self.validate_terminator(lines)
         lines = self.validate_line_content(lines)
