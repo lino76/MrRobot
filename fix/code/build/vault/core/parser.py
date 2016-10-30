@@ -23,10 +23,14 @@ class Parser:
         return s[1:-1]
 
     def validate_terminator(self, lines):
-        terminator_pos = lines.index("***")
-        if terminator_pos == -1: #not found
-            raise Exception(101, "invalid program, missing terminator")
-        return lines[:terminator_pos]
+        for indx, line in enumerate(lines):
+            l = line.strip()
+            try:
+                l.index('***')
+                return lines[:indx]
+            except:
+                pass
+        raise Exception(101, "invalid program, missing terminator")
 
     def validate_line_content(self, lines):
         for line in lines:
