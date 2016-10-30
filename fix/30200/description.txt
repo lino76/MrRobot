@@ -1,0 +1,3 @@
+Description: 30200 exposes a bug where comments after *** should be ignored but were failing the program.
+
+This fix (which builds upon earlier fixes) properly validates program termination now and ignore the comments.
